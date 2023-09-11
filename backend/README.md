@@ -272,3 +272,5 @@ PORT=3001
 3. Deploy the Node.js API to your server (Railway, Render, VPS, etc.)
 4. Set environment variables
 5. Update `FRONTEND_URL` to your deployed frontend URL
+
+<!-- noop: harmless touch -->
