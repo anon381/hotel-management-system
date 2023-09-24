@@ -24,3 +24,5 @@ export default tseslint.config(
     },
   },
 );
+
+// noop: harmless touch
