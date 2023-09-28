@@ -100,3 +100,5 @@ module.exports = function(supabase, requireRole, logActivity) {
 
   return router;
 };
+
+// noop: harmless touch
