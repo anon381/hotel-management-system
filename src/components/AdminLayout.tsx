@@ -14,3 +14,5 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+// noop: harmless touch
