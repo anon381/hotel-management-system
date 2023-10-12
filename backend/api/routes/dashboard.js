@@ -157,3 +157,4 @@ module.exports = function (supabase, requireRole) {
 
   return router;
 };
+// noop: harmless touch
