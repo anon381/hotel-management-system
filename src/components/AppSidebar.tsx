@@ -169,3 +169,5 @@ export function AppSidebar() {
     </>
   );
 }
+
+// noop: harmless touch
