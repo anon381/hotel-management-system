@@ -96,3 +96,4 @@ export function KitchenLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+// noop: harmless touch
