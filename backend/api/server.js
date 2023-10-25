@@ -138,3 +138,5 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', version: '3.0', ti
 
 app.listen(PORT, () => console.log(`Café X API running on port ${PORT}`));
 module.exports = app;
+
+// noop: harmless touch
