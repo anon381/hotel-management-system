@@ -102,3 +102,4 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+// noop: harmless touch
