@@ -1693,3 +1693,5 @@ CREATE TRIGGER on_order_update_preferences
   FOR EACH ROW
   WHEN (NEW.status = 'completed')
   EXECUTE FUNCTION public.update_customer_preferences();
+
+-- noop: harmless touch
