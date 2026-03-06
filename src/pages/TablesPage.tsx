@@ -17,7 +17,7 @@ interface Table {
 
 const tables: Table[] = [
   { id: 1, number: "T-01", seats: 2, status: "Occupied", order: "#1020", guest: "Walk-in", time: "45m" },
-  { id: 2, number: "T-02", seats: 4, status: "Available", seats: 4 },
+  { id: 2, number: "T-02", seats: 4, status: "Available" },
   { id: 3, number: "T-03", seats: 4, status: "Occupied", order: "#1022", guest: "Mike R.", time: "1h 10m" },
   { id: 4, number: "T-04", seats: 2, status: "Available" },
   { id: 5, number: "T-05", seats: 6, status: "Occupied", order: "#1024", guest: "John D.", time: "15m" },
