@@ -242,14 +242,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Transition: Hero → Features */}
-      <div className="relative -mt-16 h-32 sm:h-40 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent" />
-        <svg className="absolute bottom-0 left-0 w-full h-24 sm:h-32" viewBox="0 0 1440 140" preserveAspectRatio="none">
-          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.15)" />
-          <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
-        </svg>
-      </div>
 
       {/* Features */}
       <section id="features" className="pt-10 sm:pt-14 pb-20 sm:pb-32 relative">
