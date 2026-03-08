@@ -824,7 +824,7 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="flex flex-wrap justify-center items-center gap-4 text-sm font-medium text-muted-foreground">
-              {[{ label: "Home", href: "#hero" }, { label: "Our Story", href: "#our-story" }, { label: "Features", href: "#features" }, { label: "How It Works", href: "#how-it-works" }].map((link) => (
+              {[{ label: "Home", href: "#hero" }, { label: "Our Story", href: "#portals" }, { label: "Features", href: "#features" }, { label: "How It Works", href: "#how-it-works" }].map((link) => (
                 <a key={link.label} href={link.href} className="cursor-pointer transition-colors hover:text-primary">
                   {link.label}
                 </a>
