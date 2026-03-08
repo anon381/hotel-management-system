@@ -88,9 +88,10 @@ export default function LandingPage() {
 
           <div className="hidden md:flex items-center gap-1">
             {[
+              { label: "Home", href: "#hero" },
+              { label: "Our Story", href: "#portals" },
               { label: "Features", href: "#features" },
               { label: "How It Works", href: "#how-it-works" },
-              { label: "Our Story", href: "#portals" },
             ].map((link, i) => (
               <motion.a
                 key={link.href}
