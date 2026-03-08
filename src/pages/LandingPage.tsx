@@ -270,7 +270,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
         <div className="absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
-        <div ref={howRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
