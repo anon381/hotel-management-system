@@ -498,11 +498,11 @@ export default function CustomerMenu() {
                 ))}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={skipReservation}
-                  className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors"
+                  className="flex-1 py-2.5 sm:py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors"
                 >
                   Skip · Takeaway
                 </motion.button>
@@ -510,7 +510,7 @@ export default function CustomerMenu() {
                   whileTap={{ scale: 0.95 }}
                   onClick={confirmReservation}
                   disabled={!selectedTable}
-                  className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+                  className={`flex-1 py-2.5 sm:py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
                     selectedTable
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground cursor-not-allowed"
