@@ -128,6 +128,29 @@
 }
 
 @layer components {
+  /* Sidebar custom scrollbar */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.2) transparent;
+  }
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+  }
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.15);
+    border-radius: 9999px;
+    transition: background 0.2s;
+  }
+  .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.35);
+  }
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
   .glass-card {
     @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
     box-shadow: var(--shadow-card);
