@@ -352,24 +352,33 @@ export default function CustomerMenu() {
                   </div>
                 ) : (
                   cart.map((c) => (
-                    <motion.div key={c.name} layout className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                      <span className="text-2xl">{c.emoji}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-foreground truncate">{c.name}</p>
-                        <p className="text-xs text-muted-foreground">${c.price} each</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, -1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-                          <Minus className="w-3 h-3" />
+                    <motion.div key={c.name} layout className="p-3 rounded-xl bg-secondary/50 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{c.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">{c.name}</p>
+                          <p className="text-xs text-muted-foreground">${c.price} each</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, -1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                            <Minus className="w-3 h-3" />
+                          </motion.button>
+                          <span className="text-sm font-bold w-6 text-center text-foreground">{c.quantity}</span>
+                          <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, 1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                            <Plus className="w-3 h-3" />
+                          </motion.button>
+                        </div>
+                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeFromCart(c.name)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                          <X className="w-3 h-3" />
                         </motion.button>
-                        <span className="text-sm font-bold w-6 text-center text-foreground">{c.quantity}</span>
-                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, 1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-                          <Plus className="w-3 h-3" />
-                        </motion.button>
                       </div>
-                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeFromCart(c.name)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
-                        <X className="w-3 h-3" />
-                      </motion.button>
+                      <input
+                        type="text"
+                        placeholder="Special instructions (e.g., no onions, extra sauce)"
+                        value={c.notes}
+                        onChange={(e) => setCart(prev => prev.map(item => item.name === c.name ? { ...item, notes: e.target.value } : item))}
+                        className="w-full h-8 px-3 rounded-lg border border-border/50 bg-background text-xs text-foreground placeholder:text-muted-foreground/60 focus:ring-1 focus:ring-ring outline-none"
+                      />
                     </motion.div>
                   ))
                 )}
