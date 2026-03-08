@@ -29,7 +29,7 @@ const howItWorks = [
 ];
 
 const roles = [
-  { icon: ShieldCheck, title: "Admin Portal", desc: "Full system control — menu, staff, inventory, reports, and user management.", path: "/login/admin", color: "from-primary to-orange-600" },
+  { icon: ShieldCheck, title: "Admin Portal", desc: "Full system control — menu, staff, inventory, reports, and user management.", path: "/login/admin", color: "from-primary to-purple-700" },
   { icon: Users, title: "Customer Portal", desc: "Browse menus, place orders, track history, and earn loyalty rewards.", path: "/login/customer", color: "from-info to-blue-600" },
   { icon: ChefHat, title: "Kitchen Portal", desc: "Real-time order queue, priority management, and preparation tracking.", path: "/login/kitchen", color: "from-success to-emerald-600" },
 ];
