@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingCart, Grid3X3, ChefHat,
   CreditCard, Package, Users, BarChart3, Heart, Bell, Shield,
-  ChevronLeft, ChevronRight, Menu, LogOut
+  ChevronLeft, ChevronRight, Menu, LogOut, Coins
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
