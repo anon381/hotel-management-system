@@ -373,23 +373,23 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Transition: Hero → Features — visible wave + gradient band */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-32" viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave-grad-1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.15" />
-              <stop offset="50%" stopColor="hsl(var(--accent))" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.15" />
-            </linearGradient>
-          </defs>
-          <path d="M0,80 C180,20 360,100 540,40 C720,0 900,80 1080,30 C1260,0 1380,50 1440,80 L1440,120 L0,120 Z" fill="url(#wave-grad-1)" />
-          <path d="M0,100 C360,50 720,90 1080,50 C1260,30 1380,70 1440,100 L1440,120 L0,120 Z" className="fill-background" />
+      {/* Transition: Hero → Features (intense parallax) */}
+      <div className="relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
+        <div className="hero-features-glow absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+
+        <div className="hero-features-layer-back absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
+        <div className="hero-features-layer-mid absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
+        <div className="hero-features-layer-front absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
+
+        <svg className="absolute bottom-0 left-0 w-full h-28 sm:h-36" viewBox="0 0 1440 140" preserveAspectRatio="none">
+          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.22)" />
+          <path d="M0,125 C220,100 380,130 560,110 C760,85 900,125 1120,95 C1260,78 1360,88 1440,100 L1440,140 L0,140 Z" fill="hsl(var(--accent) / 0.20)" />
+          <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
         </svg>
       </div>
 
       {/* Features */}
-      <section id="features" className="py-20 sm:py-32 relative">
+      <section id="features" className="pt-10 sm:pt-14 pb-20 sm:pb-32 relative">
         <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Everything You Need</span>
