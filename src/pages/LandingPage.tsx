@@ -357,17 +357,9 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: Features → How It Works */}
-      <div className="transition-band relative -mt-1">
-        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="28" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
-              <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
-            </linearGradient>
-          </defs>
+      <div className="relative -mt-1">
+        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <path d="M0,0 L0,60 C360,100 720,20 1080,80 C1260,100 1380,40 1440,60 L1440,0 Z" className="fill-background" />
-          <path d="M0,50 C240,80 480,30 720,70 C960,100 1200,50 1440,70 L1440,100 L0,100 Z" fill="url(#wave-grad-2)" />
           <path d="M0,80 C360,50 720,90 1080,60 C1260,50 1380,70 1440,80 L1440,100 L0,100 Z" fill="hsl(var(--muted) / 0.3)" />
         </svg>
       </div>
