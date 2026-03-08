@@ -88,7 +88,8 @@ export default function LandingPage() {
               x: 0, opacity: 1,
               duration: 0.8,
               ease: "power3.out",
-              scrollTrigger: { trigger: step, start: "top 85%", toggleActions: "play none none none" },
+              immediateRender: false,
+              scrollTrigger: { trigger: step, start: "top 98%", toggleActions: "play none none none" },
             }
           );
         });
