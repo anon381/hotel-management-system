@@ -17,6 +17,16 @@ const hourlyOrders = [
   { hour: "8PM", orders: 40 }, { hour: "9PM", orders: 25 }, { hour: "10PM", orders: 12 },
 ];
 
+const topDishes = [
+  { name: "Wagyu Steak", orders: 142 },
+  { name: "Truffle Pasta", orders: 128 },
+  { name: "Grilled Salmon", orders: 115 },
+  { name: "Margherita Pizza", orders: 98 },
+  { name: "Tiramisu", orders: 87 },
+  { name: "Avocado Toast", orders: 76 },
+  { name: "Iced Latte", orders: 65 },
+];
+
 const categoryBreakdown = [
   { name: "Main Course", value: 40, color: "hsl(25, 95%, 53%)" },
   { name: "Drinks", value: 25, color: "hsl(160, 60%, 40%)" },
