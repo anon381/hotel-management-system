@@ -66,11 +66,11 @@ export default function LandingPage() {
     return () => { document.body.style.overflow = ""; };
   }, [sceneReady]);
 
-  // 4-second loader then auto-dismiss
+  // 3-second loader then auto-dismiss
   useEffect(() => {
     if (hasVisited.current) return;
     const start = Date.now();
-    const duration = 4000;
+    const duration = 3000;
     const tick = () => {
       const elapsed = Date.now() - start;
       const p = Math.min((elapsed / duration) * 100, 100);
