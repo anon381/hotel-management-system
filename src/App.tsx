@@ -27,6 +27,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 // Kitchen pages
 import KitchenDashboard from "./pages/kitchen/KitchenDashboard";
 import KitchenOrders from "./pages/kitchen/KitchenOrders";
+import KitchenCreateDish from "./pages/kitchen/KitchenCreateDish";
+import KitchenManageMenu from "./pages/kitchen/KitchenManageMenu";
 import KitchenNotifications from "./pages/kitchen/KitchenNotifications";
 
 // Customer pages
@@ -71,6 +73,8 @@ const App = () => (
             {/* Kitchen */}
             <Route path="/kitchen" element={<KitchenDashboard />} />
             <Route path="/kitchen/orders" element={<KitchenOrders />} />
+            <Route path="/kitchen/create-dish" element={<KitchenCreateDish />} />
+            <Route path="/kitchen/manage-menu" element={<KitchenManageMenu />} />
             <Route path="/kitchen/notifications" element={<KitchenNotifications />} />
 
             {/* Customer */}

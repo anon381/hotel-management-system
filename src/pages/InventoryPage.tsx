@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Package, AlertTriangle, TrendingDown, Plus, Search, Truck } from "lucide-react";
+import { Package, AlertTriangle, TrendingDown, Plus, Search, Truck, Pencil, Trash2 } from "lucide-react";
 import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -83,7 +83,7 @@ export default function InventoryPage() {
                 <th className="text-left p-4">Supplier</th>
                 <th className="text-left p-4">Last Order</th>
                 <th className="text-left p-4">Status</th>
-                <th className="text-right p-4">Action</th>
+                <th className="text-right p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -113,7 +113,14 @@ export default function InventoryPage() {
                     <td className="p-4 text-sm text-muted-foreground">{item.lastOrder}</td>
                     <td className="p-4"><span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${style.bg} ${style.text}`}>{style.label}</span></td>
                     <td className="p-4 text-right">
-                      <motion.button whileTap={{ scale: 0.9 }} className="text-xs font-semibold text-primary hover:underline">Reorder</motion.button>
+                      <div className="flex items-center justify-end gap-2">
+                        <motion.button whileTap={{ scale: 0.9 }} className="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center transition-colors" title="Edit">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </motion.button>
+                        <motion.button whileTap={{ scale: 0.9 }} className="w-8 h-8 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center justify-center transition-colors" title="Delete">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </motion.button>
+                      </div>
                     </td>
                   </motion.tr>
                 );
