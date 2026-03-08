@@ -450,26 +450,45 @@ export default function LandingPage() {
                   {/* Content */}
                   <motion.div
                     className="md:mt-6 flex-1"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.8 + i * 0.35, ease: "easeOut" }}
                     whileHover={{ y: -4 }}
-                    transition={{ duration: 0.3 }}
                   >
-                    <h3 className="font-display font-semibold text-lg text-foreground mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                    <motion.h3 
+                      className="font-display font-semibold text-lg text-foreground mb-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.9 + i * 0.35 }}
+                    >
+                      {item.title}
+                    </motion.h3>
+                    <motion.p 
+                      className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 1.0 + i * 0.35 }}
+                    >
+                      {item.desc}
+                    </motion.p>
                     
                     {/* Completion indicator */}
                     <motion.div
                       className="flex items-center gap-2 mt-4 md:justify-center"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
-                      transition={{ delay: 1.2 + i * 0.35 }}
+                      transition={{ delay: 1.2 + i * 0.35, duration: 0.4 }}
                     >
                       <motion.div
-                        className={`w-5 h-5 rounded-full bg-gradient-to-br ${gradients[i]} flex items-center justify-center opacity-20`}
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
+                        className={`w-5 h-5 rounded-full bg-gradient-to-br ${gradients[i]} flex items-center justify-center`}
+                        initial={{ scale: 0, rotate: -180 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 1.4 + i * 0.35, type: "spring" }}
+                        transition={{ delay: 1.3 + i * 0.35, type: "spring", stiffness: 200 }}
                       >
                         <motion.svg
                           width="12" height="12" viewBox="0 0 12 12" fill="none"
@@ -484,11 +503,19 @@ export default function LandingPage() {
                             initial={{ pathLength: 0 }}
                             whileInView={{ pathLength: 1 }}
                             viewport={{ once: true }}
-                            transition={{ delay: 1.5 + i * 0.35, duration: 0.6 }}
+                            transition={{ delay: 1.4 + i * 0.35, duration: 0.5 }}
                           />
                         </motion.svg>
                       </motion.div>
-                      <span className="text-xs font-medium text-primary">Step {item.step}</span>
+                      <motion.span 
+                        className="text-xs font-medium bg-gradient-to-r from-[hsl(270,80%,60%)] to-[hsl(290,75%,55%)] bg-clip-text text-transparent"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 1.5 + i * 0.35 }}
+                      >
+                        Step {item.step}
+                      </motion.span>
                     </motion.div>
                   </motion.div>
                 </motion.div>
