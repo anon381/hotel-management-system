@@ -245,7 +245,7 @@ export default function CustomerMenu() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-sm bg-background border border-border rounded-2xl p-6 shadow-2xl"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-sm bg-background border border-border rounded-2xl p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <AnimatePresence mode="wait">
                 {!justAdded ? (
@@ -326,15 +326,15 @@ export default function CustomerMenu() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl"
+              className="fixed right-0 top-0 bottom-0 w-full sm:max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl"
             >
-              <div className="flex items-center justify-between p-5 border-b border-border">
+              <div className="flex items-center justify-between p-4 sm:p-5 border-b border-border">
                 <h2 className="font-display font-bold text-lg text-foreground">Your Cart ({cartCount})</h2>
                 <motion.button whileTap={{ scale: 0.9 }} onClick={() => setCartOpen(false)} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
-                  <X className="w-4 h-4" />
+                   <X className="w-4 h-4" />
                 </motion.button>
               </div>
-              <div className="flex-1 overflow-y-auto p-5 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <ShoppingCart className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
@@ -380,7 +380,7 @@ export default function CustomerMenu() {
                   >
                     <Plus className="w-4 h-4" /> Add More Items
                   </motion.button>
-                  <div className="flex justify-between text-sm">
+                <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Total</span>
                     <span className="font-display font-bold text-lg text-foreground">${cartTotal}</span>
                   </div>
@@ -407,7 +407,7 @@ export default function CustomerMenu() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl max-h-[80vh] overflow-y-auto"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-md bg-background border border-border rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
             >
               <h3 className="font-display font-bold text-lg text-foreground mb-4">Checkout</h3>
               <div className="space-y-2 mb-4">
@@ -444,12 +444,12 @@ export default function CustomerMenu() {
         {orderPlaced && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-[60]" />
-            <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="w-full max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+                className="w-full max-w-md bg-background border border-border rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="text-center mb-5">
                 <motion.div
@@ -474,7 +474,7 @@ export default function CustomerMenu() {
               </div>
 
               {/* Table selection */}
-              <div className="space-y-3 mb-5 max-h-48 overflow-y-auto">
+              <div className="space-y-3 mb-4 sm:mb-5 max-h-40 sm:max-h-48 overflow-y-auto">
                 {tableZones.map((zone) => (
                   <div key={zone.zone}>
                     <p className="text-xs font-semibold text-muted-foreground mb-2">{zone.zone} Zone</p>
@@ -484,7 +484,7 @@ export default function CustomerMenu() {
                           key={t}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => setSelectedTable(selectedTable === t ? null : t)}
-                          className={`w-12 h-12 rounded-xl text-xs font-bold flex items-center justify-center transition-colors ${
+                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl text-xs font-bold flex items-center justify-center transition-colors ${
                             selectedTable === t
                               ? "bg-primary text-primary-foreground shadow-lg"
                               : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
@@ -498,11 +498,11 @@ export default function CustomerMenu() {
                 ))}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={skipReservation}
-                  className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors"
+                  className="flex-1 py-2.5 sm:py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors"
                 >
                   Skip · Takeaway
                 </motion.button>
@@ -510,7 +510,7 @@ export default function CustomerMenu() {
                   whileTap={{ scale: 0.95 }}
                   onClick={confirmReservation}
                   disabled={!selectedTable}
-                  className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+                  className={`flex-1 py-2.5 sm:py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
                     selectedTable
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground cursor-not-allowed"
