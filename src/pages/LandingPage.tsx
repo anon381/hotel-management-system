@@ -90,7 +90,7 @@ export default function LandingPage() {
             {[
               { label: "Features", href: "#features" },
               { label: "How It Works", href: "#how-it-works" },
-              { label: "Portals", href: "#portals" },
+              { label: "Our Story", href: "#portals" },
             ].map((link, i) => (
               <motion.a
                 key={link.href}
