@@ -145,7 +145,7 @@ export function AdminSidebar() {
             <motion.aside
               initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 w-[260px] bg-background/40 backdrop-blur-2xl backdrop-saturate-150 border-r border-border/20 z-50 shadow-2xl sidebar-curved"
+              className="lg:hidden fixed left-4 top-4 bottom-4 w-[260px] bg-background/40 backdrop-blur-2xl backdrop-saturate-150 border border-border/20 z-50 shadow-2xl rounded-2xl"
             >
               {sidebarContent}
             </motion.aside>
