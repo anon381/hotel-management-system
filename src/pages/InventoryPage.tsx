@@ -83,7 +83,7 @@ export default function InventoryPage() {
                 <th className="text-left p-4">Supplier</th>
                 <th className="text-left p-4">Last Order</th>
                 <th className="text-left p-4">Status</th>
-                <th className="text-right p-4">Action</th>
+                <th className="text-right p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
