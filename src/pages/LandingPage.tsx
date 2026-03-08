@@ -119,8 +119,7 @@ export default function LandingPage() {
             key="loader"
             exit={{ opacity: 0, scale: 1.08, filter: "blur(10px)" }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden cursor-pointer"
-            onClick={handleDismissLoader}
+            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden"
           >
             {/* Radial gradient bg */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.08)_0%,transparent_70%)]" />
