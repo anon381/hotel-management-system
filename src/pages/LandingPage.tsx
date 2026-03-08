@@ -362,13 +362,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Section Transition: Features → How It Works */}
-      <div className="section-divider relative h-32 sm:h-40 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-muted/30" />
-        <div className="parallax-bg absolute left-[20%] top-1/3 w-24 h-24 bg-primary/8 rounded-full blur-2xl" />
-        <div className="parallax-bg absolute right-[20%] top-2/3 w-32 h-32 bg-accent/6 rounded-full blur-2xl" />
-        <svg className="absolute top-0 left-0 w-full rotate-180" viewBox="0 0 1440 40" preserveAspectRatio="none">
-          <path d="M0,40 C480,0 960,0 1440,40 L1440,40 L0,40 Z" className="fill-background" />
+      {/* Transition: Features → How It Works */}
+      <div className="relative -mt-1">
+        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wave-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
+              <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
+            </linearGradient>
+          </defs>
+          <path d="M0,0 L0,60 C360,100 720,20 1080,80 C1260,100 1380,40 1440,60 L1440,0 Z" className="fill-background" />
+          <path d="M0,50 C240,80 480,30 720,70 C960,100 1200,50 1440,70 L1440,100 L0,100 Z" fill="url(#wave-grad-2)" />
+          <path d="M0,80 C360,50 720,90 1080,60 C1260,50 1380,70 1440,80 L1440,100 L0,100 Z" fill="hsl(var(--muted) / 0.3)" />
         </svg>
       </div>
 
