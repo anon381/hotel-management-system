@@ -52,6 +52,7 @@ function TypingText({ text, className }: { text: string; className?: string }) {
 
 export default function LandingPage() {
   const mainRef = useRef<HTMLDivElement>(null);
+  const [sceneReady, setSceneReady] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
