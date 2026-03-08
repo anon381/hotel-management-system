@@ -104,7 +104,7 @@ export default function LandingPage() {
               duration: 0.9,
               delay: i * 0.15,
               ease: "power3.out",
-              scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none reverse" },
+              scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none none" },
             }
           );
         });
