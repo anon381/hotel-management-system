@@ -105,7 +105,7 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-sidebar-border space-y-3">
+      <div className="p-4 border-t border-border/30 space-y-3">
         <div className="flex justify-center">
           <ThemeToggle />
         </div>
