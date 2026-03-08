@@ -32,10 +32,6 @@ const roles = [
 
 export default function LandingPage() {
   const mainRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLElement>(null);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  const howRef = useRef<HTMLDivElement>(null);
-  const portalsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -62,7 +58,6 @@ export default function LandingPage() {
     <div ref={mainRef} className="min-h-screen bg-background overflow-x-hidden">
       {/* Animated Navbar */}
       <motion.nav
-        ref={navRef}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", damping: 20, stiffness: 120 }}
@@ -158,13 +153,6 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Parallax decorative blobs */}
-        <div className="absolute inset-0 z-[1] pointer-events-none">
-          <div data-speed="1.2" className="parallax-blob absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-          <div data-speed="0.8" className="parallax-blob absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-          <div data-speed="1.5" className="parallax-blob absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
-          <div data-speed="0.6" className="parallax-blob absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
-        </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -254,18 +242,10 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Transition: Hero → Features */}
-      <div className="relative -mt-16 h-32 sm:h-40 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent" />
-        <svg className="absolute bottom-0 left-0 w-full h-24 sm:h-32" viewBox="0 0 1440 140" preserveAspectRatio="none">
-          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.15)" />
-          <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
-        </svg>
-      </div>
 
       {/* Features */}
       <section id="features" className="pt-10 sm:pt-14 pb-20 sm:pb-32 relative">
-        <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Everything You Need</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Powerful Features</h2>
@@ -285,19 +265,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Transition: Features → How It Works */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <path d="M0,0 L0,60 C360,100 720,20 1080,80 C1260,100 1380,40 1440,60 L1440,0 Z" className="fill-background" />
-          <path d="M0,80 C360,50 720,90 1080,60 C1260,50 1380,70 1440,80 L1440,100 L0,100 Z" fill="hsl(var(--muted) / 0.3)" />
-        </svg>
-      </div>
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
         <div className="absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
-        <div ref={howRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
@@ -316,16 +289,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <path d="M0,0 L0,50 C240,80 480,20 720,60 C960,90 1200,30 1440,50 L1440,0 Z" fill="hsl(var(--muted) / 0.3)" />
-          <path d="M0,70 C480,50 960,80 1440,60 L1440,100 L0,100 Z" className="fill-background" />
-        </svg>
-      </div>
 
       {/* Portals */}
       <section id="portals" className="py-20 sm:py-32">
-        <div ref={portalsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Role-Based Access</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Choose Your Portal</h2>
