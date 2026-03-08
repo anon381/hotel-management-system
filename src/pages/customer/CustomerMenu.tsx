@@ -326,7 +326,7 @@ export default function CustomerMenu() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl"
+              className="fixed right-0 top-0 bottom-0 w-full sm:max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl"
             >
               <div className="flex items-center justify-between p-5 border-b border-border">
                 <h2 className="font-display font-bold text-lg text-foreground">Your Cart ({cartCount})</h2>
