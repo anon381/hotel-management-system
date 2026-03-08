@@ -409,14 +409,14 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-8">
               {howItWorks.map((item, i) => {
                 const gradients = [
-                  "from-primary to-accent",
-                  "from-accent to-[hsl(320,60%,50%)]",
-                  "from-[hsl(320,60%,50%)] to-primary",
+                  "from-[hsl(270,80%,60%)] to-[hsl(300,70%,55%)]",
+                  "from-[hsl(290,75%,55%)] to-[hsl(330,80%,60%)]",
+                  "from-[hsl(250,80%,60%)] to-[hsl(280,90%,65%)]",
                 ];
                 const shadowColors = [
-                  "shadow-[0_0_20px_-4px_hsl(var(--primary)/0.4)]",
-                  "shadow-[0_0_20px_-4px_hsl(var(--accent)/0.4)]",
-                  "shadow-[0_0_20px_-4px_hsl(320,60%,50%,0.4)]",
+                  "shadow-[0_0_24px_-2px_hsl(285,75%,58%,0.5)]",
+                  "shadow-[0_0_24px_-2px_hsl(310,78%,58%,0.5)]",
+                  "shadow-[0_0_24px_-2px_hsl(265,85%,63%,0.5)]",
                 ];
                 return (
                 <motion.div
