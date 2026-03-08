@@ -113,22 +113,57 @@ export default function LandingPage() {
         });
       }
 
-      // Parallax background movement
+      // Global decorative parallax
       gsap.to(".parallax-bg", {
-        yPercent: -30,
+        yPercent: -45,
         ease: "none",
         scrollTrigger: {
           trigger: mainRef.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 1,
+          scrub: 1.2,
         },
       });
 
-      // Hero -> Features transition parallax (intense)
+      // Section-level parallax (intense and obvious)
+      const layeredParallax = gsap.utils.toArray<HTMLElement>(".parallax-shift");
+      layeredParallax.forEach((el, i) => {
+        const depth = Number(el.dataset.depth ?? (i % 2 === 0 ? 40 : 28));
+        const parent = el.closest("section, .transition-band") as Element | null;
+
+        gsap.fromTo(
+          el,
+          { yPercent: -depth * 0.35, xPercent: depth * 0.12 },
+          {
+            yPercent: depth,
+            xPercent: -depth * 0.1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: parent || mainRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.15,
+            },
+          }
+        );
+      });
+
+      // Hero -> Features transition parallax (extra intense)
       gsap.to(".hero-features-layer-back", {
-        yPercent: -55,
-        scale: 1.15,
+        yPercent: -85,
+        scale: 1.25,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.4,
+        },
+      });
+
+      gsap.to(".hero-features-layer-mid", {
+        yPercent: -60,
+        xPercent: 24,
         ease: "none",
         scrollTrigger: {
           trigger: "#features",
@@ -138,9 +173,9 @@ export default function LandingPage() {
         },
       });
 
-      gsap.to(".hero-features-layer-mid", {
-        yPercent: -35,
-        xPercent: 12,
+      gsap.to(".hero-features-layer-front", {
+        yPercent: -42,
+        xPercent: -20,
         ease: "none",
         scrollTrigger: {
           trigger: "#features",
@@ -150,28 +185,23 @@ export default function LandingPage() {
         },
       });
 
-      gsap.to(".hero-features-layer-front", {
-        yPercent: -20,
-        xPercent: -10,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 0.8,
-        },
-      });
+      gsap.fromTo(
+        ".hero-features-glow",
+        { opacity: 0.25, scale: 1 },
+        {
+          opacity: 0.95,
+          scale: 1.15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#features",
+            start: "top bottom",
+            end: "top center",
+            scrub: true,
+          },
+        }
+      );
 
-      gsap.fromTo(".hero-features-glow", { opacity: 0.2 }, {
-        opacity: 0.8,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top center",
-          scrub: true,
-        },
-      });
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     }, mainRef);
 
     return () => ctx.revert();
