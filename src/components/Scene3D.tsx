@@ -160,7 +160,7 @@ function IceCream({ position }: { position: [number, number, number] }) {
 }
 
 /* ── Donut ── */
-function Donut({ position, color }: { position: [number, number, number]; color: string }) {
+function Donut({ position }: { position: [number, number, number] }) {
   const ref = useRef<THREE.Mesh>(null);
   useFrame((state) => {
     if (ref.current) {
@@ -173,9 +173,8 @@ function Donut({ position, color }: { position: [number, number, number]; color:
       <group position={position}>
         <mesh ref={ref}>
           <torusGeometry args={[0.5, 0.25, 32, 64]} />
-          <meshStandardMaterial color={color} roughness={0.3} metalness={0.1} />
+          <meshStandardMaterial color="#a855f7" roughness={0.3} metalness={0.1} />
         </mesh>
-        {/* Frosting */}
         <mesh ref={ref} position={[0, 0.05, 0]}>
           <torusGeometry args={[0.5, 0.22, 32, 64]} />
           <meshStandardMaterial color="#f472b6" roughness={0.2} metalness={0.1} />
@@ -185,37 +184,202 @@ function Donut({ position, color }: { position: [number, number, number]; color:
   );
 }
 
-/* ── Cupcake ── */
-function Cupcake({ position }: { position: [number, number, number] }) {
+/* ── Coffee Cup ── */
+function CoffeeCup({ position }: { position: [number, number, number] }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.25;
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.4) * 0.1;
+    }
+  });
+  return (
+    <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1.5}>
+      <group ref={ref} position={position} scale={0.5}>
+        {/* Cup body */}
+        <mesh position={[0, 0, 0]}>
+          <cylinderGeometry args={[0.5, 0.4, 1.2, 32]} />
+          <meshStandardMaterial color="#fef3c7" roughness={0.4} />
+        </mesh>
+        {/* Coffee inside */}
+        <mesh position={[0, 0.5, 0]}>
+          <cylinderGeometry args={[0.48, 0.48, 0.1, 32]} />
+          <meshStandardMaterial color="#5c3317" roughness={0.2} metalness={0.1} />
+        </mesh>
+        {/* Handle */}
+        <mesh position={[0.6, 0.1, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <torusGeometry args={[0.25, 0.06, 16, 32, Math.PI]} />
+          <meshStandardMaterial color="#fef3c7" roughness={0.4} />
+        </mesh>
+        {/* Steam wisps */}
+        {[[0, 0.8, 0], [-0.15, 0.9, 0.1], [0.15, 0.85, -0.1]].map((pos, i) => (
+          <mesh key={i} position={pos as [number, number, number]} scale={[0.06, 0.2, 0.06]}>
+            <sphereGeometry args={[1, 8, 8]} />
+            <meshStandardMaterial color="#ffffff" transparent opacity={0.3} roughness={0.1} />
+          </mesh>
+        ))}
+      </group>
+    </Float>
+  );
+}
+
+/* ── Croissant ── */
+function Croissant({ position }: { position: [number, number, number] }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.3;
+      ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.35) * 0.1;
+    }
+  });
+  return (
+    <Float speed={1.8} rotationIntensity={0.8} floatIntensity={2}>
+      <group ref={ref} position={position} scale={0.45} rotation={[0.2, 0, 0.3]}>
+        {/* Crescent body using torus segment */}
+        <mesh>
+          <torusGeometry args={[0.7, 0.3, 16, 32, Math.PI * 0.7]} />
+          <meshStandardMaterial color="#d4920a" roughness={0.6} />
+        </mesh>
+        {/* Layers/ridges */}
+        {[0, 0.4, 0.8, 1.2].map((angle, i) => (
+          <mesh key={i} position={[Math.cos(angle) * 0.7, Math.sin(angle) * 0.7, 0]} rotation={[0, 0, angle]} scale={[0.35, 0.08, 0.25]}>
+            <sphereGeometry args={[1, 8, 8]} />
+            <meshStandardMaterial color="#b8860b" roughness={0.7} />
+          </mesh>
+        ))}
+        {/* Glaze sheen */}
+        <mesh position={[0, 0.1, 0.15]}>
+          <torusGeometry args={[0.68, 0.15, 8, 32, Math.PI * 0.7]} />
+          <meshStandardMaterial color="#f59e0b" roughness={0.2} metalness={0.2} transparent opacity={0.5} />
+        </mesh>
+      </group>
+    </Float>
+  );
+}
+
+/* ── Sushi Roll ── */
+function SushiRoll({ position }: { position: [number, number, number] }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.4;
+      ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.08;
+    }
+  });
+  return (
+    <Float speed={2.2} rotationIntensity={0.7} floatIntensity={1.8}>
+      <group ref={ref} position={position} scale={0.5} rotation={[Math.PI / 2, 0, 0]}>
+        {/* Nori wrap */}
+        <mesh>
+          <cylinderGeometry args={[0.5, 0.5, 0.6, 32]} />
+          <meshStandardMaterial color="#1a1a2e" roughness={0.8} />
+        </mesh>
+        {/* Rice ring */}
+        <mesh position={[0, 0.31, 0]}>
+          <cylinderGeometry args={[0.48, 0.48, 0.02, 32]} />
+          <meshStandardMaterial color="#fefce8" roughness={0.3} />
+        </mesh>
+        {/* Salmon center */}
+        <mesh position={[0, 0.3, 0]}>
+          <cylinderGeometry args={[0.25, 0.25, 0.05, 32]} />
+          <meshStandardMaterial color="#fb923c" roughness={0.4} />
+        </mesh>
+        {/* Avocado */}
+        <mesh position={[0.15, 0.3, 0.15]}>
+          <cylinderGeometry args={[0.1, 0.1, 0.05, 16]} />
+          <meshStandardMaterial color="#4ade80" roughness={0.5} />
+        </mesh>
+        {/* Cucumber */}
+        <mesh position={[-0.15, 0.3, -0.1]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.05, 16]} />
+          <meshStandardMaterial color="#22c55e" roughness={0.5} />
+        </mesh>
+      </group>
+    </Float>
+  );
+}
+
+/* ── Cake Slice ── */
+function CakeSlice({ position }: { position: [number, number, number] }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.2;
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.45) * 0.1;
+    }
+  });
+
+  const sliceShape = useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(0, 0);
+    s.lineTo(1, -0.5);
+    s.quadraticCurveTo(1.05, 0, 1, 0.5);
+    s.lineTo(0, 0);
+    return s;
+  }, []);
+
+  return (
+    <Float speed={1.6} rotationIntensity={0.6} floatIntensity={1.5}>
+      <group ref={ref} position={position} scale={0.5}>
+        {/* Bottom layer */}
+        <mesh position={[0, -0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <extrudeGeometry args={[sliceShape, { depth: 0.4, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02 }]} />
+          <meshStandardMaterial color="#f9a8d4" roughness={0.4} />
+        </mesh>
+        {/* Cream layer */}
+        <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <extrudeGeometry args={[sliceShape, { depth: 0.08, bevelEnabled: false }]} />
+          <meshStandardMaterial color="#fefce8" roughness={0.2} />
+        </mesh>
+        {/* Top layer */}
+        <mesh position={[0, 0.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <extrudeGeometry args={[sliceShape, { depth: 0.35, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02 }]} />
+          <meshStandardMaterial color="#c084fc" roughness={0.4} />
+        </mesh>
+        {/* Strawberry on top */}
+        <mesh position={[0.5, 0.65, 0]}>
+          <sphereGeometry args={[0.12, 16, 16]} />
+          <meshStandardMaterial color="#ef4444" roughness={0.3} />
+        </mesh>
+      </group>
+    </Float>
+  );
+}
+
+/* ── Hot Dog ── */
+function HotDog({ position }: { position: [number, number, number] }) {
   const ref = useRef<THREE.Group>(null);
   useFrame((state) => {
     if (ref.current) {
       ref.current.rotation.y = state.clock.elapsedTime * 0.35;
-      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.12;
+      ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.4) * 0.12;
     }
   });
   return (
-    <Float speed={2} rotationIntensity={0.6} floatIntensity={1.8}>
-      <group ref={ref} position={position} scale={0.5}>
-        {/* Cup */}
-        <mesh position={[0, -0.3, 0]}>
-          <cylinderGeometry args={[0.45, 0.35, 0.6, 32]} />
-          <meshStandardMaterial color="#a855f7" roughness={0.5} />
+    <Float speed={2} rotationIntensity={0.9} floatIntensity={2}>
+      <group ref={ref} position={position} scale={0.45} rotation={[0, 0, 0.3]}>
+        {/* Bottom bun */}
+        <mesh position={[0, -0.1, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <capsuleGeometry args={[0.25, 1.2, 16, 32]} />
+          <meshStandardMaterial color="#d4920a" roughness={0.6} />
         </mesh>
-        {/* Frosting */}
-        <mesh position={[0, 0.2, 0]}>
-          <sphereGeometry args={[0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshStandardMaterial color="#f472b6" roughness={0.3} />
+        {/* Sausage */}
+        <mesh position={[0, 0.05, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <capsuleGeometry args={[0.15, 1.1, 16, 32]} />
+          <meshStandardMaterial color="#b45309" roughness={0.5} />
         </mesh>
-        <mesh position={[0, 0.45, 0]}>
-          <sphereGeometry args={[0.3, 32, 32]} />
-          <meshStandardMaterial color="#e879f9" roughness={0.3} />
-        </mesh>
-        {/* Sprinkles */}
-        {[[0.15, 0.5, 0.2], [-0.2, 0.45, -0.15], [0.05, 0.55, -0.2]].map((pos, i) => (
-          <mesh key={i} position={pos as [number, number, number]} scale={[0.04, 0.12, 0.04]}>
-            <cylinderGeometry args={[1, 1, 1, 6]} />
-            <meshStandardMaterial color={["#fbbf24", "#34d399", "#60a5fa"][i]} />
+        {/* Mustard zigzag */}
+        {[-0.4, -0.2, 0, 0.2, 0.4].map((x, i) => (
+          <mesh key={i} position={[x, 0.2, (i % 2 === 0 ? 0.05 : -0.05)]} scale={[0.08, 0.04, 0.08]}>
+            <sphereGeometry args={[1, 8, 8]} />
+            <meshStandardMaterial color="#fbbf24" roughness={0.3} />
+          </mesh>
+        ))}
+        {/* Ketchup */}
+        {[-0.3, -0.1, 0.1, 0.3].map((x, i) => (
+          <mesh key={i} position={[x, 0.18, (i % 2 === 0 ? -0.04 : 0.04)]} scale={[0.06, 0.03, 0.06]}>
+            <sphereGeometry args={[1, 8, 8]} />
+            <meshStandardMaterial color="#ef4444" roughness={0.3} />
           </mesh>
         ))}
       </group>
@@ -257,19 +421,19 @@ export function HeroScene() {
         <pointLight position={[-6, -3, -5]} intensity={0.6} color="#a855f7" />
         <pointLight position={[6, 4, 2]} intensity={0.4} color="#e879f9" />
         <pointLight position={[0, -2, 4]} intensity={0.3} color="#c084fc" />
-        {/* Center area */}
-        <Burger position={[-2, 0.5, 0]} />
+        {/* Center */}
+        <Burger position={[-1.8, 0.5, 0]} />
         <IceCream position={[0, -1.2, 1]} />
-        <PizzaSlice position={[2.2, 0.8, -1]} />
-        {/* Far left */}
-        <Donut position={[-4.5, 1.5, -1.5]} color="#a855f7" />
-        <Cupcake position={[-4, -1.2, 0.5]} />
-        {/* Far right */}
-        <Donut position={[4.5, -0.5, -1]} color="#e879f9" />
-        <Cupcake position={[4.2, 1.8, -0.5]} />
-        {/* Extra depth items */}
-        <Donut position={[-3, 2.5, -3]} color="#c084fc" />
-        <Donut position={[3.5, -2, -2.5]} color="#d946ef" />
+        <PizzaSlice position={[2, 0.8, -1]} />
+        {/* Left side */}
+        <Donut position={[-4.5, 1.5, -1.5]} />
+        <CoffeeCup position={[-4, -1, 0.5]} />
+        {/* Right side */}
+        <Croissant position={[4.5, -0.3, -1]} />
+        <SushiRoll position={[4.2, 1.8, -0.5]} />
+        {/* Corners */}
+        <CakeSlice position={[-3, 2.5, -3]} />
+        <HotDog position={[3.5, -2, -2]} />
         <FoodParticles />
         <Environment preset="city" />
       </Canvas>
