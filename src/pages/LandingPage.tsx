@@ -237,73 +237,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-
-      {/* Features */}
-      <section id="features" className="pt-10 sm:pt-14 pb-20 sm:pb-32 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Everything You Need</span>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Powerful Features</h2>
-            <p className="text-muted-foreground mt-3 max-w-xl mx-auto">Every module designed to streamline your restaurant operations.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.25 } }}
-                className="glass-card-elevated p-6 group hover:border-primary/30 transition-colors duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-default"
-              >
-                <motion.div
-                  className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300"
-                  whileHover={{ scale: 1.15, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                >
-                  <f.icon className="w-6 h-6 text-primary" />
-                </motion.div>
-                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-                <motion.div
-                  className="h-0.5 bg-gradient-to-r from-primary/60 to-accent/40 rounded-full mt-4 origin-left"
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
-        <div className="absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {howItWorks.map((h, i) => (
-              <div key={h.step} data-delay={i * 150} className="animate-on-scroll step-card text-center">
-                <div className="w-16 h-16 rounded-2xl gradient-warm text-primary-foreground font-display font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  {h.step}
-                </div>
-                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{h.title}</h3>
-                <p className="text-sm text-muted-foreground">{h.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
       {/* Our Story Timeline */}
       <section id="portals" className="py-20 sm:py-32 relative overflow-hidden">
         <div className="absolute top-1/4 -left-20 w-60 h-60 bg-primary/5 rounded-full blur-3xl" />
@@ -386,6 +319,48 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Features */}
+      <section id="features" className="pt-10 sm:pt-14 pb-20 sm:pb-32 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Everything You Need</span>
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Powerful Features</h2>
+            <p className="text-muted-foreground mt-3 max-w-xl mx-auto">Every module designed to streamline your restaurant operations.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.25 } }}
+                className="glass-card-elevated p-6 group hover:border-primary/30 transition-colors duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-default"
+              >
+                <motion.div
+                  className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300"
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <f.icon className="w-6 h-6 text-primary" />
+                </motion.div>
+                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                <motion.div
+                  className="h-0.5 bg-gradient-to-r from-primary/60 to-accent/40 rounded-full mt-4 origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       {/* Footer */}
       <footer className="py-10 border-t border-border/50 bg-muted/20">
