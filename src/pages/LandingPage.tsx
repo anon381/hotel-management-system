@@ -169,6 +169,7 @@ export default function LandingPage() {
           scrub: true,
         },
       });
+    }, mainRef);
 
     return () => ctx.revert();
   }, []);
