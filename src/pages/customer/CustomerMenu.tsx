@@ -245,7 +245,7 @@ export default function CustomerMenu() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-sm bg-background border border-border rounded-2xl p-6 shadow-2xl"
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-sm bg-background border border-border rounded-2xl p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <AnimatePresence mode="wait">
                 {!justAdded ? (
