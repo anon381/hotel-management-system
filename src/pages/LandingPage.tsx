@@ -61,7 +61,7 @@ export default function LandingPage() {
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", damping: 20, stiffness: 120 }}
-        className="fixed top-4 left-4 right-4 z-50 bg-background/60 backdrop-blur-xl border border-border/30 rounded-2xl"
+        className="fixed top-4 left-4 right-4 z-50 bg-background/40 backdrop-blur-2xl backdrop-saturate-150 border border-border/20 rounded-2xl shadow-[0_8px_32px_-8px_hsl(var(--foreground)/0.08),0_2px_8px_-2px_hsl(var(--foreground)/0.04)]"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <motion.div
