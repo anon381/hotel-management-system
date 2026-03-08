@@ -87,30 +87,47 @@ export default function ReportsPage() {
         </motion.div>
       </div>
 
-      {/* Category Breakdown */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card-elevated p-5">
-        <h3 className="font-display font-semibold text-foreground mb-4">Sales by Category</h3>
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <ResponsiveContainer width={200} height={200}>
-            <PieChart>
-              <Pie data={categoryBreakdown} dataKey="value" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3}>
-                {categoryBreakdown.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="flex-1 space-y-3">
-            {categoryBreakdown.map((cat) => (
-              <div key={cat.name} className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                <span className="text-sm text-foreground flex-1">{cat.name}</span>
-                <span className="text-sm font-semibold text-foreground">{cat.value}%</span>
-              </div>
-            ))}
+      {/* Bottom row: two charts side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Category Breakdown */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card-elevated p-5">
+          <h3 className="font-display font-semibold text-foreground mb-4">Sales by Category</h3>
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <ResponsiveContainer width={200} height={200}>
+              <PieChart>
+                <Pie data={categoryBreakdown} dataKey="value" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3}>
+                  {categoryBreakdown.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex-1 space-y-3">
+              {categoryBreakdown.map((cat) => (
+                <div key={cat.name} className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
+                  <span className="text-sm text-foreground flex-1">{cat.name}</span>
+                  <span className="text-sm font-semibold text-foreground">{cat.value}%</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+
+        {/* Top Dishes Chart */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-card-elevated p-5">
+          <h3 className="font-display font-semibold text-foreground mb-4">Top Selling Dishes</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={topDishes} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis type="number" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "0.75rem", fontSize: 12 }} />
+              <Bar dataKey="orders" fill="hsl(280, 60%, 50%)" radius={[0, 6, 6, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
+      </div>
     </AppLayout>
   );
 }
