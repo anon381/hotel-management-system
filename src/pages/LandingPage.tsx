@@ -168,14 +168,83 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* Hero - Full screen 3D */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16">
+      <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
         {/* 3D Scene - full coverage */}
         <div className="absolute inset-0 z-0">
           <HeroScene />
         </div>
 
+        {/* Left edge floating orbs */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-40 lg:w-56 z-[1] pointer-events-none">
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={`l${i}`}
+              className="absolute rounded-full bg-primary/10 border border-primary/10 backdrop-blur-sm"
+              style={{
+                width: 30 + i * 18,
+                height: 30 + i * 18,
+                left: 8 + (i % 3) * 20,
+                top: `${15 + i * 16}%`,
+              }}
+              animate={{
+                y: [0, -20 - i * 5, 0],
+                x: [0, 8, 0],
+                opacity: [0.25, 0.5, 0.25],
+                scale: [1, 1.08, 1],
+              }}
+              transition={{
+                duration: 4 + i * 0.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.4,
+              }}
+            />
+          ))}
+          {/* Vertical glow line */}
+          <motion.div
+            className="absolute left-6 sm:left-10 top-[10%] bottom-[10%] w-px"
+            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--primary) / 0.3), transparent)" }}
+            animate={{ opacity: [0.2, 0.6, 0.2] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+        </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Right edge floating orbs */}
+        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-40 lg:w-56 z-[1] pointer-events-none">
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={`r${i}`}
+              className="absolute rounded-full bg-accent/10 border border-accent/10 backdrop-blur-sm"
+              style={{
+                width: 24 + i * 20,
+                height: 24 + i * 20,
+                right: 10 + (i % 3) * 18,
+                top: `${20 + i * 15}%`,
+              }}
+              animate={{
+                y: [0, 18 + i * 4, 0],
+                x: [0, -10, 0],
+                opacity: [0.2, 0.45, 0.2],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                duration: 5 + i * 0.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.5,
+              }}
+            />
+          ))}
+          {/* Vertical glow line */}
+          <motion.div
+            className="absolute right-6 sm:right-10 top-[10%] bottom-[10%] w-px"
+            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--accent) / 0.3), transparent)" }}
+            animate={{ opacity: [0.2, 0.6, 0.2] }}
+            transition={{ duration: 3.5, repeat: Infinity }}
+          />
+        </div>
+
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -196,10 +265,9 @@ export default function LandingPage() {
                 Café X
               </motion.span>
             </h1>
-            <TypingText
-              text="A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role."
-              className="text-xl sm:text-2xl text-foreground max-w-2xl mx-auto mb-8 [text-shadow:_0_1px_2px_hsl(var(--foreground)/0.15)]"
-            />
+            <p className="text-xl sm:text-2xl text-foreground max-w-2xl mx-auto mb-8 [text-shadow:_0_1px_2px_hsl(var(--foreground)/0.15)]">
+              A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role.
+            </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login/admin">
                 <motion.button
