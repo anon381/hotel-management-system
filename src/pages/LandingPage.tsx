@@ -226,11 +226,15 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Parallax decorative blobs */}
-        <div className="parallax-bg absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-info/5 rounded-full blur-3xl" />
+        {/* Parallax decorative blobs - fill edges */}
+        <div className="parallax-bg absolute inset-0 z-[1] pointer-events-none">
+          <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
+          <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]" />
+          <div className="absolute top-[15%] right-[15%] w-40 h-40 bg-accent/10 rounded-full blur-2xl" />
+          <div className="absolute bottom-[10%] left-[15%] w-48 h-48 bg-primary/8 rounded-full blur-2xl" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

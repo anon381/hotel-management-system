@@ -185,13 +185,51 @@ function Donut({ position, color }: { position: [number, number, number]; color:
   );
 }
 
+/* ── Cupcake ── */
+function Cupcake({ position }: { position: [number, number, number] }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.35;
+      ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.12;
+    }
+  });
+  return (
+    <Float speed={2} rotationIntensity={0.6} floatIntensity={1.8}>
+      <group ref={ref} position={position} scale={0.5}>
+        {/* Cup */}
+        <mesh position={[0, -0.3, 0]}>
+          <cylinderGeometry args={[0.45, 0.35, 0.6, 32]} />
+          <meshStandardMaterial color="#a855f7" roughness={0.5} />
+        </mesh>
+        {/* Frosting */}
+        <mesh position={[0, 0.2, 0]}>
+          <sphereGeometry args={[0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color="#f472b6" roughness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.45, 0]}>
+          <sphereGeometry args={[0.3, 32, 32]} />
+          <meshStandardMaterial color="#e879f9" roughness={0.3} />
+        </mesh>
+        {/* Sprinkles */}
+        {[[0.15, 0.5, 0.2], [-0.2, 0.45, -0.15], [0.05, 0.55, -0.2]].map((pos, i) => (
+          <mesh key={i} position={pos as [number, number, number]} scale={[0.04, 0.12, 0.04]}>
+            <cylinderGeometry args={[1, 1, 1, 6]} />
+            <meshStandardMaterial color={["#fbbf24", "#34d399", "#60a5fa"][i]} />
+          </mesh>
+        ))}
+      </group>
+    </Float>
+  );
+}
+
 /* ── Particles (food sparkle) ── */
 function FoodParticles() {
   const ref = useRef<THREE.Points>(null);
   const positions = useMemo(() => {
-    const arr = new Float32Array(150 * 3);
-    for (let i = 0; i < 150 * 3; i++) {
-      arr[i] = (Math.random() - 0.5) * 15;
+    const arr = new Float32Array(200 * 3);
+    for (let i = 0; i < 200 * 3; i++) {
+      arr[i] = (Math.random() - 0.5) * 20;
     }
     return arr;
   }, []);
@@ -205,7 +243,7 @@ function FoodParticles() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial size={0.03} color="#f97316" transparent opacity={0.5} sizeAttenuation />
+      <pointsMaterial size={0.035} color="#a855f7" transparent opacity={0.5} sizeAttenuation />
     </points>
   );
 }
@@ -213,15 +251,25 @@ function FoodParticles() {
 export function HeroScene() {
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas camera={{ position: [0, 0, 7], fov: 55 }}>
+      <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} />
-        <pointLight position={[-5, -3, -5]} intensity={0.5} color="#f97316" />
-        <pointLight position={[3, 4, 2]} intensity={0.3} color="#f472b6" />
-        <Burger position={[-2.8, 0.5, 0]} />
-        <PizzaSlice position={[2.8, 0.8, -1]} />
-        <IceCream position={[0, -1, 1]} />
-        <Donut position={[-1, 2, -2]} color="#d4920a" />
+        <pointLight position={[-6, -3, -5]} intensity={0.6} color="#a855f7" />
+        <pointLight position={[6, 4, 2]} intensity={0.4} color="#e879f9" />
+        <pointLight position={[0, -2, 4]} intensity={0.3} color="#c084fc" />
+        {/* Center area */}
+        <Burger position={[-2, 0.5, 0]} />
+        <IceCream position={[0, -1.2, 1]} />
+        <PizzaSlice position={[2.2, 0.8, -1]} />
+        {/* Far left */}
+        <Donut position={[-4.5, 1.5, -1.5]} color="#a855f7" />
+        <Cupcake position={[-4, -1.2, 0.5]} />
+        {/* Far right */}
+        <Donut position={[4.5, -0.5, -1]} color="#e879f9" />
+        <Cupcake position={[4.2, 1.8, -0.5]} />
+        {/* Extra depth items */}
+        <Donut position={[-3, 2.5, -3]} color="#c084fc" />
+        <Donut position={[3.5, -2, -2.5]} color="#d946ef" />
         <FoodParticles />
         <Environment preset="city" />
       </Canvas>
