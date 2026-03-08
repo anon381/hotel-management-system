@@ -156,7 +156,7 @@ export default function LandingPage() {
             <div>
               <span className="font-display font-bold text-lg text-foreground">Café X</span>
               <motion.div
-                className="h-0.5 bg-gradient-to-r from-primary to-orange-500 rounded-full"
+                className="h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
