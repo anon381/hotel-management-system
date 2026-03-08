@@ -74,7 +74,7 @@ function KitchenSidebar() {
           </>
         )}
       </AnimatePresence>
-      <motion.aside animate={{ width: collapsed ? 72 : 260 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="hidden lg:block fixed left-0 top-0 bottom-0 bg-sidebar z-30 border-r border-sidebar-border overflow-hidden">
+      <motion.aside animate={{ width: collapsed ? 72 : 260 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="hidden lg:block fixed left-0 top-0 bottom-0 bg-sidebar z-30 border-r border-sidebar-border overflow-hidden sidebar-curved shadow-xl">
         {content}
       </motion.aside>
       <motion.div animate={{ width: collapsed ? 72 : 260 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="hidden lg:block flex-shrink-0" />

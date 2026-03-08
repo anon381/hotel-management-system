@@ -23,9 +23,9 @@ const features = [
 ];
 
 const howItWorks = [
-  { step: "01", title: "Sign In", desc: "Each role gets a tailored interface — Admin, Kitchen Staff, or Customer." },
-  { step: "02", title: "Manage Everything", desc: "From menus to orders, tables to inventory — all from one unified system." },
-  { step: "03", title: "Track & Optimize", desc: "Real-time analytics help you make data-driven decisions for growth." },
+  { step: "01", title: "Browse Menu", desc: "Explore our curated menu with rich descriptions, photos, and ratings to find your perfect dish." },
+  { step: "02", title: "Choose a Table", desc: "View available tables across zones — Window, Patio, VIP — and reserve your favorite spot." },
+  { step: "03", title: "Complete Order", desc: "Add items to your cart, customize your meal, and confirm your order for dine-in or takeaway." },
 ];
 
 const roles = [
