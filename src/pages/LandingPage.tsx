@@ -60,146 +60,68 @@ export default function LandingPage() {
         },
       });
 
-      // Features parallax
+      // Features cards - simple fade up
       if (featuresRef.current) {
         const cards = featuresRef.current.querySelectorAll(".feature-card");
         cards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { y: 80, opacity: 0, scale: 0.9 },
-            {
-              y: 0, opacity: 1, scale: 1,
-              duration: 0.8,
-              delay: i * 0.1,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: { trigger: card, start: "top 98%", toggleActions: "play none none none" },
-            }
-          );
+          gsap.set(card, { y: 60, opacity: 0 });
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top 90%",
+            onEnter: () => {
+              gsap.to(card, { y: 0, opacity: 1, duration: 0.7, delay: i * 0.08, ease: "power2.out" });
+            },
+            once: true,
+          });
         });
       }
 
-      // How it works parallax
+      // How it works steps
       if (howRef.current) {
         const steps = howRef.current.querySelectorAll(".step-card");
         steps.forEach((step, i) => {
-          gsap.fromTo(step,
-            { x: i % 2 === 0 ? -60 : 60, opacity: 0 },
-            {
-              x: 0, opacity: 1,
-              duration: 0.8,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: { trigger: step, start: "top 98%", toggleActions: "play none none none" },
-            }
-          );
+          gsap.set(step, { y: 50, opacity: 0 });
+          ScrollTrigger.create({
+            trigger: step,
+            start: "top 90%",
+            onEnter: () => {
+              gsap.to(step, { y: 0, opacity: 1, duration: 0.7, delay: i * 0.12, ease: "power2.out" });
+            },
+            once: true,
+          });
         });
       }
 
-      // Portals scale-in
+      // Portal cards
       if (portalsRef.current) {
         const portalCards = portalsRef.current.querySelectorAll(".portal-card");
         portalCards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { y: 100, opacity: 0, rotateX: 15 },
-            {
-              y: 0, opacity: 1, rotateX: 0,
-              duration: 0.9,
-              delay: i * 0.15,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: { trigger: card, start: "top 98%", toggleActions: "play none none none" },
-            }
-          );
+          gsap.set(card, { y: 60, opacity: 0 });
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top 90%",
+            onEnter: () => {
+              gsap.to(card, { y: 0, opacity: 1, duration: 0.8, delay: i * 0.12, ease: "power2.out" });
+            },
+            once: true,
+          });
         });
       }
 
-      // Global decorative parallax
-      gsap.to(".parallax-bg", {
-        yPercent: -45,
-        ease: "none",
-        scrollTrigger: {
-          trigger: mainRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1.2,
-        },
-      });
-
-      // Section-level parallax (intense and obvious)
-      const layeredParallax = gsap.utils.toArray<HTMLElement>(".parallax-shift");
-      layeredParallax.forEach((el, i) => {
-        const depth = Number(el.dataset.depth ?? (i % 2 === 0 ? 40 : 28));
-        const parent = el.closest("section, .transition-band") as Element | null;
-
-        gsap.fromTo(
-          el,
-          { yPercent: -depth * 0.35, xPercent: depth * 0.12 },
-          {
-            yPercent: depth,
-            xPercent: -depth * 0.1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: parent || mainRef.current,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.15,
-            },
-          }
-        );
-      });
-
-      // Hero -> Features transition parallax (extra intense)
-      gsap.to(".hero-features-layer-back", {
-        yPercent: -85,
-        scale: 1.25,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 1.4,
-        },
-      });
-
-      gsap.to(".hero-features-layer-mid", {
-        yPercent: -60,
-        xPercent: 24,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 1.2,
-        },
-      });
-
-      gsap.to(".hero-features-layer-front", {
-        yPercent: -42,
-        xPercent: -20,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 1,
-        },
-      });
-
-      gsap.fromTo(
-        ".hero-features-glow",
-        { opacity: 0.25, scale: 1 },
-        {
-          opacity: 0.95,
-          scale: 1.15,
+      // Simple parallax on decorative blobs
+      gsap.utils.toArray<HTMLElement>(".parallax-blob").forEach((el) => {
+        const speed = Number(el.dataset.speed ?? 0.3);
+        gsap.to(el, {
+          yPercent: -30 * speed,
           ease: "none",
           scrollTrigger: {
-            trigger: "#features",
-            start: "top bottom",
-            end: "top center",
-            scrub: true,
+            trigger: mainRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1,
           },
-        }
-      );
+        });
+      });
 
       requestAnimationFrame(() => ScrollTrigger.refresh());
     }, mainRef);
