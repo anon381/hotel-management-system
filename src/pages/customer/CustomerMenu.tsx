@@ -58,9 +58,11 @@ export default function CustomerMenu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [quantityModal, setQuantityModal] = useState<{ name: string; emoji: string; price: number } | null>(null);
   const [tempQty, setTempQty] = useState(1);
-  const [wantReserve, setWantReserve] = useState(false);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [justAdded, setJustAdded] = useState<string | null>(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderSummary, setOrderSummary] = useState<{ count: number; total: number } | null>(null);
 
   const toggleFavorite = (name: string) => {
     setFavorites((prev) => {
