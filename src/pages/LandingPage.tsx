@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -24,6 +24,31 @@ const howItWorks = [
   { step: "03", title: "Complete Order", desc: "Add items to your cart, customize your meal, and confirm your order for dine-in or takeaway." },
 ];
 
+function TypingText({ text, className }: { text: string; className?: string }) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setDisplayed(text.slice(0, i + 1));
+        i++;
+      } else {
+        setDone(true);
+        clearInterval(interval);
+      }
+    }, 28);
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return (
+    <p className={className}>
+      {displayed}
+      {!done && <span className="inline-block w-0.5 h-5 bg-primary ml-0.5 animate-pulse align-middle" />}
+    </p>
+  );
+}
 
 export default function LandingPage() {
   const mainRef = useRef<HTMLDivElement>(null);
@@ -171,9 +196,10 @@ export default function LandingPage() {
                 Café X
               </motion.span>
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role.
-            </p>
+            <TypingText
+              text="A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role."
+              className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-8"
+            />
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login/admin">
                 <motion.button
