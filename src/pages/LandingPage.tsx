@@ -371,7 +371,7 @@ export default function LandingPage() {
       <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
         {/* 3D Scene - full coverage */}
         <div className="absolute inset-0 z-0">
-          <HeroScene />
+          <HeroScene onReady={() => setThreeReady(true)} />
         </div>
 
         {/* Left edge floating food emojis */}
