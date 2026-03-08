@@ -415,25 +415,29 @@ function FoodParticles() {
 export function HeroScene() {
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
+      <Canvas camera={{ position: [0, 0, 9], fov: 70 }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} />
-        <pointLight position={[-6, -3, -5]} intensity={0.6} color="#a855f7" />
-        <pointLight position={[6, 4, 2]} intensity={0.4} color="#e879f9" />
+        <pointLight position={[-8, -3, -5]} intensity={0.6} color="#a855f7" />
+        <pointLight position={[8, 4, 2]} intensity={0.4} color="#e879f9" />
         <pointLight position={[0, -2, 4]} intensity={0.3} color="#c084fc" />
         {/* Center */}
-        <Burger position={[-1.8, 0.5, 0]} />
+        <Burger position={[-1.5, 0.5, 0]} />
         <IceCream position={[0, -1.2, 1]} />
-        <PizzaSlice position={[2, 0.8, -1]} />
-        {/* Left side */}
-        <Donut position={[-4.5, 1.5, -1.5]} />
-        <CoffeeCup position={[-4, -1, 0.5]} />
-        {/* Right side */}
-        <Croissant position={[4.5, -0.3, -1]} />
-        <SushiRoll position={[4.2, 1.8, -0.5]} />
-        {/* Corners */}
-        <CakeSlice position={[-3, 2.5, -3]} />
-        <HotDog position={[3.5, -2, -2]} />
+        <PizzaSlice position={[1.8, 0.8, -1]} />
+        {/* Left edge */}
+        <Donut position={[-6, 1.5, -1]} />
+        <CoffeeCup position={[-5.5, -1.5, 0.5]} />
+        <CakeSlice position={[-7, 0, -2]} />
+        {/* Right edge */}
+        <Croissant position={[6, -0.3, -1]} />
+        <SushiRoll position={[5.5, 2, -0.5]} />
+        <HotDog position={[7, -1, -2]} />
+        {/* Extra far edges for ultrawide */}
+        <Burger position={[-8.5, -0.5, -3]} />
+        <PizzaSlice position={[8.5, 1, -3]} />
+        <IceCream position={[-7.5, 2.5, -2.5]} />
+        <Croissant position={[7.5, -2.5, -2.5]} />
         <FoodParticles />
         <Environment preset="city" />
       </Canvas>

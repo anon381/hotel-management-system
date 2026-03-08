@@ -325,6 +325,19 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* Section Transition: Hero → Features */}
+      <div className="section-divider relative h-32 sm:h-48 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
+        <div className="parallax-bg absolute left-[10%] top-1/2 -translate-y-1/2 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
+        <div className="parallax-bg absolute right-[10%] top-1/2 -translate-y-1/2 w-40 h-40 bg-accent/8 rounded-full blur-2xl" />
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
+          <div className="w-px h-16 bg-gradient-to-b from-transparent via-primary/30 to-transparent mx-auto" />
+        </div>
+        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,60 C360,0 1080,0 1440,60 L1440,60 L0,60 Z" className="fill-background" />
+        </svg>
+      </div>
+
       {/* Features */}
       <section id="features" className="py-20 sm:py-32 relative">
         <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
