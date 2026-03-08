@@ -91,9 +91,9 @@ export function CustomerLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <CustomerSidebar />
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 w-full">
         <div className="h-14 lg:hidden" />
-        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+        <div className="px-3 py-3 sm:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   );
