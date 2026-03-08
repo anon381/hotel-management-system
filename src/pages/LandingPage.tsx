@@ -56,25 +56,41 @@ export default function LandingPage() {
   const [sceneReady, setSceneReady] = useState(hasVisited.current);
   const [loadProgress, setLoadProgress] = useState(0);
   const [showTapHint, setShowTapHint] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  const [threeReady, setThreeReady] = useState(false);
 
-  // Simulate progress and mark visited
+  // Minimum 4-second timer
+  useEffect(() => {
+    if (hasVisited.current) return;
+    const timer = setTimeout(() => setMinTimeElapsed(true), 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Progress bar — takes ~4s to fill (slows down toward end)
   useEffect(() => {
     if (hasVisited.current) return;
     let progress = 0;
     const interval = setInterval(() => {
-      progress += Math.random() * 8 + 2;
+      const remaining = 100 - progress;
+      progress += Math.random() * (remaining * 0.06) + 0.5;
       if (progress >= 100) progress = 100;
       setLoadProgress(progress);
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => setShowTapHint(true), 400);
-      }
-    }, 120);
+      if (progress >= 100) clearInterval(interval);
+    }, 100);
     return () => clearInterval(interval);
   }, []);
 
+  // Show "Tap to Enter" only when ALL conditions are met:
+  // 1) Minimum 4 seconds elapsed  2) Progress bar full  3) 3D scene loaded
+  useEffect(() => {
+    if (hasVisited.current) return;
+    if (minTimeElapsed && loadProgress >= 100 && threeReady) {
+      setTimeout(() => setShowTapHint(true), 300);
+    }
+  }, [minTimeElapsed, loadProgress, threeReady]);
+
   const handleDismissLoader = () => {
-    if (loadProgress < 100) return;
+    if (!showTapHint) return;
     sessionStorage.setItem("cafex-visited", "true");
     setSceneReady(true);
   };
@@ -355,7 +371,7 @@ export default function LandingPage() {
       <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
         {/* 3D Scene - full coverage */}
         <div className="absolute inset-0 z-0">
-          <HeroScene />
+          <HeroScene onReady={() => setThreeReady(true)} />
         </div>
 
         {/* Left edge floating food emojis */}
