@@ -362,6 +362,56 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* How It Works */}
+      <section id="how-it-works" className="py-20 sm:py-32 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/3 rounded-full blur-3xl" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-16">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Seamless</span>
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
+            <p className="text-muted-foreground mt-3 max-w-xl mx-auto">Three simple steps to enjoy the full Café X experience.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {howItWorks.map((item, i) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                whileHover={{ y: -6, scale: 1.03 }}
+                className="glass-card-elevated p-8 text-center group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 relative"
+              >
+                <motion.div
+                  className="text-5xl font-display font-black text-primary/15 absolute top-4 right-6 select-none"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 + i * 0.15, type: "spring", stiffness: 200 }}
+                >
+                  {item.step}
+                </motion.div>
+                <motion.div
+                  className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors"
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <span className="text-2xl font-display font-bold text-primary">{item.step}</span>
+                </motion.div>
+                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <motion.div
+                  className="h-0.5 bg-gradient-to-r from-primary/60 to-accent/40 rounded-full mt-5 origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 + i * 0.15 }}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="py-10 border-t border-border/50 bg-muted/20">
