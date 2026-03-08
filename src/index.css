@@ -156,7 +156,7 @@
     @apply flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all duration-200;
   }
   .nav-item:hover {
-    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+    @apply bg-muted/60 text-foreground;
   }
   .nav-item.active {
     @apply bg-primary text-primary-foreground;
