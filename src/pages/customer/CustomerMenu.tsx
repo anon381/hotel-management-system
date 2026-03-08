@@ -41,6 +41,7 @@ interface CartItem {
   emoji: string;
   price: number;
   quantity: number;
+  notes: string;
 }
 
 const tableZones = [
