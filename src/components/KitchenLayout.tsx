@@ -2,12 +2,14 @@ import { ReactNode } from "react";
 import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, LayoutDashboard, ShoppingCart, Bell, LogOut, Menu, ChevronLeft, ChevronRight, UtensilsCrossed } from "lucide-react";
+import { ChefHat, LayoutDashboard, ShoppingCart, Bell, LogOut, Menu, ChevronLeft, ChevronRight, UtensilsCrossed, PlusCircle, ClipboardList } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navItems = [
   { title: "Kitchen Dashboard", icon: LayoutDashboard, path: "/kitchen" },
   { title: "Order Queue", icon: ShoppingCart, path: "/kitchen/orders" },
+  { title: "Create Dish", icon: PlusCircle, path: "/kitchen/create-dish" },
+  { title: "Manage Menu", icon: ClipboardList, path: "/kitchen/manage-menu" },
   { title: "Notifications", icon: Bell, path: "/kitchen/notifications" },
 ];
 

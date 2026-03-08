@@ -73,6 +73,8 @@ const App = () => (
             {/* Kitchen */}
             <Route path="/kitchen" element={<KitchenDashboard />} />
             <Route path="/kitchen/orders" element={<KitchenOrders />} />
+            <Route path="/kitchen/create-dish" element={<KitchenCreateDish />} />
+            <Route path="/kitchen/manage-menu" element={<KitchenManageMenu />} />
             <Route path="/kitchen/notifications" element={<KitchenNotifications />} />
 
             {/* Customer */}
