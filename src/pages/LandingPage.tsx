@@ -331,8 +331,8 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Choose Your Portal</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {roles.map((r) => (
-              <Link key={r.title} to={r.path} className="portal-card">
+            {roles.map((r, i) => (
+              <Link key={r.title} to={r.path} className="animate-on-scroll portal-card" data-delay={i * 120}>
                 <motion.div
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="glass-card-elevated p-8 text-center group cursor-pointer h-full"
