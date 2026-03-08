@@ -303,8 +303,8 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {howItWorks.map((h) => (
-              <div key={h.step} className="step-card text-center">
+            {howItWorks.map((h, i) => (
+              <div key={h.step} data-delay={i * 150} className="animate-on-scroll step-card text-center">
                 <div className="w-16 h-16 rounded-2xl gradient-warm text-primary-foreground font-display font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   {h.step}
                 </div>
