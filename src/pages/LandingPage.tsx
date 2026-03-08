@@ -198,7 +198,7 @@ export default function LandingPage() {
             </h1>
             <TypingText
               text="A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role."
-              className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-8"
+              className="text-xl sm:text-2xl text-foreground max-w-2xl mx-auto mb-8 [text-shadow:_0_1px_2px_hsl(var(--foreground)/0.15)]"
             />
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login/admin">
