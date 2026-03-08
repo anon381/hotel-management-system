@@ -89,7 +89,7 @@ export default function CustomerMenu() {
       if (existing) {
         return prev.map((c) => c.name === quantityModal.name ? { ...c, quantity: c.quantity + tempQty } : c);
       }
-      return [...prev, { name: quantityModal.name, emoji: quantityModal.emoji, price: quantityModal.price, quantity: tempQty }];
+      return [...prev, { name: quantityModal.name, emoji: quantityModal.emoji, price: quantityModal.price, quantity: tempQty, notes: "" }];
     });
     setJustAdded(quantityModal.name);
   };
