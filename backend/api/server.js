@@ -104,8 +104,23 @@ app.use('/api/dashboard', authenticate, dashboardRouter(supabase, requireRole));
 const gamificationRouter = require('./routes/gamification');
 app.use('/api/coins', authenticate, gamificationRouter(supabase, requireRole, logActivity));
 
+const trackingRouter = require('./routes/tracking');
+app.use('/api/tracking', authenticate, trackingRouter(supabase, requireRole));
+
+const referralsRouter = require('./routes/referrals');
+app.use('/api/referrals', authenticate, referralsRouter(supabase, requireRole, logActivity));
+
+const dealsRouter = require('./routes/deals');
+app.use('/api/deals', authenticate, dealsRouter(supabase, requireRole, logActivity));
+
+const recommendationsRouter = require('./routes/recommendations');
+app.use('/api/recommendations', authenticate, recommendationsRouter(supabase, requireRole));
+
+const schedulingRouter = require('./routes/scheduling');
+app.use('/api/scheduling', authenticate, schedulingRouter(supabase, requireRole));
+
 // Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok', version: '2.0', timestamp: new Date().toISOString() }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', version: '3.0', timestamp: new Date().toISOString() }));
 
 app.listen(PORT, () => console.log(`Café X API running on port ${PORT}`));
 module.exports = app;
