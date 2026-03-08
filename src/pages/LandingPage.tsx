@@ -171,9 +171,10 @@ export default function LandingPage() {
                 Café X
               </motion.span>
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role.
-            </p>
+            <TypingText
+              text="A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role."
+              className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-8"
+            />
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login/admin">
                 <motion.button
