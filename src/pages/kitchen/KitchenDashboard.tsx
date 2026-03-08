@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChefHat, Clock, AlertTriangle, CheckCircle2, Flame, Timer, X, Check, Minus, Plus, Edit2 } from "lucide-react";
+import { ChefHat, Clock, CheckCircle2, Flame, Timer, Check, Minus, Plus, AlertTriangle } from "lucide-react";
 import { KitchenLayout } from "@/components/KitchenLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { StatCard } from "@/components/StatCard";
@@ -18,16 +18,17 @@ interface Order {
   items: OrderItem[];
   priority: "high" | "medium" | "low";
   status: string;
-  time: string;
+  placedAt: number; // timestamp ms
   estimatedMin: number | null;
 }
 
+const now = Date.now();
 const initialOrders: Order[] = [
-  { id: "#1024", table: "T-05", items: [{ name: "Grilled Salmon", qty: 1, notes: "No lemon", done: false }, { name: "Caesar Salad", qty: 1, notes: "", done: false }], priority: "high", status: "preparing", time: "2 min ago", estimatedMin: null },
-  { id: "#1023", table: "T-12", items: [{ name: "Margherita Pizza", qty: 2, notes: "Extra cheese", done: false }, { name: "Tiramisu", qty: 1, notes: "", done: false }], priority: "medium", status: "queue", time: "5 min ago", estimatedMin: null },
-  { id: "#1021", table: "T-08", items: [{ name: "Pasta Carbonara", qty: 1, notes: "Al dente", done: false }], priority: "low", status: "queue", time: "8 min ago", estimatedMin: null },
-  { id: "#1025", table: "T-02", items: [{ name: "Wagyu Steak", qty: 1, notes: "Medium rare", done: false }, { name: "Truffle Fries", qty: 1, notes: "", done: false }], priority: "high", status: "preparing", time: "1 min ago", estimatedMin: null },
-  { id: "#1026", table: "T-10", items: [{ name: "Fish & Chips", qty: 2, notes: "", done: true }], priority: "medium", status: "ready", time: "10 min ago", estimatedMin: 0 },
+  { id: "#1024", table: "T-05", items: [{ name: "Grilled Salmon", qty: 1, notes: "No lemon", done: false }, { name: "Caesar Salad", qty: 1, notes: "", done: false }], priority: "high", status: "preparing", placedAt: now - 2 * 60000, estimatedMin: 15 },
+  { id: "#1023", table: "T-12", items: [{ name: "Margherita Pizza", qty: 2, notes: "Extra cheese", done: false }, { name: "Tiramisu", qty: 1, notes: "", done: false }], priority: "medium", status: "queue", placedAt: now - 5 * 60000, estimatedMin: 20 },
+  { id: "#1021", table: "T-08", items: [{ name: "Pasta Carbonara", qty: 1, notes: "Al dente", done: false }], priority: "low", status: "queue", placedAt: now - 8 * 60000, estimatedMin: null },
+  { id: "#1025", table: "T-02", items: [{ name: "Wagyu Steak", qty: 1, notes: "Medium rare", done: false }, { name: "Truffle Fries", qty: 1, notes: "", done: false }], priority: "high", status: "preparing", placedAt: now - 1 * 60000, estimatedMin: 25 },
+  { id: "#1026", table: "T-10", items: [{ name: "Fish & Chips", qty: 2, notes: "", done: true }], priority: "medium", status: "ready", placedAt: now - 10 * 60000, estimatedMin: 10 },
 ];
 
 const priorityColors: Record<string, string> = {
@@ -36,36 +37,55 @@ const priorityColors: Record<string, string> = {
   low: "bg-muted text-muted-foreground border-border",
 };
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  queue: { label: "In Queue", color: "bg-warning/10 text-warning" },
-  preparing: { label: "Preparing", color: "bg-info/10 text-info" },
-  ready: { label: "Ready", color: "bg-success/10 text-success" },
-};
+function ElapsedTimer({ placedAt, estimatedMin }: { placedAt: number; estimatedMin: number | null }) {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    const update = () => setElapsed(Math.floor((Date.now() - placedAt) / 1000));
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [placedAt]);
+
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  const exceeds = estimatedMin !== null && mins >= estimatedMin;
+  const nearLimit = estimatedMin !== null && mins >= estimatedMin * 0.8 && !exceeds;
+
+  return (
+    <div className={`flex items-center gap-1.5 text-xs font-mono font-bold px-2 py-1 rounded-lg ${
+      exceeds ? "bg-destructive/15 text-destructive animate-pulse" : nearLimit ? "bg-warning/15 text-warning" : "bg-muted/50 text-muted-foreground"
+    }`}>
+      <Clock className="w-3 h-3" />
+      <span>{String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}</span>
+      {exceeds && <AlertTriangle className="w-3 h-3" />}
+    </div>
+  );
+}
 
 export default function KitchenDashboard() {
   const [orderList, setOrderList] = useState<Order[]>(initialOrders);
-  const [editingTime, setEditingTime] = useState<string | null>(null);
 
-  const updateStatus = (id: string, newStatus: string) => {
+  const updateStatus = useCallback((id: string, newStatus: string) => {
     setOrderList(prev => prev.map(o => o.id === id ? { ...o, status: newStatus, items: newStatus === "ready" ? o.items.map(it => ({ ...it, done: true })) : o.items } : o));
-  };
+  }, []);
 
-  const toggleItemDone = (orderId: string, itemIdx: number) => {
+  const toggleItemDone = useCallback((orderId: string, itemIdx: number) => {
     setOrderList(prev => prev.map(o => {
       if (o.id !== orderId) return o;
       const newItems = o.items.map((it, i) => i === itemIdx ? { ...it, done: !it.done } : it);
       const allDone = newItems.every(it => it.done);
       return { ...o, items: newItems, status: allDone && o.status === "preparing" ? "ready" : o.status };
     }));
-  };
+  }, []);
 
-  const setEstimatedTime = (orderId: string, min: number) => {
+  const setEstimatedTime = useCallback((orderId: string, min: number) => {
     setOrderList(prev => prev.map(o => o.id === orderId ? { ...o, estimatedMin: Math.max(0, min) } : o));
-  };
+  }, []);
 
-  const adjustTime = (orderId: string, delta: number) => {
+  const adjustTime = useCallback((orderId: string, delta: number) => {
     setOrderList(prev => prev.map(o => o.id === orderId ? { ...o, estimatedMin: Math.max(0, (o.estimatedMin || 0) + delta) } : o));
-  };
+  }, []);
 
   const queueOrders = orderList.filter(o => o.status === "queue");
   const preparingOrders = orderList.filter(o => o.status === "preparing");
@@ -82,7 +102,7 @@ export default function KitchenDashboard() {
         <StatCard icon={ChefHat} title="In Queue" value={String(queueOrders.length)} change="Waiting" changeType="neutral" delay={0} />
         <StatCard icon={Flame} title="Preparing" value={String(preparingOrders.length)} change="Active" changeType="positive" delay={0.1} />
         <StatCard icon={CheckCircle2} title="Ready" value={String(readyOrders.length)} change="Pickup" changeType="positive" delay={0.2} />
-        <StatCard icon={Timer} title="Items Done" value={`${completedItems}/${totalItems}`} change={`${Math.round((completedItems / totalItems) * 100)}% complete`} changeType="positive" delay={0.3} />
+        <StatCard icon={Timer} title="Items Done" value={`${completedItems}/${totalItems}`} change={`${totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0}% complete`} changeType="positive" delay={0.3} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -116,9 +136,12 @@ export default function KitchenDashboard() {
                           <span className="font-semibold text-foreground text-sm">{order.id}</span>
                           <span className="text-xs text-muted-foreground">· {order.table}</span>
                         </div>
-                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${priorityColors[order.priority]}`}>
-                          {order.priority}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <ElapsedTimer placedAt={order.placedAt} estimatedMin={order.estimatedMin} />
+                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${priorityColors[order.priority]}`}>
+                            {order.priority}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Progress bar */}
@@ -136,14 +159,12 @@ export default function KitchenDashboard() {
                       {/* Items with checkboxes */}
                       <div className="space-y-1.5 mb-3">
                         {order.items.map((it, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm group">
+                          <div key={i} className="flex items-center gap-2 text-sm">
                             {(order.status === "preparing" || order.status === "ready") && (
                               <button
                                 onClick={() => toggleItemDone(order.id, i)}
                                 className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                                  it.done
-                                    ? "bg-success border-success text-success-foreground"
-                                    : "border-border hover:border-primary"
+                                  it.done ? "bg-success border-success text-success-foreground" : "border-border hover:border-primary"
                                 }`}
                               >
                                 {it.done && <Check className="w-3 h-3" />}
@@ -188,7 +209,7 @@ export default function KitchenDashboard() {
                       )}
 
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-muted-foreground">{order.time}</span>
+                        <ElapsedTimer placedAt={order.placedAt} estimatedMin={null} />
                         <div className="flex items-center gap-2">
                           {order.status === "preparing" && doneCount === order.items.length && (
                             <span className="text-[10px] text-success font-semibold animate-pulse">All items done!</span>

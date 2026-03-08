@@ -35,6 +35,7 @@ import CustomerOrders from "./pages/customer/CustomerOrders";
 import CustomerFavorites from "./pages/customer/CustomerFavorites";
 import CustomerNotifications from "./pages/customer/CustomerNotifications";
 import CustomerProfile from "./pages/customer/CustomerProfile";
+import CustomerReservation from "./pages/customer/CustomerReservation";
 
 import NotFound from "./pages/NotFound";
 
@@ -78,6 +79,7 @@ const App = () => (
             <Route path="/customer/favorites" element={<CustomerFavorites />} />
             <Route path="/customer/notifications" element={<CustomerNotifications />} />
             <Route path="/customer/profile" element={<CustomerProfile />} />
+            <Route path="/customer/reservation" element={<CustomerReservation />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

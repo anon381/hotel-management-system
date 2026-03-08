@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { UtensilsCrossed, LayoutDashboard, ShoppingCart, Heart, User, Bell, LogOut, Menu, ChevronLeft, ChevronRight } from "lucide-react";
+import { UtensilsCrossed, LayoutDashboard, ShoppingCart, Heart, User, Bell, LogOut, Menu, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { title: "Menu", icon: UtensilsCrossed, path: "/customer/menu" },
   { title: "My Orders", icon: ShoppingCart, path: "/customer/orders" },
   { title: "Favorites", icon: Heart, path: "/customer/favorites" },
+  { title: "Reserve Table", icon: CalendarDays, path: "/customer/reservation" },
   { title: "Notifications", icon: Bell, path: "/customer/notifications" },
   { title: "Profile", icon: User, path: "/customer/profile" },
 ];
@@ -29,7 +30,7 @@ function CustomerSidebar() {
         <AnimatePresence>
           {!collapsed && (
             <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: "auto" }} exit={{ opacity: 0, width: 0 }} className="overflow-hidden">
-              <h1 className="font-display text-lg font-bold text-sidebar-foreground whitespace-nowrap">Café Luxe</h1>
+              <h1 className="font-display text-lg font-bold text-sidebar-foreground whitespace-nowrap">Café X</h1>
               <p className="text-[10px] text-sidebar-foreground/50 whitespace-nowrap">Customer Portal</p>
             </motion.div>
           )}
