@@ -484,7 +484,7 @@ export default function CustomerMenu() {
                           key={t}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => setSelectedTable(selectedTable === t ? null : t)}
-                          className={`w-12 h-12 rounded-xl text-xs font-bold flex items-center justify-center transition-colors ${
+                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl text-xs font-bold flex items-center justify-center transition-colors ${
                             selectedTable === t
                               ? "bg-primary text-primary-foreground shadow-lg"
                               : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
