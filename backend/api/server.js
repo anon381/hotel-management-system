@@ -101,6 +101,9 @@ app.use('/api/users', authenticate, usersRouter(supabase, requireRole, logActivi
 const dashboardRouter = require('./routes/dashboard');
 app.use('/api/dashboard', authenticate, dashboardRouter(supabase, requireRole));
 
+const gamificationRouter = require('./routes/gamification');
+app.use('/api/coins', authenticate, gamificationRouter(supabase, requireRole, logActivity));
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', version: '2.0', timestamp: new Date().toISOString() }));
 

@@ -23,6 +23,7 @@ import AdminReports from "./pages/admin/AdminReports";
 import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminCoins from "./pages/admin/AdminCoins";
 
 // Kitchen pages
 import KitchenDashboard from "./pages/kitchen/KitchenDashboard";
@@ -39,6 +40,7 @@ import CustomerFavorites from "./pages/customer/CustomerFavorites";
 import CustomerNotifications from "./pages/customer/CustomerNotifications";
 import CustomerProfile from "./pages/customer/CustomerProfile";
 import CustomerReservation from "./pages/customer/CustomerReservation";
+import CustomerCoins from "./pages/customer/CustomerCoins";
 
 import NotFound from "./pages/NotFound";
 
@@ -69,6 +71,7 @@ const App = () => (
             <Route path="/admin/customers" element={<AdminCustomers />} />
             <Route path="/admin/notifications" element={<AdminNotifications />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/coins" element={<AdminCoins />} />
 
             {/* Kitchen */}
             <Route path="/kitchen" element={<KitchenDashboard />} />
@@ -85,6 +88,7 @@ const App = () => (
             <Route path="/customer/notifications" element={<CustomerNotifications />} />
             <Route path="/customer/profile" element={<CustomerProfile />} />
             <Route path="/customer/reservation" element={<CustomerReservation />} />
+            <Route path="/customer/coins" element={<CustomerCoins />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

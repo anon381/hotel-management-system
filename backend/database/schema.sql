@@ -1118,3 +1118,128 @@ INSERT INTO public.promotions (title, description, type, value, min_order_amount
   ('Welcome 10% Off', 'New customer discount on first order', 'discount_percent', 10, 20, 'WELCOME10', NULL, now(), now() + INTERVAL '1 year'),
   ('Free Dessert Friday', 'Get a free dessert with orders over $50 on Fridays', 'free_item', 0, 50, 'FRIYAY', NULL, now(), now() + INTERVAL '6 months'),
   ('$5 Off Orders Over $40', 'Limited time flat discount', 'discount_fixed', 5, 40, 'SAVE5', 500, now(), now() + INTERVAL '3 months');
+
+-- ==================== GAMIFICATION TABLES ====================
+
+-- 28. Spin Wheel Segments
+CREATE TABLE public.spin_wheel_segments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    label TEXT NOT NULL,
+    coins INT NOT NULL DEFAULT 0,
+    color TEXT NOT NULL DEFAULT '#7c3aed',
+    probability_weight INT NOT NULL DEFAULT 10,
+    display_order INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 29. Spin Wheel Log
+CREATE TABLE public.spin_wheel_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    segment_id UUID REFERENCES public.spin_wheel_segments(id) ON DELETE SET NULL,
+    coins_won INT NOT NULL DEFAULT 0,
+    segment_label TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 30. Coin Rewards (redeemable items)
+CREATE TABLE public.coin_rewards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    description TEXT,
+    icon TEXT DEFAULT '🎁',
+    cost_coins INT NOT NULL CHECK (cost_coins > 0),
+    reward_type TEXT NOT NULL DEFAULT 'discount_percent', -- discount_percent, discount_fixed, free_item, perk
+    reward_value DECIMAL(10,2) DEFAULT 0, -- e.g. 10 for 10%, 5 for $5 off
+    applicable_category TEXT, -- optional: limit to category
+    is_active BOOLEAN DEFAULT true,
+    max_redemptions INT, -- null = unlimited
+    current_redemptions INT DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 31. Coin Redemptions (customer reward claims)
+CREATE TABLE public.coin_redemptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    reward_id UUID REFERENCES public.coin_rewards(id) ON DELETE SET NULL,
+    coins_spent INT NOT NULL,
+    reward_name TEXT NOT NULL,
+    reward_type TEXT,
+    reward_value DECIMAL(10,2),
+    is_used BOOLEAN DEFAULT false, -- has the reward been applied to an order?
+    used_on_order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
+    expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '30 days'),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 32. Coin Milestones
+CREATE TABLE public.coin_milestones (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    icon TEXT DEFAULT '🏆',
+    coins_required INT NOT NULL,
+    bonus_coins INT DEFAULT 0, -- bonus coins awarded on reaching milestone
+    description TEXT,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Gamification Indexes
+CREATE INDEX idx_spin_log_customer ON public.spin_wheel_log(customer_id);
+CREATE INDEX idx_spin_log_date ON public.spin_wheel_log(created_at);
+CREATE INDEX idx_coin_redemptions_customer ON public.coin_redemptions(customer_id);
+CREATE INDEX idx_coin_redemptions_unused ON public.coin_redemptions(is_used) WHERE is_used = false;
+
+-- Gamification RLS
+ALTER TABLE public.spin_wheel_segments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.spin_wheel_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.coin_rewards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.coin_redemptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.coin_milestones ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone view wheel segments" ON public.spin_wheel_segments FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins manage segments" ON public.spin_wheel_segments FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "View own spins" ON public.spin_wheel_log FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Create own spins" ON public.spin_wheel_log FOR INSERT TO authenticated WITH CHECK (customer_id = auth.uid());
+CREATE POLICY "Admins view all spins" ON public.spin_wheel_log FOR SELECT TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "Anyone view rewards" ON public.coin_rewards FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins manage rewards" ON public.coin_rewards FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "View own redemptions" ON public.coin_redemptions FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Create own redemptions" ON public.coin_redemptions FOR INSERT TO authenticated WITH CHECK (customer_id = auth.uid());
+CREATE POLICY "Admins view redemptions" ON public.coin_redemptions FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "Anyone view milestones" ON public.coin_milestones FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins manage milestones" ON public.coin_milestones FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+
+-- Gamification Seed Data
+
+-- Spin wheel segments
+INSERT INTO public.spin_wheel_segments (label, coins, color, probability_weight, display_order) VALUES
+  ('5 Coins', 5, '#7c3aed', 30, 1),
+  ('10 Coins', 10, '#22c55e', 25, 2),
+  ('25 Coins', 25, '#f59e0b', 15, 3),
+  ('50 Coins', 50, '#3b82f6', 12, 4),
+  ('2 Coins', 2, '#8b5cf6', 8, 5),
+  ('100 Coins', 100, '#ef4444', 5, 6),
+  ('1 Coin', 1, '#6b7280', 3, 7),
+  ('200 Coins!', 200, '#eab308', 2, 8);
+
+-- Coin rewards
+INSERT INTO public.coin_rewards (name, icon, cost_coins, reward_type, reward_value, description) VALUES
+  ('10% Off Next Order', '🏷️', 200, 'discount_percent', 10, 'Get 10% off your next order'),
+  ('Free Dessert', '🍰', 350, 'free_item', 0, 'Any dessert on the house'),
+  ('Free Drink', '☕', 150, 'free_item', 0, 'Any beverage for free'),
+  ('25% Off Next Order', '🔥', 500, 'discount_percent', 25, 'Quarter off your next meal'),
+  ('Free Appetizer', '🥗', 250, 'free_item', 0, 'Any starter on us'),
+  ('Free Main Course', '🥩', 800, 'free_item', 0, 'Any main dish for free'),
+  ('50% Off Next Order', '💎', 1200, 'discount_percent', 50, 'Half price on your next visit'),
+  ('VIP Table Access', '👑', 1500, 'perk', 0, 'Priority VIP seating for one visit');
+
+-- Coin milestones
+INSERT INTO public.coin_milestones (title, icon, coins_required, bonus_coins, description, display_order) VALUES
+  ('Bronze Spender', '🥉', 500, 50, 'Earn your first 500 coins', 1),
+  ('Silver Status', '🥈', 1000, 100, 'Reach 1,000 lifetime coins', 2),
+  ('Gold Member', '🥇', 2000, 200, 'Join the Gold tier at 2,000 coins', 3),
+  ('Platinum VIP', '💎', 5000, 500, 'Ultimate status at 5,000 coins', 4);

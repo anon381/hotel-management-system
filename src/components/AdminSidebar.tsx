@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingCart, Grid3X3, ChefHat,
   CreditCard, Package, Users, BarChart3, Heart, Bell, Shield,
-  ChevronLeft, ChevronRight, Menu, LogOut
+  ChevronLeft, ChevronRight, Menu, LogOut, Coins
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -37,6 +37,7 @@ const navSections = [
     label: "More",
     items: [
       { title: "Customers", icon: Heart, path: "/admin/customers" },
+      { title: "Coins & Rewards", icon: Coins, path: "/admin/coins" },
       { title: "Notifications", icon: Bell, path: "/admin/notifications" },
       { title: "Users & Roles", icon: Shield, path: "/admin/users" },
     ],
