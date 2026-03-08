@@ -289,12 +289,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <path d="M0,0 L0,50 C240,80 480,20 720,60 C960,90 1200,30 1440,50 L1440,0 Z" fill="hsl(var(--muted) / 0.3)" />
-          <path d="M0,70 C480,50 960,80 1440,60 L1440,100 L0,100 Z" className="fill-background" />
-        </svg>
-      </div>
 
       {/* Portals */}
       <section id="portals" className="py-20 sm:py-32">
