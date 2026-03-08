@@ -111,7 +111,7 @@ export function AdminSidebar() {
         </div>
         <button
           onClick={() => navigate("/")}
-          className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-sidebar-foreground/50 hover:text-destructive hover:bg-sidebar-accent transition-colors text-sm"
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors text-sm"
         >
           <LogOut className="w-4 h-4" />
           {!collapsed && <span>Logout</span>}
