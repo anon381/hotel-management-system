@@ -8,10 +8,6 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HeroScene } from "@/components/Scene3D";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   { icon: ShoppingCart, title: "Order Management", desc: "Track orders from placement to completion with real-time status updates." },
