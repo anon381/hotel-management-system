@@ -53,7 +53,7 @@ export default function LandingPage() {
             const progress = self.progress;
             gsap.to(navRef.current, {
               backdropFilter: `blur(${8 + progress * 16}px)`,
-              borderBottomColor: `hsla(var(--border), ${0.3 + progress * 0.5})`,
+              borderBottomWidth: `${progress}px`,
               duration: 0.3,
             });
           }
