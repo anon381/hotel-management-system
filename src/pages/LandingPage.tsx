@@ -236,33 +236,9 @@ export default function LandingPage() {
                   transition={{ delay: 0.8 }}
                   className="text-xs text-muted-foreground text-center mt-2"
                 >
-                  {loadProgress < 100 ? "Preparing your experience..." : ""}
+                  {loadProgress < 100 ? "Preparing your experience..." : "Welcome!"}
                 </motion.p>
               </div>
-
-              {/* Tap to enter hint */}
-              <AnimatePresence>
-                {showTapHint && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                    onClick={handleDismissLoader}
-                    className="mt-2 px-8 py-3 rounded-2xl gradient-warm text-primary-foreground font-semibold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-shadow"
-                  >
-                    <motion.span
-                      className="flex items-center gap-2"
-                      animate={{ scale: [1, 1.03, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <Sparkles className="w-5 h-5" />
-                      Tap to Enter
-                      <ArrowRight className="w-5 h-5" />
-                    </motion.span>
-                  </motion.button>
-                )}
-              </AnimatePresence>
             </div>
           </motion.div>
         )}
