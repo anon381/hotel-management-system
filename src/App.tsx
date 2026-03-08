@@ -2,8 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { AnimatePresence } from "framer-motion";
+import { PageTransition } from "@/components/PageTransition";
 
 // Landing & Auth
 import LandingPage from "./pages/LandingPage";
@@ -41,6 +43,49 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public */}
+        <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path="/login/:role" element={<PageTransition><AuthPage /></PageTransition>} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
+        <Route path="/admin/menu" element={<PageTransition><AdminMenu /></PageTransition>} />
+        <Route path="/admin/orders" element={<PageTransition><AdminOrders /></PageTransition>} />
+        <Route path="/admin/tables" element={<PageTransition><AdminTables /></PageTransition>} />
+        <Route path="/admin/kitchen" element={<PageTransition><AdminKitchen /></PageTransition>} />
+        <Route path="/admin/payments" element={<PageTransition><AdminPayments /></PageTransition>} />
+        <Route path="/admin/inventory" element={<PageTransition><AdminInventory /></PageTransition>} />
+        <Route path="/admin/staff" element={<PageTransition><AdminStaff /></PageTransition>} />
+        <Route path="/admin/reports" element={<PageTransition><AdminReports /></PageTransition>} />
+        <Route path="/admin/customers" element={<PageTransition><AdminCustomers /></PageTransition>} />
+        <Route path="/admin/notifications" element={<PageTransition><AdminNotifications /></PageTransition>} />
+        <Route path="/admin/users" element={<PageTransition><AdminUsers /></PageTransition>} />
+
+        {/* Kitchen */}
+        <Route path="/kitchen" element={<PageTransition><KitchenDashboard /></PageTransition>} />
+        <Route path="/kitchen/orders" element={<PageTransition><KitchenOrders /></PageTransition>} />
+        <Route path="/kitchen/notifications" element={<PageTransition><KitchenNotifications /></PageTransition>} />
+
+        {/* Customer */}
+        <Route path="/customer" element={<PageTransition><CustomerDashboard /></PageTransition>} />
+        <Route path="/customer/menu" element={<PageTransition><CustomerMenu /></PageTransition>} />
+        <Route path="/customer/orders" element={<PageTransition><CustomerOrders /></PageTransition>} />
+        <Route path="/customer/favorites" element={<PageTransition><CustomerFavorites /></PageTransition>} />
+        <Route path="/customer/notifications" element={<PageTransition><CustomerNotifications /></PageTransition>} />
+        <Route path="/customer/profile" element={<PageTransition><CustomerProfile /></PageTransition>} />
+        <Route path="/customer/reservation" element={<PageTransition><CustomerReservation /></PageTransition>} />
+
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 const App = () => (
   <ThemeProvider>
     <QueryClientProvider client={queryClient}>
@@ -48,41 +93,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Public */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login/:role" element={<AuthPage />} />
-
-            {/* Admin */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/menu" element={<AdminMenu />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route path="/admin/tables" element={<AdminTables />} />
-            <Route path="/admin/kitchen" element={<AdminKitchen />} />
-            <Route path="/admin/payments" element={<AdminPayments />} />
-            <Route path="/admin/inventory" element={<AdminInventory />} />
-            <Route path="/admin/staff" element={<AdminStaff />} />
-            <Route path="/admin/reports" element={<AdminReports />} />
-            <Route path="/admin/customers" element={<AdminCustomers />} />
-            <Route path="/admin/notifications" element={<AdminNotifications />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-
-            {/* Kitchen */}
-            <Route path="/kitchen" element={<KitchenDashboard />} />
-            <Route path="/kitchen/orders" element={<KitchenOrders />} />
-            <Route path="/kitchen/notifications" element={<KitchenNotifications />} />
-
-            {/* Customer */}
-            <Route path="/customer" element={<CustomerDashboard />} />
-            <Route path="/customer/menu" element={<CustomerMenu />} />
-            <Route path="/customer/orders" element={<CustomerOrders />} />
-            <Route path="/customer/favorites" element={<CustomerFavorites />} />
-            <Route path="/customer/notifications" element={<CustomerNotifications />} />
-            <Route path="/customer/profile" element={<CustomerProfile />} />
-            <Route path="/customer/reservation" element={<CustomerReservation />} />
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
