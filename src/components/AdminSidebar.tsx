@@ -51,7 +51,7 @@ export function AdminSidebar() {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="p-4 flex items-center gap-3 border-b border-sidebar-border">
+      <div className="p-4 flex items-center gap-3 border-b border-border/30">
         <div className="w-10 h-10 rounded-xl gradient-warm flex items-center justify-center shadow-lg flex-shrink-0">
           <UtensilsCrossed className="w-5 h-5 text-primary-foreground" />
         </div>
