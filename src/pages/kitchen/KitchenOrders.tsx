@@ -48,12 +48,12 @@ function ElapsedBadge({ placedAt, estimatedMin }: { placedAt: number; estimatedM
   const nearLimit = estimatedMin !== null && mins >= estimatedMin * 0.8 && !exceeds;
 
   return (
-    <span className={`text-xs font-mono font-bold flex items-center gap-1 px-2 py-0.5 rounded-lg ${
+    <span className={`text-xs font-mono font-bold flex items-center gap-1 px-2 py-0.5 rounded-lg whitespace-nowrap ${
       exceeds ? "bg-destructive/15 text-destructive animate-pulse" : nearLimit ? "bg-warning/15 text-warning" : "text-muted-foreground"
     }`}>
-      <Clock className="w-3 h-3" />
+      <Clock className="w-3 h-3 flex-shrink-0" />
       {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
-      {exceeds && <AlertTriangle className="w-3 h-3" />}
+      {exceeds && <AlertTriangle className="w-3 h-3 flex-shrink-0" />}
     </span>
   );
 }
@@ -96,7 +96,7 @@ export default function KitchenOrders() {
       <PageHeader title="All Orders" subtitle="Complete order list — mark items done, advance status" />
 
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        <Filter className="w-4 h-4 text-muted-foreground" />
+        <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
         {["All", ...statusOrder].map(s => (
           <button
             key={s}
@@ -124,26 +124,28 @@ export default function KitchenOrders() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ delay: i * 0.03 }}
-                className="glass-card-elevated p-4"
+                className="glass-card-elevated p-4 overflow-hidden"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0 flex-1">
-                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="flex flex-col gap-3">
+                  {/* Top: order info */}
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <UtensilsCrossed className="w-4 h-4 text-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <p className="text-sm font-semibold text-foreground">{order.id} · {order.table}</p>
-                        <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${statusColors[order.status]}`}>{order.status}</span>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <p className="text-sm font-semibold text-foreground whitespace-nowrap">{order.id} · {order.table}</p>
+                        <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap ${statusColors[order.status]}`}>{order.status}</span>
                         {order.priority === "high" && (
-                          <span className="text-[10px] font-bold text-destructive bg-destructive/10 px-1.5 py-0.5 rounded">RUSH</span>
+                          <span className="text-[10px] font-bold text-destructive bg-destructive/10 px-1.5 py-0.5 rounded whitespace-nowrap">RUSH</span>
                         )}
                         <ElapsedBadge placedAt={order.placedAt} estimatedMin={order.estimatedMin} />
                       </div>
 
+                      {/* Items */}
                       <div className="space-y-1.5">
                         {order.items.map((it, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
+                          <div key={idx} className="flex items-center gap-2 min-w-0">
                             <button
                               onClick={() => toggleItemDone(order.id, idx)}
                               disabled={order.status === "Completed"}
@@ -153,7 +155,7 @@ export default function KitchenOrders() {
                             >
                               {it.done && <Check className="w-3 h-3" />}
                             </button>
-                            <span className={`text-sm ${it.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                            <span className={`text-sm truncate ${it.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
                               {it.name}
                             </span>
                           </div>
@@ -174,27 +176,28 @@ export default function KitchenOrders() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 sm:flex-col sm:items-end">
+                  {/* Bottom: actions */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/50">
                     {order.estimatedMin !== null && (
-                      <span className="text-[10px] text-muted-foreground">ETA: {order.estimatedMin}m</span>
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">ETA: {order.estimatedMin}m</span>
                     )}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 ml-auto flex-wrap">
                       {order.status !== "Completed" && order.status !== "Ready" && !allDone && (
                         <motion.button
                           whileTap={{ scale: 0.9 }}
                           onClick={() => markAllDone(order.id)}
-                          className="text-[11px] font-semibold bg-success/10 text-success px-2.5 py-1 rounded-lg flex items-center gap-1"
+                          className="text-[11px] font-semibold bg-success/10 text-success px-2.5 py-1 rounded-lg flex items-center gap-1 whitespace-nowrap"
                         >
-                          <CheckCircle2 className="w-3 h-3" /> All Done
+                          <CheckCircle2 className="w-3 h-3 flex-shrink-0" /> All Done
                         </motion.button>
                       )}
                       {nextStatus && (
                         <motion.button
                           whileTap={{ scale: 0.9 }}
                           onClick={() => advanceStatus(order.id)}
-                          className="text-[11px] font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-lg flex items-center gap-1"
+                          className="text-[11px] font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-lg flex items-center gap-1 whitespace-nowrap"
                         >
-                          <ChefHat className="w-3 h-3" /> → {nextStatus}
+                          <ChefHat className="w-3 h-3 flex-shrink-0" /> → {nextStatus}
                         </motion.button>
                       )}
                     </div>
