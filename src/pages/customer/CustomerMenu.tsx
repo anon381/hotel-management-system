@@ -425,9 +425,12 @@ export default function CustomerMenu() {
                 <h3 className="font-display font-bold text-lg text-foreground mb-4">Checkout</h3>
                 <div className="space-y-2 mb-4">
                   {cart.map((c) => (
-                    <div key={c.name} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
-                      <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+                    <div key={c.name} className="text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
+                        <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+                      </div>
+                      {c.notes && <p className="text-xs text-muted-foreground/70 italic ml-4">"{c.notes}"</p>}
                     </div>
                   ))}
                   <div className="pt-2 border-t border-border flex justify-between">
