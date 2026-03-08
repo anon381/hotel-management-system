@@ -175,72 +175,74 @@ export default function LandingPage() {
         </div>
 
         {/* Left edge floating orbs */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-40 lg:w-56 z-[1] pointer-events-none">
-          {[...Array(5)].map((_, i) => (
+        <div className="absolute left-0 top-0 bottom-0 w-28 sm:w-44 lg:w-64 z-[1] pointer-events-none">
+          {[...Array(8)].map((_, i) => (
             <motion.div
               key={`l${i}`}
-              className="absolute rounded-full bg-primary/10 border border-primary/10 backdrop-blur-sm"
+              className="absolute rounded-full"
               style={{
-                width: 30 + i * 18,
-                height: 30 + i * 18,
-                left: 8 + (i % 3) * 20,
-                top: `${15 + i * 16}%`,
+                width: 20 + i * 22,
+                height: 20 + i * 22,
+                left: 4 + (i % 4) * 16,
+                top: `${8 + i * 11}%`,
+                background: `radial-gradient(circle, hsl(var(--primary) / ${0.25 + (i % 3) * 0.1}) 0%, transparent 70%)`,
+                boxShadow: `0 0 ${20 + i * 10}px ${6 + i * 3}px hsl(var(--primary) / ${0.15 + (i % 3) * 0.08})`,
               }}
               animate={{
-                y: [0, -20 - i * 5, 0],
-                x: [0, 8, 0],
-                opacity: [0.25, 0.5, 0.25],
-                scale: [1, 1.08, 1],
+                y: [0, -35 - i * 8, 10, 0],
+                x: [0, 15 + i * 3, -8, 0],
+                opacity: [0.35, 0.8, 0.4, 0.35],
+                scale: [1, 1.25, 0.9, 1],
               }}
               transition={{
-                duration: 4 + i * 0.8,
+                duration: 3 + i * 0.5,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: i * 0.4,
+                delay: i * 0.3,
               }}
             />
           ))}
-          {/* Vertical glow line */}
           <motion.div
-            className="absolute left-6 sm:left-10 top-[10%] bottom-[10%] w-px"
-            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--primary) / 0.3), transparent)" }}
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{ duration: 3, repeat: Infinity }}
+            className="absolute left-6 sm:left-12 top-[5%] bottom-[5%] w-0.5 rounded-full"
+            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--primary) / 0.5), hsl(var(--primary) / 0.2), transparent)" }}
+            animate={{ opacity: [0.3, 0.9, 0.3], scaleY: [0.95, 1, 0.95] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
           />
         </div>
 
         {/* Right edge floating orbs */}
-        <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-40 lg:w-56 z-[1] pointer-events-none">
-          {[...Array(5)].map((_, i) => (
+        <div className="absolute right-0 top-0 bottom-0 w-28 sm:w-44 lg:w-64 z-[1] pointer-events-none">
+          {[...Array(8)].map((_, i) => (
             <motion.div
               key={`r${i}`}
-              className="absolute rounded-full bg-accent/10 border border-accent/10 backdrop-blur-sm"
+              className="absolute rounded-full"
               style={{
-                width: 24 + i * 20,
-                height: 24 + i * 20,
-                right: 10 + (i % 3) * 18,
-                top: `${20 + i * 15}%`,
+                width: 18 + i * 24,
+                height: 18 + i * 24,
+                right: 6 + (i % 4) * 14,
+                top: `${12 + i * 10}%`,
+                background: `radial-gradient(circle, hsl(var(--accent) / ${0.2 + (i % 3) * 0.12}) 0%, transparent 70%)`,
+                boxShadow: `0 0 ${18 + i * 12}px ${5 + i * 4}px hsl(var(--accent) / ${0.12 + (i % 3) * 0.1})`,
               }}
               animate={{
-                y: [0, 18 + i * 4, 0],
-                x: [0, -10, 0],
-                opacity: [0.2, 0.45, 0.2],
-                scale: [1, 1.1, 1],
+                y: [0, 30 + i * 6, -12, 0],
+                x: [0, -18 - i * 2, 6, 0],
+                opacity: [0.3, 0.75, 0.35, 0.3],
+                scale: [1, 1.2, 0.85, 1],
               }}
               transition={{
-                duration: 5 + i * 0.6,
+                duration: 3.5 + i * 0.4,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: i * 0.5,
+                delay: i * 0.35,
               }}
             />
           ))}
-          {/* Vertical glow line */}
           <motion.div
-            className="absolute right-6 sm:right-10 top-[10%] bottom-[10%] w-px"
-            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--accent) / 0.3), transparent)" }}
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{ duration: 3.5, repeat: Infinity }}
+            className="absolute right-6 sm:right-12 top-[5%] bottom-[5%] w-0.5 rounded-full"
+            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--accent) / 0.5), hsl(var(--accent) / 0.2), transparent)" }}
+            animate={{ opacity: [0.3, 0.9, 0.3], scaleY: [0.95, 1, 0.95] }}
+            transition={{ duration: 2.8, repeat: Infinity }}
           />
         </div>
 
