@@ -519,7 +519,8 @@ export default function CustomerMenu() {
                   <CalendarDays className="w-4 h-4" /> Reserve {selectedTable || "Table"}
                 </motion.button>
               </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
