@@ -79,6 +79,7 @@ const App = () => (
             <Route path="/customer/favorites" element={<CustomerFavorites />} />
             <Route path="/customer/notifications" element={<CustomerNotifications />} />
             <Route path="/customer/profile" element={<CustomerProfile />} />
+            <Route path="/customer/reservation" element={<CustomerReservation />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

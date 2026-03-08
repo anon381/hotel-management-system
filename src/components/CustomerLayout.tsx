@@ -10,6 +10,7 @@ const navItems = [
   { title: "Menu", icon: UtensilsCrossed, path: "/customer/menu" },
   { title: "My Orders", icon: ShoppingCart, path: "/customer/orders" },
   { title: "Favorites", icon: Heart, path: "/customer/favorites" },
+  { title: "Reserve Table", icon: CalendarDays, path: "/customer/reservation" },
   { title: "Notifications", icon: Bell, path: "/customer/notifications" },
   { title: "Profile", icon: User, path: "/customer/profile" },
 ];
