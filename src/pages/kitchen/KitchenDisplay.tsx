@@ -61,6 +61,15 @@ export default function KitchenDisplay() {
   const [soundOn, setSoundOn] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Exit fullscreen when navigating away
+  useEffect(() => {
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    };
+  }, []);
+
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
