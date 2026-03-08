@@ -483,8 +483,8 @@ export default function LandingPage() {
           {/* Stats */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+            animate={sceneReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ delay: 1.1, duration: 0.6 }}
             className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
           >
             {[
