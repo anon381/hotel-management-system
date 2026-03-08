@@ -1243,3 +1243,450 @@ INSERT INTO public.coin_milestones (title, icon, coins_required, bonus_coins, de
   ('Silver Status', '🥈', 1000, 100, 'Reach 1,000 lifetime coins', 2),
   ('Gold Member', '🥇', 2000, 200, 'Join the Gold tier at 2,000 coins', 3),
   ('Platinum VIP', '💎', 5000, 500, 'Ultimate status at 5,000 coins', 4);
+
+-- ==================== FEATURE: ORDER TRACKING ====================
+
+-- 33. Order Tracking Steps (real-time status timeline)
+CREATE TABLE public.order_tracking_steps (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
+    status order_status NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    completed_at TIMESTAMPTZ,
+    completed_by UUID REFERENCES auth.users(id),
+    is_current BOOLEAN DEFAULT false,
+    step_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_order_tracking_order ON public.order_tracking_steps(order_id);
+CREATE INDEX idx_order_tracking_current ON public.order_tracking_steps(order_id) WHERE is_current = true;
+
+ALTER TABLE public.order_tracking_steps ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Customers view own tracking" ON public.order_tracking_steps FOR SELECT TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.orders WHERE id = order_id AND customer_id = auth.uid())
+);
+CREATE POLICY "Kitchen manage tracking" ON public.order_tracking_steps FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'kitchen_staff'));
+CREATE POLICY "Admins manage tracking" ON public.order_tracking_steps FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+
+-- Auto-create tracking steps when order is placed
+CREATE OR REPLACE FUNCTION public.create_order_tracking_steps()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.order_tracking_steps (order_id, status, title, description, step_order, is_current, completed_at) VALUES
+    (NEW.id, 'pending', 'Order Placed', 'Your order has been received', 1, true, now()),
+    (NEW.id, 'confirmed', 'Confirmed', 'Restaurant confirmed your order', 2, false, NULL),
+    (NEW.id, 'preparing', 'Preparing', 'Chef is cooking your food', 3, false, NULL),
+    (NEW.id, 'ready', 'Ready', 'Your order is ready for pickup/serving', 4, false, NULL),
+    (NEW.id, 'served', 'Served', 'Enjoy your meal!', 5, false, NULL),
+    (NEW.id, 'completed', 'Completed', 'Thank you for dining with us', 6, false, NULL);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_order_created_tracking
+  AFTER INSERT ON public.orders
+  FOR EACH ROW EXECUTE FUNCTION public.create_order_tracking_steps();
+
+-- Update tracking steps when order status changes
+CREATE OR REPLACE FUNCTION public.update_order_tracking()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF OLD.status IS DISTINCT FROM NEW.status THEN
+    UPDATE public.order_tracking_steps
+    SET is_current = false
+    WHERE order_id = NEW.id;
+
+    UPDATE public.order_tracking_steps
+    SET is_current = true, completed_at = now()
+    WHERE order_id = NEW.id AND status = NEW.status;
+
+    -- Also mark all previous steps as completed
+    UPDATE public.order_tracking_steps
+    SET completed_at = COALESCE(completed_at, now())
+    WHERE order_id = NEW.id AND step_order <= (
+      SELECT step_order FROM public.order_tracking_steps WHERE order_id = NEW.id AND status = NEW.status LIMIT 1
+    );
+
+    -- Notify customer
+    IF NEW.customer_id IS NOT NULL THEN
+      INSERT INTO public.notifications (user_id, type, title, message, metadata)
+      VALUES (NEW.customer_id, 'order',
+        CASE NEW.status
+          WHEN 'confirmed' THEN 'Order Confirmed ✅'
+          WHEN 'preparing' THEN 'Being Prepared 👨‍🍳'
+          WHEN 'ready' THEN 'Ready for Pickup! 🔔'
+          WHEN 'served' THEN 'Enjoy Your Meal! 🍽️'
+          WHEN 'completed' THEN 'Order Complete 🎉'
+          WHEN 'cancelled' THEN 'Order Cancelled ❌'
+          ELSE 'Order Updated'
+        END,
+        'Order #' || NEW.order_number || ' status: ' || NEW.status,
+        jsonb_build_object('order_id', NEW.id, 'status', NEW.status)
+      );
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_order_status_changed
+  AFTER UPDATE ON public.orders
+  FOR EACH ROW EXECUTE FUNCTION public.update_order_tracking();
+
+-- ==================== FEATURE: REFERRAL SYSTEM ====================
+
+-- 34. Referral Codes
+CREATE TABLE public.referral_codes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    referrer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    code TEXT UNIQUE NOT NULL,
+    bonus_coins_referrer INT DEFAULT 100,
+    bonus_coins_referee INT DEFAULT 50,
+    max_uses INT DEFAULT 50,
+    current_uses INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 35. Referral Log
+CREATE TABLE public.referral_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    referrer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    referee_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    referral_code_id UUID REFERENCES public.referral_codes(id) ON DELETE SET NULL,
+    coins_awarded_referrer INT NOT NULL DEFAULT 0,
+    coins_awarded_referee INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (referee_id) -- each user can only be referred once
+);
+
+CREATE INDEX idx_referral_codes_referrer ON public.referral_codes(referrer_id);
+CREATE INDEX idx_referral_codes_code ON public.referral_codes(code);
+CREATE INDEX idx_referral_log_referrer ON public.referral_log(referrer_id);
+
+ALTER TABLE public.referral_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.referral_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "View own referral codes" ON public.referral_codes FOR SELECT TO authenticated USING (referrer_id = auth.uid());
+CREATE POLICY "Create own referral codes" ON public.referral_codes FOR INSERT TO authenticated WITH CHECK (referrer_id = auth.uid());
+CREATE POLICY "Admins manage referral codes" ON public.referral_codes FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "View own referral log" ON public.referral_log FOR SELECT TO authenticated USING (referrer_id = auth.uid() OR referee_id = auth.uid());
+CREATE POLICY "System insert referral log" ON public.referral_log FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Admins view referral log" ON public.referral_log FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+
+-- Auto-generate referral code on signup
+CREATE OR REPLACE FUNCTION public.generate_referral_code()
+RETURNS TRIGGER AS $$
+DECLARE
+  _code TEXT;
+BEGIN
+  _code := 'CAFE' || UPPER(SUBSTRING(MD5(NEW.id::TEXT) FROM 1 FOR 6));
+  INSERT INTO public.referral_codes (referrer_id, code) VALUES (NEW.id, _code);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_user_create_referral_code
+  AFTER INSERT ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.generate_referral_code();
+
+-- ==================== FEATURE: DAILY DEALS & HAPPY HOUR ====================
+
+-- 36. Daily Deals
+CREATE TABLE public.daily_deals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    description TEXT,
+    deal_type TEXT NOT NULL DEFAULT 'discount_percent', -- discount_percent, discount_fixed, free_item, bogo
+    deal_value DECIMAL(10,2) NOT NULL DEFAULT 0,
+    menu_item_id UUID REFERENCES public.menu_items(id) ON DELETE SET NULL,
+    category_filter dish_category, -- optional: applies to specific category
+    day_of_week INT CHECK (day_of_week >= 0 AND day_of_week <= 6), -- NULL = every day
+    start_time TIME DEFAULT '00:00',
+    end_time TIME DEFAULT '23:59',
+    is_happy_hour BOOLEAN DEFAULT false,
+    min_order_amount DECIMAL(10,2) DEFAULT 0,
+    max_discount DECIMAL(10,2), -- cap for percentage discounts
+    banner_emoji TEXT DEFAULT '🔥',
+    is_active BOOLEAN DEFAULT true,
+    starts_at DATE DEFAULT CURRENT_DATE,
+    expires_at DATE,
+    created_by UUID REFERENCES auth.users(id),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 37. Deal Redemptions
+CREATE TABLE public.deal_redemptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deal_id UUID REFERENCES public.daily_deals(id) ON DELETE CASCADE NOT NULL,
+    customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
+    discount_applied DECIMAL(10,2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_daily_deals_active ON public.daily_deals(is_active) WHERE is_active = true;
+CREATE INDEX idx_daily_deals_day ON public.daily_deals(day_of_week);
+CREATE INDEX idx_daily_deals_happy ON public.daily_deals(is_happy_hour) WHERE is_happy_hour = true;
+CREATE INDEX idx_deal_redemptions_customer ON public.deal_redemptions(customer_id);
+CREATE INDEX idx_deal_redemptions_deal ON public.deal_redemptions(deal_id);
+
+ALTER TABLE public.daily_deals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.deal_redemptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone view active deals" ON public.daily_deals FOR SELECT TO authenticated USING (is_active = true);
+CREATE POLICY "Admins manage deals" ON public.daily_deals FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "View own deal redemptions" ON public.deal_redemptions FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Create deal redemptions" ON public.deal_redemptions FOR INSERT TO authenticated WITH CHECK (customer_id = auth.uid());
+CREATE POLICY "Admins view deal redemptions" ON public.deal_redemptions FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+
+CREATE TRIGGER update_daily_deals_updated_at BEFORE UPDATE ON public.daily_deals FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+-- Seed deals
+INSERT INTO public.daily_deals (title, description, deal_type, deal_value, day_of_week, start_time, end_time, is_happy_hour, banner_emoji) VALUES
+  ('Taco Tuesday', '20% off all main courses every Tuesday', 'discount_percent', 20, 2, '11:00', '22:00', false, '🌮'),
+  ('Happy Hour', 'Buy 1 Get 1 Free on all drinks', 'bogo', 0, NULL, '16:00', '19:00', true, '🍺'),
+  ('Weekend Brunch Special', '$5 off breakfast items on weekends', 'discount_fixed', 5, 0, '08:00', '13:00', false, '🥞'),
+  ('Weekend Brunch Special Sun', '$5 off breakfast items on weekends', 'discount_fixed', 5, 6, '08:00', '13:00', false, '🥞'),
+  ('Late Night Dessert', '30% off all desserts after 9PM', 'discount_percent', 30, NULL, '21:00', '23:59', false, '🍰'),
+  ('Wine Wednesday', 'Free appetizer with any wine order', 'free_item', 0, 3, '17:00', '22:00', true, '🍷');
+
+-- ==================== FEATURE: CUSTOMER REVIEWS (enhanced) ====================
+-- Reviews table already exists. Add photo support column.
+
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS photos TEXT[]; -- array of photo URLs
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS helpful_count INT DEFAULT 0;
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS order_item_name TEXT; -- denormalized for display
+
+-- 38. Review Helpful Votes
+CREATE TABLE public.review_helpful_votes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    review_id UUID REFERENCES public.reviews(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (review_id, user_id)
+);
+
+CREATE INDEX idx_review_votes_review ON public.review_helpful_votes(review_id);
+ALTER TABLE public.review_helpful_votes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone view votes" ON public.review_helpful_votes FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Customers vote" ON public.review_helpful_votes FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Remove own vote" ON public.review_helpful_votes FOR DELETE TO authenticated USING (user_id = auth.uid());
+
+-- Award coins for reviews
+CREATE OR REPLACE FUNCTION public.award_review_coins()
+RETURNS TRIGGER AS $$
+DECLARE
+  _current_points INT;
+BEGIN
+  SELECT total_loyalty_points INTO _current_points FROM public.profiles WHERE id = NEW.customer_id;
+  _current_points := COALESCE(_current_points, 0) + 10;
+
+  INSERT INTO public.loyalty_transactions (customer_id, points, reason, reference_type, reference_id, balance_after)
+  VALUES (NEW.customer_id, 10, 'Review bonus', 'review', NEW.id, _current_points);
+
+  UPDATE public.profiles SET total_loyalty_points = _current_points WHERE id = NEW.customer_id;
+
+  INSERT INTO public.notifications (user_id, type, title, message)
+  VALUES (NEW.customer_id, 'loyalty', 'Review Bonus! ✍️', 'You earned 10 coins for your review. Keep sharing your thoughts!');
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_review_award_coins
+  AFTER INSERT ON public.reviews
+  FOR EACH ROW EXECUTE FUNCTION public.award_review_coins();
+
+-- ==================== FEATURE: STAFF SCHEDULE CALENDAR ====================
+
+-- 39. Staff Schedule Calendar (date-specific, not just recurring)
+CREATE TABLE public.staff_schedule_calendar (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    staff_id UUID REFERENCES public.staff(id) ON DELETE CASCADE NOT NULL,
+    schedule_date DATE NOT NULL,
+    shift_start TIME NOT NULL,
+    shift_end TIME NOT NULL,
+    break_start TIME,
+    break_end TIME,
+    role_override TEXT, -- if different from usual role
+    notes TEXT,
+    is_day_off BOOLEAN DEFAULT false,
+    swap_requested BOOLEAN DEFAULT false,
+    swap_with_staff_id UUID REFERENCES public.staff(id),
+    swap_approved BOOLEAN DEFAULT false,
+    approved_by UUID REFERENCES auth.users(id),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (staff_id, schedule_date)
+);
+
+CREATE INDEX idx_staff_calendar_date ON public.staff_schedule_calendar(schedule_date);
+CREATE INDEX idx_staff_calendar_staff ON public.staff_schedule_calendar(staff_id);
+CREATE INDEX idx_staff_calendar_swaps ON public.staff_schedule_calendar(swap_requested) WHERE swap_requested = true;
+
+ALTER TABLE public.staff_schedule_calendar ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admins manage schedule calendar" ON public.staff_schedule_calendar FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "Staff view own schedule calendar" ON public.staff_schedule_calendar FOR SELECT TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.staff WHERE id = staff_id AND user_id = auth.uid())
+);
+CREATE POLICY "Staff request swaps" ON public.staff_schedule_calendar FOR UPDATE TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.staff WHERE id = staff_id AND user_id = auth.uid())
+);
+
+CREATE TRIGGER update_staff_calendar_updated_at BEFORE UPDATE ON public.staff_schedule_calendar FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+-- ==================== FEATURE: AI DISH RECOMMENDATIONS ====================
+
+-- 40. Customer Preferences (learned from behavior)
+CREATE TABLE public.customer_preferences (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
+    favorite_categories dish_category[] DEFAULT '{}',
+    favorite_tags TEXT[] DEFAULT '{}',
+    dietary_restrictions TEXT[] DEFAULT '{}', -- vegetarian, vegan, gluten_free, halal
+    avg_spend_range DECIMAL(10,2) DEFAULT 0,
+    spice_preference TEXT DEFAULT 'mild', -- mild, medium, spicy
+    order_frequency TEXT DEFAULT 'occasional', -- first_time, occasional, regular, frequent
+    last_computed_at TIMESTAMPTZ DEFAULT now(),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 41. AI Recommendation Log
+CREATE TABLE public.recommendation_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    menu_item_id UUID REFERENCES public.menu_items(id) ON DELETE CASCADE NOT NULL,
+    score DECIMAL(5,3) NOT NULL DEFAULT 0, -- 0-1 relevance score
+    reason TEXT, -- 'popular_in_category', 'similar_to_favorites', 'trending', 'new_item', 'reorder'
+    was_clicked BOOLEAN DEFAULT false,
+    was_ordered BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_customer_prefs_customer ON public.customer_preferences(customer_id);
+CREATE INDEX idx_recommendation_log_customer ON public.recommendation_log(customer_id);
+CREATE INDEX idx_recommendation_log_item ON public.recommendation_log(menu_item_id);
+
+ALTER TABLE public.customer_preferences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.recommendation_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "View own preferences" ON public.customer_preferences FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Update own preferences" ON public.customer_preferences FOR ALL TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Admins view preferences" ON public.customer_preferences FOR SELECT TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "View own recommendations" ON public.recommendation_log FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "System insert recommendations" ON public.recommendation_log FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Admins view recommendations" ON public.recommendation_log FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+
+CREATE TRIGGER update_customer_prefs_updated_at BEFORE UPDATE ON public.customer_preferences FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+-- Function to compute recommendations for a customer
+CREATE OR REPLACE FUNCTION public.get_recommendations(_customer_id UUID, _limit INT DEFAULT 6)
+RETURNS TABLE (
+  item_id UUID,
+  item_name TEXT,
+  item_emoji TEXT,
+  item_price DECIMAL,
+  item_rating DECIMAL,
+  item_category dish_category,
+  rec_score DECIMAL,
+  rec_reason TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH customer_orders AS (
+    SELECT oi.menu_item_id, COUNT(*) as order_count
+    FROM order_items oi
+    JOIN orders o ON o.id = oi.order_id
+    WHERE o.customer_id = _customer_id AND o.status != 'cancelled'
+    GROUP BY oi.menu_item_id
+  ),
+  customer_cats AS (
+    SELECT mi.category, COUNT(*) as cat_count
+    FROM customer_orders co
+    JOIN menu_items mi ON mi.id = co.menu_item_id
+    GROUP BY mi.category
+  ),
+  popular_items AS (
+    SELECT menu_item_id, COUNT(*) as pop_count
+    FROM order_items
+    GROUP BY menu_item_id
+    ORDER BY pop_count DESC
+    LIMIT 20
+  )
+  SELECT
+    mi.id,
+    mi.name,
+    mi.emoji,
+    mi.price,
+    mi.avg_rating,
+    mi.category,
+    ROUND((
+      COALESCE((SELECT cat_count FROM customer_cats WHERE category = mi.category), 0) * 0.3 +
+      COALESCE(mi.avg_rating, 0) * 0.2 +
+      CASE WHEN mi.is_featured THEN 0.15 ELSE 0 END +
+      COALESCE((SELECT pop_count FROM popular_items WHERE menu_item_id = mi.id), 0) * 0.05 +
+      CASE WHEN co.menu_item_id IS NOT NULL THEN 0.3 ELSE 0 END
+    )::DECIMAL, 3),
+    CASE
+      WHEN co.menu_item_id IS NOT NULL THEN 'reorder'
+      WHEN EXISTS (SELECT 1 FROM customer_cats WHERE category = mi.category) THEN 'similar_to_favorites'
+      WHEN mi.is_featured THEN 'trending'
+      WHEN EXISTS (SELECT 1 FROM popular_items WHERE menu_item_id = mi.id) THEN 'popular'
+      ELSE 'new_for_you'
+    END
+  FROM menu_items mi
+  LEFT JOIN customer_orders co ON co.menu_item_id = mi.id
+  WHERE mi.is_available = true
+  ORDER BY 7 DESC
+  LIMIT _limit;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Auto-create customer preferences on first order
+CREATE OR REPLACE FUNCTION public.update_customer_preferences()
+RETURNS TRIGGER AS $$
+DECLARE
+  _cats dish_category[];
+BEGIN
+  IF NEW.customer_id IS NULL THEN RETURN NEW; END IF;
+
+  SELECT ARRAY_AGG(DISTINCT mi.category)
+  INTO _cats
+  FROM order_items oi
+  JOIN menu_items mi ON mi.id = oi.menu_item_id
+  JOIN orders o ON o.id = oi.order_id
+  WHERE o.customer_id = NEW.customer_id AND o.status != 'cancelled';
+
+  INSERT INTO public.customer_preferences (customer_id, favorite_categories, order_frequency, avg_spend_range, last_computed_at)
+  VALUES (
+    NEW.customer_id,
+    COALESCE(_cats, '{}'),
+    CASE
+      WHEN (SELECT COUNT(*) FROM orders WHERE customer_id = NEW.customer_id) >= 10 THEN 'frequent'
+      WHEN (SELECT COUNT(*) FROM orders WHERE customer_id = NEW.customer_id) >= 5 THEN 'regular'
+      WHEN (SELECT COUNT(*) FROM orders WHERE customer_id = NEW.customer_id) >= 2 THEN 'occasional'
+      ELSE 'first_time'
+    END,
+    COALESCE((SELECT AVG(total) FROM orders WHERE customer_id = NEW.customer_id AND status != 'cancelled'), 0),
+    now()
+  )
+  ON CONFLICT (customer_id) DO UPDATE SET
+    favorite_categories = EXCLUDED.favorite_categories,
+    order_frequency = EXCLUDED.order_frequency,
+    avg_spend_range = EXCLUDED.avg_spend_range,
+    last_computed_at = now();
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_order_update_preferences
+  AFTER UPDATE ON public.orders
+  FOR EACH ROW
+  WHEN (NEW.status = 'completed')
+  EXECUTE FUNCTION public.update_customer_preferences();
