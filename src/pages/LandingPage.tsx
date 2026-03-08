@@ -253,13 +253,32 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <div key={f.title} data-delay={i * 100} className="animate-on-scroll feature-card glass-card-elevated p-6 group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.25 } }}
+                className="glass-card-elevated p-6 group hover:border-primary/30 transition-colors duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-default"
+              >
+                <motion.div
+                  className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300"
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
                   <f.icon className="w-6 h-6 text-primary" />
-                </div>
+                </motion.div>
                 <h3 className="font-display font-semibold text-lg text-foreground mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </div>
+                <motion.div
+                  className="h-0.5 bg-gradient-to-r from-primary/60 to-accent/40 rounded-full mt-4 origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
+                />
+              </motion.div>
             ))}
           </div>
         </div>
