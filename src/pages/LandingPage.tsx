@@ -272,8 +272,8 @@ export default function LandingPage() {
             <p className="text-muted-foreground mt-3 max-w-xl mx-auto">Every module designed to streamline your restaurant operations.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => (
-              <div key={f.title} className="feature-card glass-card-elevated p-6 group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+            {features.map((f, i) => (
+              <div key={f.title} data-delay={i * 100} className="animate-on-scroll feature-card glass-card-elevated p-6 group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
                   <f.icon className="w-6 h-6 text-primary" />
                 </div>
