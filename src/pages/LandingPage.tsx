@@ -838,7 +838,7 @@ export default function LandingPage() {
               Get Started
             </motion.a>
 
-            <div className="w-16 h-px bg-border mt-1" />
+            <div className="w-12 h-px bg-border" />
 
             <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-xs text-muted-foreground">
               © 2026 Café X Restaurant Management System. Crafted with ♥
