@@ -78,7 +78,7 @@ function CustomerSidebar() {
           </>
         )}
       </AnimatePresence>
-      <motion.aside animate={{ width: collapsed ? 72 : 260 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="hidden lg:block fixed left-0 top-0 bottom-0 bg-background/40 backdrop-blur-2xl backdrop-saturate-150 z-30 border-r border-border/20 overflow-hidden sidebar-curved shadow-[0_8px_32px_-8px_hsl(var(--foreground)/0.08)]">
+      <motion.aside animate={{ width: collapsed ? 72 : 260 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="hidden lg:block fixed left-4 top-4 bottom-4 bg-background/40 backdrop-blur-2xl backdrop-saturate-150 z-30 border border-border/20 overflow-hidden rounded-2xl shadow-[0_8px_32px_-8px_hsl(var(--foreground)/0.08)]">
         {content}
       </motion.aside>
       <motion.div animate={{ width: collapsed ? 72 : 260 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="hidden lg:block flex-shrink-0" />
