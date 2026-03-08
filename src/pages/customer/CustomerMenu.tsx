@@ -289,7 +289,7 @@ export default function CustomerMenu() {
                     <div className="flex gap-3">
                       <motion.button
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => setQuantityModal(null)}
+                        onClick={() => setJustAdded(null)}
                         className="flex-1 py-3 rounded-xl border border-border text-foreground text-sm font-semibold hover:bg-muted transition-colors flex items-center justify-center gap-2"
                       >
                         <Plus className="w-4 h-4" /> Add More
