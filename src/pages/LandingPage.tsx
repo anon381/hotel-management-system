@@ -71,7 +71,8 @@ export default function LandingPage() {
               duration: 0.8,
               delay: i * 0.1,
               ease: "power3.out",
-              scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none none" },
+              immediateRender: false,
+              scrollTrigger: { trigger: card, start: "top 98%", toggleActions: "play none none none" },
             }
           );
         });
