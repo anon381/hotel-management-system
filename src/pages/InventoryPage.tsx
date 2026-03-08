@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Package, AlertTriangle, TrendingDown, Plus, Search, Truck } from "lucide-react";
+import { Package, AlertTriangle, TrendingDown, Plus, Search, Truck, Pencil, Trash2 } from "lucide-react";
 import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
