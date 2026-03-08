@@ -241,12 +241,13 @@ export default function CustomerMenu() {
         {quantityModal && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" onClick={() => setQuantityModal(null)} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-sm bg-background border border-border rounded-2xl p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="w-full max-w-sm bg-background border border-border rounded-2xl p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+              >
               <AnimatePresence mode="wait">
                 {!justAdded ? (
                   <motion.div key="pick-qty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -20 }}>
@@ -311,7 +312,8 @@ export default function CustomerMenu() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
@@ -403,36 +405,38 @@ export default function CustomerMenu() {
         {checkoutOpen && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" onClick={() => setCheckoutOpen(false)} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-md bg-background border border-border rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
-            >
-              <h3 className="font-display font-bold text-lg text-foreground mb-4">Checkout</h3>
-              <div className="space-y-2 mb-4">
-                {cart.map((c) => (
-                  <div key={c.name} className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
-                    <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="w-full max-w-md bg-background border border-border rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+              >
+                <h3 className="font-display font-bold text-lg text-foreground mb-4">Checkout</h3>
+                <div className="space-y-2 mb-4">
+                  {cart.map((c) => (
+                    <div key={c.name} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
+                      <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+                    </div>
+                  ))}
+                  <div className="pt-2 border-t border-border flex justify-between">
+                    <span className="font-semibold text-foreground">Total</span>
+                    <span className="font-display font-bold text-lg text-primary">${cartTotal}</span>
                   </div>
-                ))}
-                <div className="pt-2 border-t border-border flex justify-between">
-                  <span className="font-semibold text-foreground">Total</span>
-                  <span className="font-display font-bold text-lg text-primary">${cartTotal}</span>
                 </div>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => setCheckoutOpen(false)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Back</button>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={placeOrder}
-                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2"
-                >
-                  <Check className="w-4 h-4" /> Place Order
-                </motion.button>
-              </div>
-            </motion.div>
+                <div className="flex gap-3">
+                  <button onClick={() => setCheckoutOpen(false)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Back</button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={placeOrder}
+                    className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2"
+                  >
+                    <Check className="w-4 h-4" /> Place Order
+                  </motion.button>
+                </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
