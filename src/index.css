@@ -128,29 +128,47 @@
 
   /* Styled page scrollbar */
   html {
+    --scroll-hue: 270;
     scrollbar-width: auto;
-    scrollbar-color: hsl(var(--primary) / 0.5) transparent;
+    scrollbar-color: hsl(var(--scroll-hue) 70% 50% / 0.5) transparent;
   }
   ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.5));
-    border: 3px solid transparent;
+    background: linear-gradient(
+      180deg,
+      hsl(var(--scroll-hue) 70% 55% / 0.6),
+      hsl(calc(var(--scroll-hue) + 30) 65% 50% / 0.6),
+      hsl(calc(var(--scroll-hue) + 60) 60% 55% / 0.6)
+    );
+    border: 2px solid transparent;
     background-clip: content-box;
-    border-radius: 20px / 50%;
+    border-radius: 100px;
+    transition: border-radius 0.3s, background 0.3s;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, hsl(var(--primary) / 0.7), hsl(var(--accent) / 0.7));
+    background: linear-gradient(
+      180deg,
+      hsl(var(--scroll-hue) 70% 55% / 0.8),
+      hsl(calc(var(--scroll-hue) + 30) 65% 50% / 0.8),
+      hsl(calc(var(--scroll-hue) + 60) 60% 55% / 0.8)
+    );
     background-clip: content-box;
+    border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(180deg, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.9));
+    background: linear-gradient(
+      180deg,
+      hsl(var(--scroll-hue) 70% 55% / 1),
+      hsl(calc(var(--scroll-hue) + 40) 65% 50% / 1)
+    );
     background-clip: content-box;
+    border-radius: 4px;
   }
 }
 
