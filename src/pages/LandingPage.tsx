@@ -251,7 +251,7 @@ export default function LandingPage() {
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-bold text-foreground leading-tight mb-6">
               Welcome to <br />
               <motion.span
-                className="bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent bg-[length:200%]"
+                className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%]"
                 animate={{ backgroundPosition: ["0%", "100%", "0%"] }}
                 transition={{ duration: 5, repeat: Infinity }}
               >
