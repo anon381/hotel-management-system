@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Check, Flame, AlertTriangle, Volume2, VolumeX, Maximize, ChefHat, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Clock, Check, Flame, AlertTriangle, Volume2, VolumeX, Maximize, ChefHat } from "lucide-react";
+import { KitchenLayout } from "@/components/KitchenLayout";
 
 interface DisplayOrder {
   id: string;
