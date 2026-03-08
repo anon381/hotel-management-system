@@ -58,7 +58,7 @@ export function AppSidebar() {
         <AnimatePresence>
           {!collapsed && (
             <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: "auto" }} exit={{ opacity: 0, width: 0 }} className="overflow-hidden">
-              <h1 className="font-display text-lg font-bold text-sidebar-foreground whitespace-nowrap">Café Luxe</h1>
+              <h1 className="font-display text-lg font-bold text-sidebar-foreground whitespace-nowrap">Café X</h1>
               <p className="text-[10px] text-sidebar-foreground/50 whitespace-nowrap">Restaurant Management</p>
             </motion.div>
           )}

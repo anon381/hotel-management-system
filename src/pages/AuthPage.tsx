@@ -95,7 +95,7 @@ export default function AuthPage() {
               <div className="w-8 h-8 rounded-lg gradient-warm flex items-center justify-center">
                 <UtensilsCrossed className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-foreground hidden sm:block">Café Luxe</span>
+              <span className="font-display font-bold text-foreground hidden sm:block">Café X</span>
             </Link>
           </div>
         </div>
