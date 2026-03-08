@@ -360,6 +360,16 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Section Transition: Features → How It Works */}
+      <div className="section-divider relative h-32 sm:h-40 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-muted/30" />
+        <div className="parallax-bg absolute left-[20%] top-1/3 w-24 h-24 bg-primary/8 rounded-full blur-2xl" />
+        <div className="parallax-bg absolute right-[20%] top-2/3 w-32 h-32 bg-accent/6 rounded-full blur-2xl" />
+        <svg className="absolute top-0 left-0 w-full rotate-180" viewBox="0 0 1440 40" preserveAspectRatio="none">
+          <path d="M0,40 C480,0 960,0 1440,40 L1440,40 L0,40 Z" className="fill-background" />
+        </svg>
+      </div>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
         <div className="parallax-bg absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
@@ -382,6 +392,19 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Section Transition: How It Works → Portals */}
+      <div className="section-divider relative h-32 sm:h-40 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-primary/5 to-background" />
+        <div className="parallax-bg absolute left-[15%] top-1/2 -translate-y-1/2 w-36 h-36 bg-accent/8 rounded-full blur-2xl" />
+        <div className="parallax-bg absolute right-[15%] top-1/2 -translate-y-1/2 w-28 h-28 bg-primary/10 rounded-full blur-2xl" />
+        <svg className="absolute top-0 left-0 w-full rotate-180" viewBox="0 0 1440 40" preserveAspectRatio="none">
+          <path d="M0,40 C720,0 720,40 1440,0 L1440,40 L0,40 Z" className="fill-muted/30" />
+        </svg>
+        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 40" preserveAspectRatio="none">
+          <path d="M0,40 C360,10 1080,10 1440,40 L1440,40 L0,40 Z" className="fill-background" />
+        </svg>
+      </div>
 
       {/* Portals */}
       <section id="portals" className="py-20 sm:py-32">
