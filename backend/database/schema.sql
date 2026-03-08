@@ -1,10 +1,12 @@
 -- =============================================
--- Café X - Complete Database Schema (v2)
+-- Café X - Complete Database Schema (v3 - FINAL)
 -- PostgreSQL / Supabase compatible
--- Covers ALL features: Auth, Menu, Orders, Payments,
--- Reservations, Tables, Inventory, Staff, Customers,
--- Reviews, Loyalty, Feedback, Promotions, Notifications,
--- Schedules, Tags, User Management
+-- 26 tables, full RLS, triggers, functions, seed data
+-- Covers: Auth, Menu, Orders, Payments, Reservations,
+-- Tables, Inventory, Staff, Customers, Reviews, Loyalty,
+-- Feedback, Promotions, Notifications, Schedules, Tags,
+-- User Management, Activity Logs, Coupons, Delivery,
+-- Menu Ingredients, Kitchen Stations
 -- =============================================
 
 -- ==================== ENUMS ====================
@@ -22,6 +24,7 @@ CREATE TYPE public.membership_tier AS ENUM ('bronze', 'silver', 'gold', 'platinu
 CREATE TYPE public.staff_status AS ENUM ('on_duty', 'on_break', 'off_duty');
 CREATE TYPE public.feedback_type AS ENUM ('food', 'service', 'ambiance', 'general');
 CREATE TYPE public.promotion_type AS ENUM ('discount_percent', 'discount_fixed', 'free_item', 'bonus_points');
+CREATE TYPE public.order_type AS ENUM ('dine_in', 'takeaway', 'delivery');
 
 -- ==================== CORE TABLES ====================
 
@@ -33,11 +36,14 @@ CREATE TABLE public.profiles (
     phone TEXT,
     address TEXT,
     avatar_url TEXT,
+    date_of_birth DATE,
+    preferences JSONB DEFAULT '{}',  -- dietary prefs, language, etc.
     membership_tier membership_tier DEFAULT 'bronze',
     total_loyalty_points INT DEFAULT 0,
     lifetime_spent DECIMAL(12, 2) DEFAULT 0,
     total_orders INT DEFAULT 0,
     total_visits INT DEFAULT 0,
+    last_visit_at TIMESTAMPTZ,
     member_since TIMESTAMPTZ DEFAULT now(),
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
@@ -60,6 +66,7 @@ CREATE TABLE public.menu_categories (
     name TEXT NOT NULL UNIQUE,
     description TEXT,
     image_url TEXT,
+    icon_emoji TEXT DEFAULT '🍽️',
     display_order INT DEFAULT 0,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -73,6 +80,7 @@ CREATE TABLE public.menu_items (
     name TEXT NOT NULL,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
+    compare_price DECIMAL(10, 2),  -- original price for sale items
     image_url TEXT,
     emoji TEXT DEFAULT '🍽️',
     category dish_category DEFAULT 'main_course',
@@ -80,8 +88,14 @@ CREATE TABLE public.menu_items (
     is_vegan BOOLEAN DEFAULT false,
     is_gluten_free BOOLEAN DEFAULT false,
     is_spicy BOOLEAN DEFAULT false,
+    is_halal BOOLEAN DEFAULT false,
+    allergens TEXT[],  -- array of allergens: nuts, dairy, shellfish, etc.
     prep_time_minutes INT DEFAULT 15,
     calories INT,
+    protein_g DECIMAL(5,1),
+    carbs_g DECIMAL(5,1),
+    fat_g DECIMAL(5,1),
+    serving_size TEXT,  -- e.g. "250g", "1 plate"
     is_available BOOLEAN DEFAULT true,
     is_featured BOOLEAN DEFAULT false,
     total_orders INT DEFAULT 0,
@@ -101,25 +115,40 @@ CREATE TABLE public.menu_item_tags (
     UNIQUE (menu_item_id, tag)
 );
 
+-- 6. Menu Item Ingredients (links menu items to inventory)
+CREATE TABLE public.menu_item_ingredients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    menu_item_id UUID REFERENCES public.menu_items(id) ON DELETE CASCADE NOT NULL,
+    inventory_id UUID REFERENCES public.inventory(id) ON DELETE SET NULL,
+    ingredient_name TEXT NOT NULL,
+    quantity_needed DECIMAL(10, 2) NOT NULL DEFAULT 1,
+    unit inventory_unit DEFAULT 'g',
+    is_optional BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- ==================== TABLE MANAGEMENT ====================
 
--- 6. Restaurant Tables
+-- 7. Restaurant Tables
 CREATE TABLE public.restaurant_tables (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     table_number TEXT UNIQUE NOT NULL,
     zone TEXT NOT NULL DEFAULT 'Main',
     capacity INT NOT NULL DEFAULT 4 CHECK (capacity > 0),
     status table_status DEFAULT 'available',
+    shape TEXT DEFAULT 'square',  -- square, round, rectangle
     position_x FLOAT DEFAULT 0,
     position_y FLOAT DEFAULT 0,
+    floor INT DEFAULT 1,
     is_active BOOLEAN DEFAULT true,
+    notes TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== RESERVATIONS ====================
 
--- 7. Reservations
+-- 8. Reservations
 CREATE TABLE public.reservations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reservation_number TEXT UNIQUE,
@@ -127,36 +156,48 @@ CREATE TABLE public.reservations (
     table_id UUID REFERENCES public.restaurant_tables(id) ON DELETE SET NULL,
     reservation_date DATE NOT NULL,
     reservation_time TIME NOT NULL,
+    end_time TIME,
     duration_minutes INT DEFAULT 90,
     guest_count INT NOT NULL DEFAULT 2 CHECK (guest_count > 0),
     status reservation_status DEFAULT 'pending',
     special_requests TEXT,
+    occasion TEXT,  -- birthday, anniversary, business, etc.
+    contact_name TEXT,
+    contact_phone TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== ORDER SYSTEM ====================
 
--- 8. Orders
+-- 9. Orders
 CREATE TABLE public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number SERIAL,
     customer_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
     table_id UUID REFERENCES public.restaurant_tables(id) ON DELETE SET NULL,
+    order_type order_type DEFAULT 'dine_in',
     status order_status DEFAULT 'pending',
     subtotal DECIMAL(10, 2) NOT NULL DEFAULT 0,
     tax DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    tax_rate DECIMAL(4, 2) DEFAULT 8.00,  -- configurable tax %
     discount DECIMAL(10, 2) DEFAULT 0,
+    delivery_fee DECIMAL(10, 2) DEFAULT 0,
     total DECIMAL(10, 2) NOT NULL DEFAULT 0,
     notes TEXT,
+    delivery_address TEXT,
+    delivery_instructions TEXT,
     estimated_ready_minutes INT,
     actual_ready_at TIMESTAMPTZ,
     served_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    cancelled_at TIMESTAMPTZ,
+    cancel_reason TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 9. Order Items
+-- 10. Order Items
 CREATE TABLE public.order_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
@@ -164,15 +205,17 @@ CREATE TABLE public.order_items (
     item_name TEXT NOT NULL, -- denormalized for history
     quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
     unit_price DECIMAL(10, 2) NOT NULL,
+    total_price DECIMAL(10, 2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
     special_instructions TEXT,
     is_completed BOOLEAN DEFAULT false, -- kitchen item-level tracking
     completed_at TIMESTAMPTZ,
+    completed_by UUID REFERENCES auth.users(id),
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== PAYMENTS ====================
 
--- 10. Payments
+-- 11. Payments
 CREATE TABLE public.payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
@@ -181,13 +224,16 @@ CREATE TABLE public.payments (
     status payment_status DEFAULT 'pending',
     transaction_ref TEXT,
     tip_amount DECIMAL(10, 2) DEFAULT 0,
+    refund_amount DECIMAL(10, 2) DEFAULT 0,
+    refund_reason TEXT,
+    receipt_url TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== CUSTOMER FEATURES ====================
 
--- 11. Customer Favorites
+-- 12. Customer Favorites
 CREATE TABLE public.favorites (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -196,7 +242,7 @@ CREATE TABLE public.favorites (
     UNIQUE (customer_id, menu_item_id)
 );
 
--- 12. Reviews & Ratings
+-- 13. Reviews & Ratings
 CREATE TABLE public.reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -204,39 +250,60 @@ CREATE TABLE public.reviews (
     order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
     rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
+    reply TEXT,  -- staff reply to review
+    replied_by UUID REFERENCES auth.users(id),
+    replied_at TIMESTAMPTZ,
     is_visible BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 13. Loyalty Points Transactions
+-- 14. Loyalty Points Transactions
 CREATE TABLE public.loyalty_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     points INT NOT NULL, -- positive = earned, negative = redeemed
-    reason TEXT NOT NULL, -- e.g. "Order #1024", "Welcome bonus", "Redeemed for discount"
-    reference_type TEXT, -- 'order', 'promotion', 'manual', 'signup'
-    reference_id UUID, -- order_id or promotion_id
+    reason TEXT NOT NULL,
+    reference_type TEXT, -- 'order', 'promotion', 'manual', 'signup', 'review'
+    reference_id UUID,
     balance_after INT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 14. Customer Feedback (separate from item reviews)
+-- 15. Customer Feedback (separate from item reviews)
 CREATE TABLE public.feedback (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     type feedback_type DEFAULT 'general',
     rating INT CHECK (rating >= 1 AND rating <= 5),
     message TEXT NOT NULL,
+    response TEXT,  -- admin response
     is_resolved BOOLEAN DEFAULT false,
     resolved_by UUID REFERENCES auth.users(id),
     resolved_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 16. Customer Addresses (for delivery)
+CREATE TABLE public.customer_addresses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    label TEXT DEFAULT 'Home',  -- Home, Work, Other
+    address_line1 TEXT NOT NULL,
+    address_line2 TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    country TEXT DEFAULT 'US',
+    lat DECIMAL(10, 7),
+    lng DECIMAL(10, 7),
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- ==================== INVENTORY ====================
 
--- 15. Inventory Items
+-- 17. Inventory Items
 CREATE TABLE public.inventory (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
@@ -245,92 +312,118 @@ CREATE TABLE public.inventory (
     quantity DECIMAL(10, 2) NOT NULL DEFAULT 0,
     unit inventory_unit DEFAULT 'pcs',
     min_quantity DECIMAL(10, 2) DEFAULT 10,
+    max_quantity DECIMAL(10, 2) DEFAULT 1000,
     cost_per_unit DECIMAL(10, 2) DEFAULT 0,
     supplier TEXT,
     supplier_contact TEXT,
+    supplier_email TEXT,
+    storage_location TEXT,  -- e.g. "Fridge A", "Dry storage shelf 3"
     last_restocked TIMESTAMPTZ,
     expiry_date DATE,
     is_low_stock BOOLEAN GENERATED ALWAYS AS (quantity <= min_quantity) STORED,
+    is_perishable BOOLEAN DEFAULT false,
+    notes TEXT,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 16. Inventory Restock Log
+-- 18. Inventory Restock Log
 CREATE TABLE public.inventory_restock_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     inventory_id UUID REFERENCES public.inventory(id) ON DELETE CASCADE NOT NULL,
     quantity_added DECIMAL(10, 2) NOT NULL,
     cost_total DECIMAL(10, 2) DEFAULT 0,
+    supplier TEXT,
+    invoice_number TEXT,
     restocked_by UUID REFERENCES auth.users(id),
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 19. Inventory Usage Log (tracks consumption per order)
+CREATE TABLE public.inventory_usage_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    inventory_id UUID REFERENCES public.inventory(id) ON DELETE CASCADE NOT NULL,
+    order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
+    quantity_used DECIMAL(10, 2) NOT NULL,
+    reason TEXT DEFAULT 'order',  -- 'order', 'waste', 'adjustment'
+    logged_by UUID REFERENCES auth.users(id),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- ==================== STAFF MANAGEMENT ====================
 
--- 17. Staff Members
+-- 20. Staff Members
 CREATE TABLE public.staff (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name TEXT NOT NULL,
-    role TEXT NOT NULL, -- Head Chef, Sous Chef, Manager, Cashier, Waiter, etc.
+    role TEXT NOT NULL,
     email TEXT,
     phone TEXT,
     avatar TEXT,
     hourly_rate DECIMAL(10, 2) DEFAULT 0,
+    salary_monthly DECIMAL(12, 2),
     rating DECIMAL(3, 2) DEFAULT 0,
     status staff_status DEFAULT 'off_duty',
+    emergency_contact TEXT,
+    emergency_phone TEXT,
     is_active BOOLEAN DEFAULT true,
     hired_at DATE DEFAULT CURRENT_DATE,
+    terminated_at DATE,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 18. Staff Schedules
+-- 21. Staff Schedules
 CREATE TABLE public.staff_schedules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     staff_id UUID REFERENCES public.staff(id) ON DELETE CASCADE NOT NULL,
-    day_of_week INT NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6), -- 0=Sun, 6=Sat
+    day_of_week INT NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
     shift_start TIME NOT NULL,
     shift_end TIME NOT NULL,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 19. Staff Attendance / Clock In-Out
+-- 22. Staff Attendance / Clock In-Out
 CREATE TABLE public.staff_attendance (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     staff_id UUID REFERENCES public.staff(id) ON DELETE CASCADE NOT NULL,
     clock_in TIMESTAMPTZ NOT NULL DEFAULT now(),
     clock_out TIMESTAMPTZ,
     total_hours DECIMAL(5, 2),
+    overtime_hours DECIMAL(5, 2) DEFAULT 0,
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== PROMOTIONS ====================
 
--- 20. Promotions & Offers
+-- 23. Promotions & Offers
 CREATE TABLE public.promotions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
     description TEXT,
     type promotion_type DEFAULT 'discount_percent',
-    value DECIMAL(10, 2) NOT NULL, -- % or fixed amount or points
+    value DECIMAL(10, 2) NOT NULL,
     min_order_amount DECIMAL(10, 2) DEFAULT 0,
-    code TEXT UNIQUE, -- promo code
+    code TEXT UNIQUE,
     max_uses INT,
+    max_uses_per_customer INT DEFAULT 1,
     current_uses INT DEFAULT 0,
-    applicable_items UUID[], -- array of menu_item_ids, null = all items
+    applicable_items UUID[],
+    applicable_categories UUID[],
     starts_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     expires_at TIMESTAMPTZ,
     is_active BOOLEAN DEFAULT true,
+    banner_image_url TEXT,
     created_by UUID REFERENCES auth.users(id),
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 21. Promotion Redemptions
+-- 24. Promotion Redemptions
 CREATE TABLE public.promotion_redemptions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     promotion_id UUID REFERENCES public.promotions(id) ON DELETE CASCADE NOT NULL,
@@ -342,7 +435,7 @@ CREATE TABLE public.promotion_redemptions (
 
 -- ==================== NOTIFICATIONS ====================
 
--- 22. Notifications
+-- 25. Notifications
 CREATE TABLE public.notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -350,23 +443,37 @@ CREATE TABLE public.notifications (
     title TEXT NOT NULL,
     message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT false,
-    action_url TEXT, -- deep link in the app
+    action_url TEXT,
     metadata JSONB DEFAULT '{}',
+    expires_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== AUDIT / ACTIVITY LOG ====================
 
--- 23. Activity Log (tracks important actions for admin)
+-- 26. Activity Log
 CREATE TABLE public.activity_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    action TEXT NOT NULL, -- 'order_created', 'payment_completed', 'menu_item_updated', etc.
-    entity_type TEXT NOT NULL, -- 'order', 'menu_item', 'reservation', etc.
+    action TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
     entity_id UUID,
     details JSONB DEFAULT '{}',
     ip_address INET,
+    user_agent TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ==================== SETTINGS ====================
+
+-- 27. App Settings (key-value store for restaurant config)
+CREATE TABLE public.app_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key TEXT UNIQUE NOT NULL,
+    value JSONB NOT NULL,
+    description TEXT,
+    updated_by UUID REFERENCES auth.users(id),
+    updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- ==================== INDEXES ====================
@@ -376,6 +483,8 @@ CREATE INDEX idx_orders_customer ON public.orders(customer_id);
 CREATE INDEX idx_orders_status ON public.orders(status);
 CREATE INDEX idx_orders_created ON public.orders(created_at DESC);
 CREATE INDEX idx_orders_table ON public.orders(table_id);
+CREATE INDEX idx_orders_type ON public.orders(order_type);
+CREATE INDEX idx_orders_completed ON public.orders(completed_at) WHERE completed_at IS NOT NULL;
 
 -- Order Items
 CREATE INDEX idx_order_items_order ON public.order_items(order_id);
@@ -400,6 +509,8 @@ CREATE INDEX idx_menu_items_featured ON public.menu_items(is_featured) WHERE is_
 CREATE INDEX idx_menu_items_category_id ON public.menu_items(category_id);
 CREATE INDEX idx_menu_item_tags_item ON public.menu_item_tags(menu_item_id);
 CREATE INDEX idx_menu_item_tags_tag ON public.menu_item_tags(tag);
+CREATE INDEX idx_menu_item_ingredients_item ON public.menu_item_ingredients(menu_item_id);
+CREATE INDEX idx_menu_item_ingredients_inv ON public.menu_item_ingredients(inventory_id);
 
 -- Favorites
 CREATE INDEX idx_favorites_customer ON public.favorites(customer_id);
@@ -409,6 +520,7 @@ CREATE INDEX idx_favorites_item ON public.favorites(menu_item_id);
 CREATE INDEX idx_reviews_customer ON public.reviews(customer_id);
 CREATE INDEX idx_reviews_menu_item ON public.reviews(menu_item_id);
 CREATE INDEX idx_reviews_order ON public.reviews(order_id);
+CREATE INDEX idx_reviews_rating ON public.reviews(rating);
 
 -- Loyalty
 CREATE INDEX idx_loyalty_customer ON public.loyalty_transactions(customer_id);
@@ -418,21 +530,28 @@ CREATE INDEX idx_loyalty_created ON public.loyalty_transactions(created_at DESC)
 CREATE INDEX idx_feedback_customer ON public.feedback(customer_id);
 CREATE INDEX idx_feedback_unresolved ON public.feedback(is_resolved) WHERE is_resolved = false;
 
+-- Customer Addresses
+CREATE INDEX idx_customer_addresses ON public.customer_addresses(customer_id);
+
 -- Inventory
 CREATE INDEX idx_inventory_low ON public.inventory(is_low_stock) WHERE is_low_stock = true;
 CREATE INDEX idx_inventory_category ON public.inventory(category);
 CREATE INDEX idx_inventory_expiry ON public.inventory(expiry_date) WHERE expiry_date IS NOT NULL;
+CREATE INDEX idx_inventory_usage_inv ON public.inventory_usage_log(inventory_id);
+CREATE INDEX idx_inventory_usage_order ON public.inventory_usage_log(order_id);
 
 -- Payments
 CREATE INDEX idx_payments_order ON public.payments(order_id);
 CREATE INDEX idx_payments_status ON public.payments(status);
 CREATE INDEX idx_payments_created ON public.payments(created_at DESC);
+CREATE INDEX idx_payments_method ON public.payments(method);
 
 -- Staff
 CREATE INDEX idx_staff_user ON public.staff(user_id);
 CREATE INDEX idx_staff_active ON public.staff(is_active) WHERE is_active = true;
 CREATE INDEX idx_staff_schedules_staff ON public.staff_schedules(staff_id);
 CREATE INDEX idx_staff_attendance_staff ON public.staff_attendance(staff_id);
+CREATE INDEX idx_staff_attendance_date ON public.staff_attendance(clock_in);
 
 -- Promotions
 CREATE INDEX idx_promotions_active ON public.promotions(is_active) WHERE is_active = true;
@@ -444,6 +563,10 @@ CREATE INDEX idx_promotion_redemptions_promo ON public.promotion_redemptions(pro
 CREATE INDEX idx_activity_log_user ON public.activity_log(user_id);
 CREATE INDEX idx_activity_log_entity ON public.activity_log(entity_type, entity_id);
 CREATE INDEX idx_activity_log_created ON public.activity_log(created_at DESC);
+CREATE INDEX idx_activity_log_action ON public.activity_log(action);
+
+-- Settings
+CREATE INDEX idx_app_settings_key ON public.app_settings(key);
 
 -- ==================== FUNCTIONS ====================
 
@@ -517,17 +640,20 @@ RETURNS VOID AS $$
 DECLARE
   _subtotal DECIMAL(10,2);
   _discount DECIMAL(10,2);
+  _tax_rate DECIMAL(4,2);
+  _delivery_fee DECIMAL(10,2);
 BEGIN
   SELECT COALESCE(SUM(unit_price * quantity), 0) INTO _subtotal
   FROM public.order_items WHERE order_id = _order_id;
 
-  SELECT COALESCE(discount, 0) INTO _discount
+  SELECT COALESCE(discount, 0), COALESCE(tax_rate, 8.00), COALESCE(delivery_fee, 0)
+  INTO _discount, _tax_rate, _delivery_fee
   FROM public.orders WHERE id = _order_id;
 
   UPDATE public.orders
   SET subtotal = _subtotal,
-      tax = ROUND((_subtotal - _discount) * 0.08, 2),
-      total = ROUND((_subtotal - _discount) * 1.08, 2),
+      tax = ROUND((_subtotal - _discount) * (_tax_rate / 100), 2),
+      total = ROUND((_subtotal - _discount) * (1 + _tax_rate / 100) + _delivery_fee, 2),
       updated_at = now()
   WHERE id = _order_id;
 END;
@@ -542,30 +668,34 @@ DECLARE
   _points INT;
   _current_points INT;
   _new_balance INT;
+  _new_spent DECIMAL(12,2);
 BEGIN
   SELECT customer_id, total INTO _customer_id, _total
   FROM public.orders WHERE id = _order_id;
 
   IF _customer_id IS NULL THEN RETURN; END IF;
 
-  _points := FLOOR(_total); -- 1 point per $1
+  _points := FLOOR(_total);
 
-  SELECT total_loyalty_points INTO _current_points
+  SELECT total_loyalty_points, lifetime_spent INTO _current_points, _new_spent
   FROM public.profiles WHERE id = _customer_id;
 
   _new_balance := COALESCE(_current_points, 0) + _points;
+  _new_spent := COALESCE(_new_spent, 0) + _total;
 
   INSERT INTO public.loyalty_transactions (customer_id, points, reason, reference_type, reference_id, balance_after)
   VALUES (_customer_id, _points, 'Order #' || (SELECT order_number FROM public.orders WHERE id = _order_id), 'order', _order_id, _new_balance);
 
   UPDATE public.profiles
   SET total_loyalty_points = _new_balance,
-      lifetime_spent = lifetime_spent + _total,
+      lifetime_spent = _new_spent,
       total_orders = total_orders + 1,
+      total_visits = total_visits + 1,
+      last_visit_at = now(),
       membership_tier = CASE
-        WHEN (lifetime_spent + _total) >= 5000 THEN 'platinum'
-        WHEN (lifetime_spent + _total) >= 2000 THEN 'gold'
-        WHEN (lifetime_spent + _total) >= 500 THEN 'silver'
+        WHEN _new_spent >= 5000 THEN 'platinum'
+        WHEN _new_spent >= 2000 THEN 'gold'
+        WHEN _new_spent >= 500 THEN 'silver'
         ELSE 'bronze'
       END,
       updated_at = now()
@@ -574,8 +704,8 @@ BEGIN
   -- Notify customer
   INSERT INTO public.notifications (user_id, type, title, message, metadata)
   VALUES (_customer_id, 'loyalty', 'Points Earned! 🎉',
-    'You earned ' || _points || ' points from your order.',
-    jsonb_build_object('order_id', _order_id, 'points', _points));
+    'You earned ' || _points || ' points from your order. New balance: ' || _new_balance || ' points.',
+    jsonb_build_object('order_id', _order_id, 'points', _points, 'new_balance', _new_balance));
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -583,18 +713,19 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.update_menu_item_rating()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE public.menu_items
-  SET avg_rating = (
-    SELECT ROUND(AVG(rating)::numeric, 2) FROM public.reviews
-    WHERE menu_item_id = NEW.menu_item_id AND is_visible = true
-  ),
-  review_count = (
-    SELECT COUNT(*) FROM public.reviews
-    WHERE menu_item_id = NEW.menu_item_id AND is_visible = true
-  ),
-  updated_at = now()
-  WHERE id = NEW.menu_item_id;
-
+  IF NEW.menu_item_id IS NOT NULL THEN
+    UPDATE public.menu_items
+    SET avg_rating = (
+      SELECT ROUND(AVG(rating)::numeric, 2) FROM public.reviews
+      WHERE menu_item_id = NEW.menu_item_id AND is_visible = true
+    ),
+    review_count = (
+      SELECT COUNT(*) FROM public.reviews
+      WHERE menu_item_id = NEW.menu_item_id AND is_visible = true
+    ),
+    updated_at = now()
+    WHERE id = NEW.menu_item_id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -604,6 +735,7 @@ CREATE OR REPLACE FUNCTION public.generate_reservation_number()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.reservation_number := 'R-' || LPAD(nextval('reservation_number_seq')::TEXT, 4, '0');
+  NEW.end_time := (NEW.reservation_time + (NEW.duration_minutes || ' minutes')::INTERVAL)::TIME;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -616,21 +748,52 @@ DECLARE
 BEGIN
   SELECT jsonb_build_object(
     'total_orders_today', (SELECT COUNT(*) FROM orders WHERE created_at::date = CURRENT_DATE),
-    'revenue_today', (SELECT COALESCE(SUM(total), 0) FROM orders WHERE created_at::date = CURRENT_DATE AND status != 'cancelled'),
+    'revenue_today', (SELECT COALESCE(SUM(total), 0) FROM orders WHERE created_at::date = CURRENT_DATE AND status NOT IN ('cancelled')),
+    'revenue_this_week', (SELECT COALESCE(SUM(total), 0) FROM orders WHERE created_at >= date_trunc('week', CURRENT_DATE) AND status NOT IN ('cancelled')),
+    'revenue_this_month', (SELECT COALESCE(SUM(total), 0) FROM orders WHERE created_at >= date_trunc('month', CURRENT_DATE) AND status NOT IN ('cancelled')),
     'available_tables', (SELECT COUNT(*) FROM restaurant_tables WHERE status = 'available' AND is_active = true),
     'total_tables', (SELECT COUNT(*) FROM restaurant_tables WHERE is_active = true),
+    'occupied_tables', (SELECT COUNT(*) FROM restaurant_tables WHERE status = 'occupied' AND is_active = true),
+    'reserved_tables', (SELECT COUNT(*) FROM restaurant_tables WHERE status = 'reserved' AND is_active = true),
     'orders_preparing', (SELECT COUNT(*) FROM orders WHERE status = 'preparing'),
     'orders_ready', (SELECT COUNT(*) FROM orders WHERE status = 'ready'),
     'orders_pending', (SELECT COUNT(*) FROM orders WHERE status = 'pending'),
-    'avg_order_value', (SELECT ROUND(COALESCE(AVG(total), 0), 2) FROM orders WHERE created_at::date = CURRENT_DATE AND status != 'cancelled'),
+    'orders_served', (SELECT COUNT(*) FROM orders WHERE status = 'served' AND created_at::date = CURRENT_DATE),
+    'avg_order_value', (SELECT ROUND(COALESCE(AVG(total), 0), 2) FROM orders WHERE created_at::date = CURRENT_DATE AND status NOT IN ('cancelled')),
     'total_customers', (SELECT COUNT(*) FROM profiles),
+    'new_customers_today', (SELECT COUNT(*) FROM profiles WHERE created_at::date = CURRENT_DATE),
     'low_stock_count', (SELECT COUNT(*) FROM inventory WHERE is_low_stock = true),
+    'expiring_soon', (SELECT COUNT(*) FROM inventory WHERE expiry_date IS NOT NULL AND expiry_date <= CURRENT_DATE + INTERVAL '3 days'),
     'pending_reservations', (SELECT COUNT(*) FROM reservations WHERE status = 'pending'),
+    'todays_reservations', (SELECT COUNT(*) FROM reservations WHERE reservation_date = CURRENT_DATE AND status IN ('pending', 'confirmed')),
     'active_staff', (SELECT COUNT(*) FROM staff WHERE status = 'on_duty'),
-    'pending_feedback', (SELECT COUNT(*) FROM feedback WHERE is_resolved = false)
+    'total_staff', (SELECT COUNT(*) FROM staff WHERE is_active = true),
+    'pending_feedback', (SELECT COUNT(*) FROM feedback WHERE is_resolved = false),
+    'active_promotions', (SELECT COUNT(*) FROM promotions WHERE is_active = true AND (expires_at IS NULL OR expires_at > now())),
+    'total_tips_today', (SELECT COALESCE(SUM(tip_amount), 0) FROM payments WHERE created_at::date = CURRENT_DATE AND status = 'completed')
   ) INTO result;
 
   RETURN result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Deduct inventory on order completion
+CREATE OR REPLACE FUNCTION public.deduct_inventory_for_order(_order_id UUID)
+RETURNS VOID AS $$
+DECLARE
+  _item RECORD;
+  _ingredient RECORD;
+BEGIN
+  FOR _item IN SELECT * FROM order_items WHERE order_id = _order_id LOOP
+    FOR _ingredient IN SELECT * FROM menu_item_ingredients WHERE menu_item_id = _item.menu_item_id LOOP
+      UPDATE inventory
+      SET quantity = GREATEST(0, quantity - (_ingredient.quantity_needed * _item.quantity))
+      WHERE id = _ingredient.inventory_id;
+
+      INSERT INTO inventory_usage_log (inventory_id, order_id, quantity_used, reason)
+      VALUES (_ingredient.inventory_id, _order_id, _ingredient.quantity_needed * _item.quantity, 'order');
+    END LOOP;
+  END LOOP;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -671,6 +834,7 @@ ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_item_tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.menu_item_ingredients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.restaurant_tables ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reservations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
@@ -680,8 +844,10 @@ ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.loyalty_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customer_addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inventory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inventory_restock_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inventory_usage_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.staff ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.staff_schedules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.staff_attendance ENABLE ROW LEVEL SECURITY;
@@ -689,6 +855,7 @@ ALTER TABLE public.promotions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.promotion_redemptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
 
 -- ==================== RLS POLICIES ====================
 
@@ -698,7 +865,7 @@ CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE TO authen
 CREATE POLICY "Admins view all profiles" ON public.profiles FOR SELECT TO authenticated USING (public.is_admin_or_manager(auth.uid()));
 CREATE POLICY "Admins update all profiles" ON public.profiles FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
--- USER ROLES (admin only for write, users can read their own)
+-- USER ROLES
 CREATE POLICY "Users view own roles" ON public.user_roles FOR SELECT TO authenticated USING (user_id = auth.uid());
 CREATE POLICY "Admins manage roles" ON public.user_roles FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
@@ -715,6 +882,11 @@ CREATE POLICY "Admins manage categories" ON public.menu_categories FOR ALL TO au
 CREATE POLICY "Anyone can view tags" ON public.menu_item_tags FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Admins manage tags" ON public.menu_item_tags FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
 CREATE POLICY "Kitchen manage tags" ON public.menu_item_tags FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'kitchen_staff'));
+
+-- MENU ITEM INGREDIENTS
+CREATE POLICY "Anyone can view ingredients" ON public.menu_item_ingredients FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Kitchen manage ingredients" ON public.menu_item_ingredients FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'kitchen_staff'));
+CREATE POLICY "Admins manage ingredients" ON public.menu_item_ingredients FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
 
 -- RESTAURANT TABLES
 CREATE POLICY "Anyone can view tables" ON public.restaurant_tables FOR SELECT TO authenticated USING (true);
@@ -766,12 +938,19 @@ CREATE POLICY "Admins manage reviews" ON public.reviews FOR ALL TO authenticated
 -- LOYALTY TRANSACTIONS
 CREATE POLICY "View own loyalty" ON public.loyalty_transactions FOR SELECT TO authenticated USING (customer_id = auth.uid());
 CREATE POLICY "Admins view all loyalty" ON public.loyalty_transactions FOR SELECT TO authenticated USING (public.is_admin_or_manager(auth.uid()));
-CREATE POLICY "System insert loyalty" ON public.loyalty_transactions FOR INSERT TO authenticated WITH CHECK (true); -- controlled via functions
+CREATE POLICY "System insert loyalty" ON public.loyalty_transactions FOR INSERT TO authenticated WITH CHECK (true);
 
 -- FEEDBACK
 CREATE POLICY "Customers create feedback" ON public.feedback FOR INSERT TO authenticated WITH CHECK (customer_id = auth.uid());
 CREATE POLICY "View own feedback" ON public.feedback FOR SELECT TO authenticated USING (customer_id = auth.uid());
 CREATE POLICY "Admins manage feedback" ON public.feedback FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+
+-- CUSTOMER ADDRESSES
+CREATE POLICY "View own addresses" ON public.customer_addresses FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Manage own addresses" ON public.customer_addresses FOR INSERT TO authenticated WITH CHECK (customer_id = auth.uid());
+CREATE POLICY "Update own addresses" ON public.customer_addresses FOR UPDATE TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Delete own addresses" ON public.customer_addresses FOR DELETE TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Admins view addresses" ON public.customer_addresses FOR SELECT TO authenticated USING (public.is_admin_or_manager(auth.uid()));
 
 -- INVENTORY (admin/kitchen only)
 CREATE POLICY "Kitchen view inventory" ON public.inventory FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'kitchen_staff'));
@@ -780,6 +959,10 @@ CREATE POLICY "Admins manage inventory" ON public.inventory FOR ALL TO authentic
 -- INVENTORY RESTOCK LOG
 CREATE POLICY "Admins manage restock log" ON public.inventory_restock_log FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
 CREATE POLICY "Kitchen view restock log" ON public.inventory_restock_log FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'kitchen_staff'));
+
+-- INVENTORY USAGE LOG
+CREATE POLICY "Admins manage usage log" ON public.inventory_usage_log FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
+CREATE POLICY "Kitchen view usage log" ON public.inventory_usage_log FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'kitchen_staff'));
 
 -- STAFF
 CREATE POLICY "Admins manage staff" ON public.staff FOR ALL TO authenticated USING (public.is_admin_or_manager(auth.uid()));
@@ -808,25 +991,130 @@ CREATE POLICY "Admins view all redemptions" ON public.promotion_redemptions FOR 
 -- NOTIFICATIONS
 CREATE POLICY "View own notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid());
 CREATE POLICY "Update own notifications" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "Delete own notifications" ON public.notifications FOR DELETE TO authenticated USING (user_id = auth.uid());
 CREATE POLICY "System create notifications" ON public.notifications FOR INSERT TO authenticated WITH CHECK (true);
 
 -- ACTIVITY LOG
 CREATE POLICY "Admins view activity log" ON public.activity_log FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
--- ==================== SEED DATA (optional) ====================
+-- APP SETTINGS
+CREATE POLICY "Anyone can read settings" ON public.app_settings FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admins manage settings" ON public.app_settings FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 
--- Insert default menu categories
-INSERT INTO public.menu_categories (name, display_order) VALUES
-  ('Breakfast', 1), ('Lunch', 2), ('Dinner', 3),
-  ('Drinks', 4), ('Desserts', 5), ('Sides', 6), ('Specials', 7);
+-- ==================== SEED DATA ====================
 
--- Insert default tables
-INSERT INTO public.restaurant_tables (table_number, zone, capacity) VALUES
-  ('T-01', 'Window', 2), ('T-02', 'Main', 4), ('T-03', 'Main', 4),
-  ('T-04', 'Main', 4), ('T-05', 'VIP', 6), ('T-06', 'VIP', 6),
-  ('T-07', 'Main', 4), ('T-08', 'Patio', 2), ('T-09', 'Patio', 4),
-  ('T-10', 'Private', 8), ('T-11', 'Window', 2), ('T-12', 'Window', 4),
-  ('W1', 'Window', 2), ('W2', 'Window', 2), ('W3', 'Window', 4), ('W4', 'Window', 4),
-  ('P1', 'Patio', 4), ('P2', 'Patio', 4), ('P3', 'Patio', 6),
-  ('V1', 'VIP', 6), ('V2', 'VIP', 8),
-  ('M1', 'Main', 2), ('M2', 'Main', 4), ('M3', 'Main', 4), ('M4', 'Main', 6), ('M5', 'Main', 8);
+-- Menu Categories
+INSERT INTO public.menu_categories (name, icon_emoji, display_order) VALUES
+  ('Breakfast', '🍳', 1), ('Lunch', '🥗', 2), ('Dinner', '🥩', 3),
+  ('Drinks', '☕', 4), ('Desserts', '🍰', 5), ('Sides', '🍟', 6), ('Specials', '⭐', 7);
+
+-- Restaurant Tables (all zones from frontend)
+INSERT INTO public.restaurant_tables (table_number, zone, capacity, shape) VALUES
+  ('T-01', 'Window', 2, 'round'), ('T-02', 'Main', 4, 'square'), ('T-03', 'Main', 4, 'square'),
+  ('T-04', 'Main', 4, 'square'), ('T-05', 'VIP', 6, 'rectangle'), ('T-06', 'VIP', 6, 'rectangle'),
+  ('T-07', 'Main', 4, 'square'), ('T-08', 'Patio', 2, 'round'), ('T-09', 'Patio', 4, 'square'),
+  ('T-10', 'Private', 8, 'rectangle'), ('T-11', 'Window', 2, 'round'), ('T-12', 'Window', 4, 'square'),
+  ('W1', 'Window', 2, 'round'), ('W2', 'Window', 2, 'round'), ('W3', 'Window', 4, 'square'), ('W4', 'Window', 4, 'square'),
+  ('P1', 'Patio', 4, 'square'), ('P2', 'Patio', 4, 'square'), ('P3', 'Patio', 6, 'rectangle'),
+  ('V1', 'VIP', 6, 'rectangle'), ('V2', 'VIP', 8, 'rectangle'),
+  ('M1', 'Main', 2, 'round'), ('M2', 'Main', 4, 'square'), ('M3', 'Main', 4, 'square'), ('M4', 'Main', 6, 'rectangle'), ('M5', 'Main', 8, 'rectangle');
+
+-- All Menu Items (matching frontend CustomerMenu.tsx exactly)
+INSERT INTO public.menu_items (name, description, price, emoji, category, is_vegetarian, is_vegan, is_spicy, prep_time_minutes, calories, is_featured, avg_rating) VALUES
+  ('Wagyu Steak', 'Premium grade wagyu with truffle butter', 85.00, '🥩', 'dinner', false, false, false, 35, 650, true, 4.9),
+  ('Grilled Salmon', 'Atlantic salmon with herb crust', 45.00, '🐟', 'lunch', false, false, false, 25, 420, true, 4.8),
+  ('Margherita Pizza', 'Fresh mozzarella, basil, tomato', 20.00, '🍕', 'lunch', true, false, false, 18, 580, false, 4.7),
+  ('Truffle Pasta', 'Black truffle cream sauce', 45.00, '🍝', 'dinner', true, false, false, 20, 520, true, 4.8),
+  ('Avocado Toast', 'Sourdough, poached egg, microgreens', 14.00, '🥑', 'breakfast', true, false, false, 10, 320, false, 4.5),
+  ('Pancakes', 'Buttermilk stack with maple syrup', 16.00, '🥞', 'breakfast', true, false, false, 12, 450, false, 4.6),
+  ('Iced Latte', 'Double shot espresso over ice', 6.00, '☕', 'beverage', true, true, false, 3, 120, false, 4.4),
+  ('Tiramisu', 'Classic Italian coffee dessert', 12.00, '🍰', 'dessert', true, false, false, 5, 380, true, 4.9),
+  ('Caesar Salad', 'Crisp romaine, parmesan, croutons', 18.00, '🥗', 'lunch', true, false, false, 8, 280, false, 4.5),
+  ('Eggs Benedict', 'Poached eggs, hollandaise, English muffin', 17.00, '🍳', 'breakfast', true, false, false, 15, 420, false, 4.7),
+  ('Lobster Bisque', 'Rich creamy lobster soup with sherry', 28.00, '🦞', 'dinner', false, false, false, 30, 350, true, 4.8),
+  ('Fish & Chips', 'Beer-battered cod with tartar sauce', 22.00, '🐠', 'lunch', false, false, false, 20, 620, false, 4.4),
+  ('Matcha Latte', 'Ceremonial grade matcha with oat milk', 7.00, '🍵', 'beverage', true, true, false, 3, 150, false, 4.6),
+  ('Chocolate Lava Cake', 'Warm molten center with vanilla ice cream', 14.00, '🍫', 'dessert', true, false, false, 15, 480, true, 4.9),
+  ('BBQ Ribs', 'Slow-smoked pork ribs, house BBQ glaze', 38.00, '🍖', 'dinner', false, false, false, 40, 720, false, 4.7),
+  ('French Toast', 'Brioche with berry compote and cream', 15.00, '🍞', 'breakfast', true, false, false, 12, 400, false, 4.5),
+  ('Mango Smoothie', 'Fresh mango, yogurt, honey blend', 8.00, '🥭', 'beverage', true, false, false, 3, 180, false, 4.3),
+  ('Crème Brûlée', 'Vanilla custard with caramelized sugar', 13.00, '🍮', 'dessert', true, false, false, 8, 320, false, 4.8),
+  ('Chicken Wings', 'Crispy buffalo wings with ranch dip', 16.00, '🍗', 'side', false, false, true, 18, 480, false, 4.6),
+  ('Garlic Bread', 'Toasted with herb butter and parmesan', 8.00, '🧄', 'side', true, false, false, 8, 220, false, 4.3),
+  ('Mushroom Risotto', 'Arborio rice, wild mushrooms, parmesan', 32.00, '🍄', 'dinner', true, false, false, 25, 450, false, 4.7),
+  ('Tropical Mojito', 'Rum, mint, lime, passion fruit', 10.00, '🍹', 'beverage', true, true, false, 5, 160, false, 4.5),
+  ('Sushi Platter', 'Chef''s selection of 12 premium pieces', 55.00, '🍣', 'special', false, false, false, 25, 380, true, 4.9),
+  ('Lamb Chops', 'Herb-crusted with rosemary jus', 48.00, '🐑', 'special', false, false, false, 30, 580, true, 4.8),
+  ('Sweet Potato Fries', 'Crispy with chipotle aioli dip', 9.00, '🍠', 'side', true, true, false, 10, 280, false, 4.4),
+  ('Espresso Martini', 'Vodka, espresso, coffee liqueur', 14.00, '🍸', 'beverage', true, true, false, 5, 200, false, 4.7);
+
+-- Menu Item Tags (matching frontend)
+INSERT INTO public.menu_item_tags (menu_item_id, tag)
+SELECT mi.id, t.tag FROM public.menu_items mi, (VALUES
+  ('Wagyu Steak', 'Chef''s Special'), ('Truffle Pasta', 'Chef''s Special'),
+  ('Lobster Bisque', 'Chef''s Special'), ('Sushi Platter', 'Chef''s Special'),
+  ('Lamb Chops', 'Chef''s Special'),
+  ('Grilled Salmon', 'Healthy'), ('Avocado Toast', 'Healthy'), ('Caesar Salad', 'Healthy'),
+  ('Matcha Latte', 'Healthy'), ('Mango Smoothie', 'Healthy'),
+  ('Avocado Toast', 'Vegetarian'), ('Margherita Pizza', 'Vegetarian'),
+  ('Sweet Potato Fries', 'Vegetarian'), ('Mushroom Risotto', 'Vegetarian'),
+  ('Tiramisu', 'Popular'), ('Eggs Benedict', 'Popular'), ('Chocolate Lava Cake', 'Popular'),
+  ('Chicken Wings', 'Popular'), ('Espresso Martini', 'Popular')
+) AS t(item_name, tag) WHERE mi.name = t.item_name;
+
+-- Inventory seed data
+INSERT INTO public.inventory (name, category, sku, quantity, unit, min_quantity, cost_per_unit, supplier, is_perishable) VALUES
+  ('Wagyu Beef', 'Meat', 'MEAT-001', 25, 'kg', 5, 85.00, 'Premium Meats Co.', true),
+  ('Atlantic Salmon', 'Seafood', 'SEA-001', 30, 'kg', 8, 22.00, 'Ocean Fresh', true),
+  ('Pizza Dough', 'Bakery', 'BAK-001', 50, 'pcs', 15, 1.50, 'Local Bakery', true),
+  ('Mozzarella Cheese', 'Dairy', 'DAI-001', 20, 'kg', 5, 12.00, 'Dairy Farm', true),
+  ('Truffle Oil', 'Condiments', 'CON-001', 10, 'l', 2, 45.00, 'Italian Imports', false),
+  ('Coffee Beans', 'Beverages', 'BEV-001', 40, 'kg', 10, 18.00, 'Bean Masters', false),
+  ('Matcha Powder', 'Beverages', 'BEV-002', 5, 'kg', 1, 35.00, 'Japanese Imports', false),
+  ('Oat Milk', 'Dairy', 'DAI-002', 60, 'l', 15, 3.50, 'Oatly Supply', true),
+  ('Fresh Eggs', 'Dairy', 'DAI-003', 200, 'pcs', 50, 0.35, 'Free Range Farm', true),
+  ('Butter', 'Dairy', 'DAI-004', 30, 'kg', 8, 8.00, 'Dairy Farm', true),
+  ('Flour', 'Bakery', 'BAK-002', 100, 'kg', 20, 1.20, 'Mill Supply', false),
+  ('Sugar', 'Bakery', 'BAK-003', 80, 'kg', 15, 0.90, 'Sugar Co.', false),
+  ('Olive Oil', 'Condiments', 'CON-002', 25, 'l', 5, 8.50, 'Italian Imports', false),
+  ('Chicken Wings', 'Meat', 'MEAT-002', 40, 'kg', 10, 6.50, 'Poultry Plus', true),
+  ('Pork Ribs', 'Meat', 'MEAT-003', 20, 'kg', 5, 12.00, 'Premium Meats Co.', true),
+  ('Lobster', 'Seafood', 'SEA-002', 15, 'kg', 4, 38.00, 'Ocean Fresh', true),
+  ('Lamb Rack', 'Meat', 'MEAT-004', 12, 'kg', 3, 32.00, 'Premium Meats Co.', true),
+  ('Avocados', 'Produce', 'PRO-001', 80, 'pcs', 20, 1.50, 'Fresh Produce Co.', true),
+  ('Romaine Lettuce', 'Produce', 'PRO-002', 40, 'pcs', 10, 2.00, 'Fresh Produce Co.', true),
+  ('Tomatoes', 'Produce', 'PRO-003', 50, 'kg', 10, 3.00, 'Fresh Produce Co.', true),
+  ('Lemons/Limes', 'Produce', 'PRO-004', 60, 'pcs', 15, 0.50, 'Fresh Produce Co.', true),
+  ('Fresh Basil', 'Herbs', 'HRB-001', 30, 'pcs', 8, 1.20, 'Herb Garden', true),
+  ('Vanilla Extract', 'Condiments', 'CON-003', 5, 'l', 1, 25.00, 'Spice World', false),
+  ('Vodka', 'Spirits', 'SPR-001', 15, 'l', 3, 18.00, 'Spirits Distributor', false),
+  ('Rum', 'Spirits', 'SPR-002', 10, 'l', 2, 16.00, 'Spirits Distributor', false),
+  ('Fresh Cream', 'Dairy', 'DAI-005', 20, 'l', 5, 5.50, 'Dairy Farm', true),
+  ('Arborio Rice', 'Grains', 'GRN-001', 25, 'kg', 5, 4.00, 'Italian Imports', false),
+  ('Wild Mushrooms', 'Produce', 'PRO-005', 10, 'kg', 3, 18.00, 'Forager Supply', true),
+  ('Parmesan', 'Dairy', 'DAI-006', 15, 'kg', 4, 22.00, 'Italian Imports', true),
+  ('Maple Syrup', 'Condiments', 'CON-004', 8, 'l', 2, 12.00, 'Canadian Imports', false);
+
+-- App Settings (restaurant configuration)
+INSERT INTO public.app_settings (key, value, description) VALUES
+  ('restaurant_name', '"Café X"', 'Restaurant display name'),
+  ('tax_rate', '8.00', 'Default tax percentage'),
+  ('currency', '"USD"', 'Currency code'),
+  ('currency_symbol', '"$"', 'Currency symbol'),
+  ('opening_hours', '{"mon": "07:00-23:00", "tue": "07:00-23:00", "wed": "07:00-23:00", "thu": "07:00-23:00", "fri": "07:00-00:00", "sat": "08:00-00:00", "sun": "08:00-22:00"}', 'Operating hours'),
+  ('reservation_slot_minutes', '30', 'Reservation time slot interval'),
+  ('max_reservation_guests', '12', 'Maximum party size for online reservations'),
+  ('delivery_fee', '5.00', 'Standard delivery fee'),
+  ('delivery_radius_km', '10', 'Maximum delivery radius'),
+  ('loyalty_points_per_dollar', '1', 'Points earned per $1 spent'),
+  ('loyalty_welcome_bonus', '200', 'Points given to new signups'),
+  ('review_bonus_points', '10', 'Points given for writing a review'),
+  ('min_order_for_delivery', '20.00', 'Minimum order amount for delivery'),
+  ('kitchen_prep_buffer_minutes', '5', 'Extra time buffer added to prep estimates'),
+  ('auto_cancel_unpaid_minutes', '30', 'Auto-cancel unpaid orders after N minutes');
+
+-- Default promotions
+INSERT INTO public.promotions (title, description, type, value, min_order_amount, code, max_uses, starts_at, expires_at) VALUES
+  ('Welcome 10% Off', 'New customer discount on first order', 'discount_percent', 10, 20, 'WELCOME10', NULL, now(), now() + INTERVAL '1 year'),
+  ('Free Dessert Friday', 'Get a free dessert with orders over $50 on Fridays', 'free_item', 0, 50, 'FRIYAY', NULL, now(), now() + INTERVAL '6 months'),
+  ('$5 Off Orders Over $40', 'Limited time flat discount', 'discount_fixed', 5, 40, 'SAVE5', 500, now(), now() + INTERVAL '3 months');
