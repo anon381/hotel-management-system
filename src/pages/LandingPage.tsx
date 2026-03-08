@@ -401,16 +401,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Section Transition: How It Works → Portals */}
-      <div className="section-divider relative h-32 sm:h-40 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-primary/5 to-background" />
-        <div className="parallax-bg absolute left-[15%] top-1/2 -translate-y-1/2 w-36 h-36 bg-accent/8 rounded-full blur-2xl" />
-        <div className="parallax-bg absolute right-[15%] top-1/2 -translate-y-1/2 w-28 h-28 bg-primary/10 rounded-full blur-2xl" />
-        <svg className="absolute top-0 left-0 w-full rotate-180" viewBox="0 0 1440 40" preserveAspectRatio="none">
-          <path d="M0,40 C720,0 720,40 1440,0 L1440,40 L0,40 Z" className="fill-muted/30" />
-        </svg>
-        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 40" preserveAspectRatio="none">
-          <path d="M0,40 C360,10 1080,10 1440,40 L1440,40 L0,40 Z" className="fill-background" />
+      {/* Transition: How It Works → Portals */}
+      <div className="relative -mt-1">
+        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wave-grad-3" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+              <stop offset="50%" stopColor="hsl(var(--accent))" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          <path d="M0,0 L0,50 C240,80 480,20 720,60 C960,90 1200,30 1440,50 L1440,0 Z" fill="hsl(var(--muted) / 0.3)" />
+          <path d="M0,40 C360,80 720,30 1080,70 C1260,90 1380,50 1440,40 L1440,100 L0,100 Z" fill="url(#wave-grad-3)" />
+          <path d="M0,70 C480,50 960,80 1440,60 L1440,100 L0,100 Z" className="fill-background" />
         </svg>
       </div>
 
