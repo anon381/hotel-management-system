@@ -364,51 +364,128 @@ export default function LandingPage() {
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/3 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-success/5 rounded-full blur-3xl" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Seamless</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-success">Simple & Seamless</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
             <p className="text-muted-foreground mt-3 max-w-xl mx-auto">Three simple steps to enjoy the full Café X experience.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {howItWorks.map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-                whileHover={{ y: -6, scale: 1.03 }}
-                className="glass-card-elevated p-8 text-center group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 relative"
-              >
+
+          {/* Step Progress Layout */}
+          <div className="relative">
+            {/* Horizontal connector line (desktop) */}
+            <motion.div
+              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-0.5 bg-border"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: "easeOut" }}
+            />
+            <motion.div
+              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-0.5 bg-gradient-to-r from-success via-success/80 to-success/40 origin-left"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+            />
+
+            {/* Vertical connector line (mobile) */}
+            <motion.div
+              className="md:hidden absolute top-0 bottom-0 left-7 w-0.5 bg-border"
+              initial={{ scaleY: 0, originY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1 }}
+            />
+            <motion.div
+              className="md:hidden absolute top-0 bottom-0 left-7 w-0.5 bg-gradient-to-b from-success via-success/80 to-success/40 origin-top"
+              initial={{ scaleY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, delay: 0.5 }}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-8">
+              {howItWorks.map((item, i) => (
                 <motion.div
-                  className="text-5xl font-display font-black text-primary/15 absolute top-4 right-6 select-none"
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  whileInView={{ scale: 1, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 + i * 0.15, type: "spring", stiffness: 200 }}
+                  key={item.step}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="flex md:flex-col items-start md:items-center text-left md:text-center relative pb-10 md:pb-0 pl-16 md:pl-0"
                 >
-                  {item.step}
+                  {/* Step circle */}
+                  <motion.div
+                    className="absolute left-0 md:relative md:left-auto w-14 h-14 rounded-full border-[3px] border-success bg-background flex items-center justify-center z-10 shadow-[0_0_16px_-4px_hsl(var(--success)/0.4)]"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4 + i * 0.25, type: "spring", stiffness: 300, damping: 15 }}
+                    whileHover={{ scale: 1.15, boxShadow: "0 0 24px -4px hsl(142 71% 45% / 0.5)" }}
+                  >
+                    <span className="text-xl font-display font-bold text-success">{item.step}</span>
+                  </motion.div>
+
+                  {/* Check pulse ring */}
+                  <motion.div
+                    className="absolute left-0 md:relative md:left-auto md:top-[-3.5rem] w-14 h-14 rounded-full border-2 border-success/30 pointer-events-none"
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
+                    style={{ position: "absolute", top: 0 }}
+                  />
+
+                  {/* Content */}
+                  <motion.div
+                    className="md:mt-6 flex-1"
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <h3 className="font-display font-semibold text-lg text-foreground mb-2">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                    
+                    {/* Completion indicator */}
+                    <motion.div
+                      className="flex items-center gap-2 mt-4 md:justify-center"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.8 + i * 0.25 }}
+                    >
+                      <motion.div
+                        className="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center"
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 1 + i * 0.25, type: "spring" }}
+                      >
+                        <motion.svg
+                          width="12" height="12" viewBox="0 0 12 12" fill="none"
+                          className="text-success"
+                          initial={{ pathLength: 0 }}
+                          whileInView={{ pathLength: 1 }}
+                          viewport={{ once: true }}
+                        >
+                          <motion.path
+                            d="M2.5 6L5 8.5L9.5 3.5"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            initial={{ pathLength: 0 }}
+                            whileInView={{ pathLength: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 1.1 + i * 0.25, duration: 0.4 }}
+                          />
+                        </motion.svg>
+                      </motion.div>
+                      <span className="text-xs font-medium text-success">Step {item.step}</span>
+                    </motion.div>
+                  </motion.div>
                 </motion.div>
-                <motion.div
-                  className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors"
-                  whileHover={{ scale: 1.15, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                >
-                  <span className="text-2xl font-display font-bold text-primary">{item.step}</span>
-                </motion.div>
-                <h3 className="font-display font-semibold text-lg text-foreground mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                <motion.div
-                  className="h-0.5 bg-gradient-to-r from-primary/60 to-accent/40 rounded-full mt-5 origin-left"
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 + i * 0.15 }}
-                />
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
