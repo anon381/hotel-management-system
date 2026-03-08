@@ -412,10 +412,10 @@ function FoodParticles() {
   );
 }
 
-export function HeroScene() {
+export function HeroScene({ onReady }: { onReady?: () => void }) {
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas camera={{ position: [0, 0, 9], fov: 70 }}>
+      <Canvas camera={{ position: [0, 0, 9], fov: 70 }} onCreated={() => { setTimeout(() => onReady?.(), 300); }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} />
         <pointLight position={[-8, -3, -5]} intensity={0.6} color="#a855f7" />
