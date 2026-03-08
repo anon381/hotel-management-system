@@ -65,7 +65,7 @@ export function AdminSidebar() {
         </AnimatePresence>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5 sidebar-scroll">
         {navSections.map((section) => (
           <div key={section.label}>
             <AnimatePresence>
@@ -145,7 +145,7 @@ export function AdminSidebar() {
             <motion.aside
               initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 w-[260px] bg-background/40 backdrop-blur-2xl backdrop-saturate-150 border-r border-border/20 z-50 shadow-2xl sidebar-curved"
+              className="lg:hidden fixed left-4 top-4 bottom-4 w-[260px] bg-background/40 backdrop-blur-2xl backdrop-saturate-150 border border-border/20 z-50 shadow-2xl rounded-2xl"
             >
               {sidebarContent}
             </motion.aside>
@@ -155,7 +155,7 @@ export function AdminSidebar() {
       <motion.aside
         animate={{ width: collapsed ? 72 : 260 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="hidden lg:block fixed left-0 top-0 bottom-0 bg-background/40 backdrop-blur-2xl backdrop-saturate-150 z-30 border-r border-border/20 overflow-hidden sidebar-curved shadow-[0_8px_32px_-8px_hsl(var(--foreground)/0.08)]"
+        className="hidden lg:block fixed left-4 top-4 bottom-4 bg-background/40 backdrop-blur-2xl backdrop-saturate-150 z-30 border border-border/20 overflow-hidden rounded-2xl shadow-[0_8px_32px_-8px_hsl(var(--foreground)/0.08)]"
       >
         {sidebarContent}
       </motion.aside>
