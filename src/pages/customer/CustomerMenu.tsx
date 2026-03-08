@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Star, ShoppingCart, Heart, Plus, Minus, X, CalendarDays, Check } from "lucide-react";
+import { Search, Star, ShoppingCart, Heart, Plus, Minus, X, CalendarDays, Check, ArrowRight, UtensilsCrossed } from "lucide-react";
 import { CustomerLayout } from "@/components/CustomerLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { toast } from "@/hooks/use-toast";
@@ -58,9 +58,13 @@ export default function CustomerMenu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [quantityModal, setQuantityModal] = useState<{ name: string; emoji: string; price: number } | null>(null);
   const [tempQty, setTempQty] = useState(1);
-  const [wantReserve, setWantReserve] = useState(false);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  // After adding: show "Add More" or "View Cart"
+  const [justAdded, setJustAdded] = useState<string | null>(null);
+  // Post-order: ask about table reservation
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderSummary, setOrderSummary] = useState<{ count: number; total: number } | null>(null);
 
   const toggleFavorite = (name: string) => {
     setFavorites((prev) => {
@@ -74,6 +78,7 @@ export default function CustomerMenu() {
   const openQuantityModal = (item: { name: string; emoji: string; price: number }) => {
     setQuantityModal(item);
     setTempQty(1);
+    setJustAdded(null);
   };
 
   const addToCart = () => {
@@ -85,8 +90,7 @@ export default function CustomerMenu() {
       }
       return [...prev, { name: quantityModal.name, emoji: quantityModal.emoji, price: quantityModal.price, quantity: tempQty }];
     });
-    toast({ title: "Added to Cart", description: `${tempQty}x ${quantityModal.name}` });
-    setQuantityModal(null);
+    setJustAdded(quantityModal.name);
   };
 
   const updateCartQty = (name: string, delta: number) => {
@@ -103,14 +107,30 @@ export default function CustomerMenu() {
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
   const placeOrder = () => {
-    toast({
-      title: "🎉 Order Placed!",
-      description: `${cartCount} items — $${cartTotal}${selectedTable ? ` · Table ${selectedTable}` : " · Takeaway"}`,
-    });
+    setOrderSummary({ count: cartCount, total: cartTotal });
     setCart([]);
     setCheckoutOpen(false);
     setCartOpen(false);
-    setWantReserve(false);
+    setOrderPlaced(true);
+  };
+
+  const confirmReservation = () => {
+    toast({
+      title: "🎉 Order Confirmed!",
+      description: `${orderSummary?.count} items — $${orderSummary?.total}${selectedTable ? ` · Table ${selectedTable} reserved` : " · Takeaway"}`,
+    });
+    setOrderPlaced(false);
+    setOrderSummary(null);
+    setSelectedTable(null);
+  };
+
+  const skipReservation = () => {
+    toast({
+      title: "🎉 Order Placed!",
+      description: `${orderSummary?.count} items — $${orderSummary?.total} · Takeaway`,
+    });
+    setOrderPlaced(false);
+    setOrderSummary(null);
     setSelectedTable(null);
   };
 
@@ -123,7 +143,6 @@ export default function CustomerMenu() {
     <CustomerLayout>
       <div className="flex items-center justify-between mb-2">
         <PageHeader title="Menu" subtitle="Explore our delicious offerings" />
-        {/* Cart button */}
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => setCartOpen(true)}
@@ -217,7 +236,7 @@ export default function CustomerMenu() {
         ))}
       </div>
 
-      {/* Quantity Modal */}
+      {/* Quantity Modal — with "Add More" / "View Cart" after adding */}
       <AnimatePresence>
         {quantityModal && (
           <>
@@ -228,26 +247,64 @@ export default function CustomerMenu() {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-sm bg-background border border-border rounded-2xl p-6 shadow-2xl"
             >
-              <div className="text-center mb-4">
-                <span className="text-5xl">{quantityModal.emoji}</span>
-                <h3 className="font-display font-bold text-lg text-foreground mt-2">{quantityModal.name}</h3>
-                <p className="text-sm text-muted-foreground">${quantityModal.price} each</p>
-              </div>
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <motion.button whileTap={{ scale: 0.9 }} onClick={() => setTempQty(Math.max(1, tempQty - 1))} className="w-10 h-10 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center">
-                  <Minus className="w-4 h-4" />
-                </motion.button>
-                <span className="text-3xl font-display font-bold text-foreground w-12 text-center">{tempQty}</span>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={() => setTempQty(tempQty + 1)} className="w-10 h-10 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center">
-                  <Plus className="w-4 h-4" />
-                </motion.button>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => setQuantityModal(null)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Cancel</button>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={addToCart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
-                  Add · ${quantityModal.price * tempQty}
-                </motion.button>
-              </div>
+              <AnimatePresence mode="wait">
+                {!justAdded ? (
+                  <motion.div key="pick-qty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -20 }}>
+                    <div className="text-center mb-4">
+                      <span className="text-5xl">{quantityModal.emoji}</span>
+                      <h3 className="font-display font-bold text-lg text-foreground mt-2">{quantityModal.name}</h3>
+                      <p className="text-sm text-muted-foreground">${quantityModal.price} each</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-4 mb-6">
+                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => setTempQty(Math.max(1, tempQty - 1))} className="w-10 h-10 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center">
+                        <Minus className="w-4 h-4" />
+                      </motion.button>
+                      <span className="text-3xl font-display font-bold text-foreground w-12 text-center">{tempQty}</span>
+                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => setTempQty(tempQty + 1)} className="w-10 h-10 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center">
+                        <Plus className="w-4 h-4" />
+                      </motion.button>
+                    </div>
+                    <div className="flex gap-3">
+                      <button onClick={() => setQuantityModal(null)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Cancel</button>
+                      <motion.button whileTap={{ scale: 0.95 }} onClick={addToCart} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
+                        Add · ${quantityModal.price * tempQty}
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div key="added" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                    <div className="text-center mb-5">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                        className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3"
+                      >
+                        <Check className="w-8 h-8 text-primary" />
+                      </motion.div>
+                      <h3 className="font-display font-bold text-lg text-foreground">Added to Cart!</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{tempQty}x {quantityModal.name}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{cartCount} item{cartCount !== 1 ? "s" : ""} in cart · ${cartTotal}</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setQuantityModal(null)}
+                        className="flex-1 py-3 rounded-xl border border-border text-foreground text-sm font-semibold hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" /> Add More
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => { setQuantityModal(null); setCartOpen(true); }}
+                        className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2"
+                      >
+                        View Cart <ArrowRight className="w-4 h-4" />
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </>
         )}
@@ -279,6 +336,13 @@ export default function CustomerMenu() {
                       <div className="text-center py-12">
                         <ShoppingCart className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
                         <p className="text-muted-foreground text-sm">Your cart is empty</p>
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setCartOpen(false)}
+                          className="mt-4 px-6 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold"
+                        >
+                          Browse Menu
+                        </motion.button>
                       </div>
                     ) : (
                       cart.map((c) => (
@@ -306,6 +370,14 @@ export default function CustomerMenu() {
                   </div>
                   {cart.length > 0 && (
                     <div className="p-5 border-t border-border space-y-3">
+                      {/* Add more items button */}
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setCartOpen(false)}
+                        className="w-full py-2.5 rounded-xl border border-dashed border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" /> Add More Items
+                      </motion.button>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Total</span>
                         <span className="font-display font-bold text-lg text-foreground">${cartTotal}</span>
@@ -321,7 +393,7 @@ export default function CustomerMenu() {
                   )}
                 </>
               ) : (
-                /* Checkout with optional table reservation */
+                /* Checkout — order summary then place */
                 <div className="flex-1 overflow-y-auto p-5 space-y-6">
                   <div>
                     <h3 className="font-semibold text-foreground mb-3">Order Summary</h3>
@@ -339,55 +411,6 @@ export default function CustomerMenu() {
                     </div>
                   </div>
 
-                  {/* Reserve table option */}
-                  <div>
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => { setWantReserve(!wantReserve); setSelectedTable(null); }}
-                      className={`w-full py-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
-                        wantReserve ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"
-                      }`}
-                    >
-                      <CalendarDays className="w-4 h-4" />
-                      {wantReserve ? "Table reservation added" : "Want to dine in? Reserve a table"}
-                    </motion.button>
-
-                    <AnimatePresence>
-                      {wantReserve && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pt-4 space-y-3">
-                            {tableZones.map((zone) => (
-                              <div key={zone.zone}>
-                                <p className="text-xs font-semibold text-muted-foreground mb-2">{zone.zone} Zone</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {zone.tables.map((t) => (
-                                    <motion.button
-                                      key={t}
-                                      whileTap={{ scale: 0.9 }}
-                                      onClick={() => setSelectedTable(selectedTable === t ? null : t)}
-                                      className={`w-12 h-12 rounded-xl text-xs font-bold flex items-center justify-center transition-colors ${
-                                        selectedTable === t
-                                          ? "bg-primary text-primary-foreground shadow-lg"
-                                          : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                                      }`}
-                                    >
-                                      {t}
-                                    </motion.button>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
                   <div className="flex gap-3">
                     <button onClick={() => setCheckoutOpen(false)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Back</button>
                     <motion.button
@@ -400,6 +423,90 @@ export default function CustomerMenu() {
                   </div>
                 </div>
               )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Post-Order: Reserve Table Modal */}
+      <AnimatePresence>
+        {orderPlaced && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl"
+            >
+              <div className="text-center mb-5">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3"
+                >
+                  <UtensilsCrossed className="w-8 h-8 text-primary" />
+                </motion.div>
+                <h3 className="font-display font-bold text-xl text-foreground">Order Placed! 🎉</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {orderSummary?.count} items · ${orderSummary?.total}
+                </p>
+              </div>
+
+              <div className="bg-secondary/50 rounded-xl p-4 mb-5">
+                <p className="text-sm font-semibold text-foreground mb-1 flex items-center gap-2">
+                  <CalendarDays className="w-4 h-4 text-primary" /> Want to dine in?
+                </p>
+                <p className="text-xs text-muted-foreground">Reserve a table for your meal, or skip for takeaway.</p>
+              </div>
+
+              {/* Table selection */}
+              <div className="space-y-3 mb-5 max-h-48 overflow-y-auto">
+                {tableZones.map((zone) => (
+                  <div key={zone.zone}>
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">{zone.zone} Zone</p>
+                    <div className="flex flex-wrap gap-2">
+                      {zone.tables.map((t) => (
+                        <motion.button
+                          key={t}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => setSelectedTable(selectedTable === t ? null : t)}
+                          className={`w-12 h-12 rounded-xl text-xs font-bold flex items-center justify-center transition-colors ${
+                            selectedTable === t
+                              ? "bg-primary text-primary-foreground shadow-lg"
+                              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                          }`}
+                        >
+                          {t}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-3">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={skipReservation}
+                  className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors"
+                >
+                  Skip · Takeaway
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={confirmReservation}
+                  disabled={!selectedTable}
+                  className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+                    selectedTable
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground cursor-not-allowed"
+                  }`}
+                >
+                  <CalendarDays className="w-4 h-4" /> Reserve {selectedTable || "Table"}
+                </motion.button>
+              </div>
             </motion.div>
           </>
         )}
