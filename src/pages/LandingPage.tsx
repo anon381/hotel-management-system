@@ -55,36 +55,39 @@ export default function LandingPage() {
   const hasVisited = useRef(sessionStorage.getItem("cafex-visited") === "true");
   const [sceneReady, setSceneReady] = useState(hasVisited.current);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [showTapHint, setShowTapHint] = useState(false);
-  // Minimum 4-second timer
-  useEffect(() => {
-    if (hasVisited.current) return;
-    const timer = setTimeout(() => {
-      setLoadProgress(100);
-      setTimeout(() => setShowTapHint(true), 300);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
 
-  // Animated progress bar filling over 4s
+  // Lock scroll during loader
+  useEffect(() => {
+    if (!sceneReady && !hasVisited.current) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [sceneReady]);
+
+  // 4-second loader then auto-dismiss
   useEffect(() => {
     if (hasVisited.current) return;
     const start = Date.now();
     const duration = 4000;
     const tick = () => {
       const elapsed = Date.now() - start;
-      const p = Math.min((elapsed / duration) * 100, 99);
+      const p = Math.min((elapsed / duration) * 100, 100);
       setLoadProgress(p);
-      if (elapsed < duration) requestAnimationFrame(tick);
+      if (elapsed < duration) {
+        requestAnimationFrame(tick);
+      } else {
+        // Auto-dismiss after bar completes
+        setTimeout(() => {
+          sessionStorage.setItem("cafex-visited", "true");
+          window.scrollTo(0, 0);
+          setSceneReady(true);
+        }, 400);
+      }
     };
     requestAnimationFrame(tick);
   }, []);
-
-  const handleDismissLoader = () => {
-    if (!showTapHint) return;
-    sessionStorage.setItem("cafex-visited", "true");
-    setSceneReady(true);
-  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
