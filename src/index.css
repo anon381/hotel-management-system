@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -61,8 +61,8 @@
     --shadow-card: 0 1px 3px hsl(270 20% 10% / 0.06), 0 4px 16px hsl(270 20% 10% / 0.04);
     --shadow-elevated: 0 8px 32px hsl(270 20% 10% / 0.08), 0 2px 8px hsl(270 20% 10% / 0.04);
 
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Figtree', sans-serif;
+    --font-body: 'Inter', sans-serif;
   }
 
   .dark {
