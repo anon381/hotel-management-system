@@ -289,7 +289,13 @@ export default function CustomerMenu() {
                     <div className="flex gap-3">
                       <motion.button
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => { setQuantityModal(null); setJustAdded(null); }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setJustAdded(null);
+                          setTempQty(1);
+                          requestAnimationFrame(() => setQuantityModal(null));
+                        }}
                         className="flex-1 py-3 rounded-xl border border-border text-foreground text-sm font-semibold hover:bg-muted transition-colors flex items-center justify-center gap-2"
                       >
                         <Plus className="w-4 h-4" /> Add More
@@ -437,12 +443,13 @@ export default function CustomerMenu() {
       <AnimatePresence>
         {orderPlaced && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-[60]" />
+            <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="w-full max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
             >
               <div className="text-center mb-5">
                 <motion.div
@@ -512,7 +519,8 @@ export default function CustomerMenu() {
                   <CalendarDays className="w-4 h-4" /> Reserve {selectedTable || "Table"}
                 </motion.button>
               </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
