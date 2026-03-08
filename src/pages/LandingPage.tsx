@@ -76,6 +76,45 @@ export default function LandingPage() {
   }, []);
 
   return (
+    <>
+      {/* Loading Screen */}
+      <AnimatePresence>
+        {!sceneReady && (
+          <motion.div
+            key="loader"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center gap-5"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+              className="w-14 h-14 rounded-2xl gradient-warm flex items-center justify-center shadow-xl"
+            >
+              <UtensilsCrossed className="w-7 h-7 text-primary-foreground" />
+            </motion.div>
+            <div className="text-center">
+              <h2 className="font-display text-xl font-bold text-foreground">Café X</h2>
+              <motion.p
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="text-sm text-muted-foreground mt-1"
+              >
+                Loading experience...
+              </motion.p>
+            </div>
+            <div className="w-40 h-1 rounded-full bg-muted overflow-hidden mt-2">
+              <motion.div
+                className="h-full rounded-full bg-primary"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+                style={{ width: "50%" }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     <div ref={mainRef} className="min-h-screen bg-background overflow-x-hidden">
       {/* Animated Navbar */}
       <motion.nav
