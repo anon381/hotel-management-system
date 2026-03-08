@@ -416,30 +416,49 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }} 
+            animate={sceneReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }} 
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              animate={sceneReady ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
+              transition={{ delay: 0.4 }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6 backdrop-blur-sm"
             >
               <Sparkles className="w-3.5 h-3.5 text-primary" />
               <span className="text-xs font-semibold text-primary">Next-Gen Restaurant Management</span>
             </motion.div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-bold text-foreground leading-tight mb-6">
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={sceneReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="text-4xl sm:text-5xl md:text-7xl font-display font-bold text-foreground leading-tight mb-6"
+            >
               Welcome to <br />
               <motion.span
                 className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%]"
-                animate={{ backgroundPosition: ["0%", "100%", "0%"] }}
+                animate={sceneReady ? { backgroundPosition: ["0%", "100%", "0%"] } : {}}
                 transition={{ duration: 5, repeat: Infinity }}
               >
                 Café X
               </motion.span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-foreground max-w-2xl mx-auto mb-8 [text-shadow:_0_1px_2px_hsl(var(--foreground)/0.15)]">
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={sceneReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="text-xl sm:text-2xl text-foreground max-w-2xl mx-auto mb-8 [text-shadow:_0_1px_2px_hsl(var(--foreground)/0.15)]"
+            >
               A complete system for orders, kitchen, tables, payments, inventory, and analytics — beautifully designed for every role.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            </motion.p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={sceneReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
               <Link to="/login/admin">
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: "0 20px 40px -15px hsla(var(--primary), 0.4)" }}
@@ -458,7 +477,7 @@ export default function LandingPage() {
                   Explore Features
                 </motion.button>
               </a>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Stats */}
