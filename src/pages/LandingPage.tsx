@@ -52,7 +52,32 @@ function TypingText({ text, className }: { text: string; className?: string }) {
 
 export default function LandingPage() {
   const mainRef = useRef<HTMLDivElement>(null);
-  const [sceneReady, setSceneReady] = useState(false);
+  const hasVisited = useRef(sessionStorage.getItem("cafex-visited") === "true");
+  const [sceneReady, setSceneReady] = useState(hasVisited.current);
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [showTapHint, setShowTapHint] = useState(false);
+
+  // Simulate progress and mark visited
+  useEffect(() => {
+    if (hasVisited.current) return;
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 8 + 2;
+      if (progress >= 100) progress = 100;
+      setLoadProgress(progress);
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => setShowTapHint(true), 400);
+      }
+    }, 120);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDismissLoader = () => {
+    if (loadProgress < 100) return;
+    sessionStorage.setItem("cafex-visited", "true");
+    setSceneReady(true);
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -77,33 +102,48 @@ export default function LandingPage() {
 
   return (
     <>
-      {/* Loading Screen */}
+      {/* Loading Screen - only on first visit / reload */}
       <AnimatePresence>
         {!sceneReady && (
           <motion.div
             key="loader"
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden"
+            exit={{ opacity: 0, scale: 1.08, filter: "blur(10px)" }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden cursor-pointer"
+            onClick={handleDismissLoader}
           >
-            {/* Background floating food */}
-            {["🍔", "🍕", "☕", "🍩", "🥐", "🍣", "🍰", "🌮", "🍝", "🍦"].map((emoji, i) => (
+            {/* Radial gradient bg */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.08)_0%,transparent_70%)]" />
+
+            {/* Floating food emojis with interactive hover */}
+            {["🍔", "🍕", "☕", "🍩", "🥐", "🍣", "🍰", "🌮", "🍝", "🍦", "🥑", "🧁"].map((emoji, i) => (
               <motion.span
                 key={i}
-                className="absolute text-4xl sm:text-5xl select-none opacity-[0.06]"
+                className="absolute text-3xl sm:text-5xl md:text-6xl select-none cursor-pointer"
                 style={{
-                  left: `${10 + (i * 17) % 80}%`,
-                  top: `${5 + (i * 23) % 85}%`,
+                  left: `${8 + (i * 15) % 84}%`,
+                  top: `${5 + (i * 19) % 85}%`,
                 }}
+                initial={{ opacity: 0, scale: 0 }}
                 animate={{
-                  y: [0, -30, 0],
-                  rotate: [0, 15, -15, 0],
+                  opacity: [0, 0.12, 0.08, 0.12],
+                  scale: [0, 1, 0.9, 1],
+                  y: [0, -25, 5, -25],
+                  rotate: [0, 20, -10, 0],
+                  x: [0, i % 2 === 0 ? 10 : -10, 0],
                 }}
+                whileHover={{
+                  scale: 1.8,
+                  opacity: 0.6,
+                  rotate: [0, -20, 20, 0],
+                  transition: { duration: 0.3 },
+                }}
+                whileTap={{ scale: 2.2, opacity: 0.8 }}
                 transition={{
-                  duration: 3 + i * 0.3,
+                  duration: 4 + i * 0.4,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: i * 0.2,
+                  delay: i * 0.15,
                 }}
               >
                 {emoji}
@@ -111,28 +151,35 @@ export default function LandingPage() {
             ))}
 
             {/* Center content */}
-            <div className="relative z-10 flex flex-col items-center gap-6 px-6">
-              {/* Animated icon with ring pulse */}
-              <div className="relative">
+            <div className="relative z-10 flex flex-col items-center gap-5 px-6 max-w-md w-full">
+              {/* Animated icon with concentric rings */}
+              <div className="relative w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center">
+                {[0, 1, 2].map(i => (
+                  <motion.div
+                    key={i}
+                    className="absolute inset-0 rounded-full border border-primary/30"
+                    animate={{
+                      scale: [1, 1.4 + i * 0.3, 1],
+                      opacity: [0.3, 0, 0.3],
+                      rotate: [0, 120 * (i % 2 === 0 ? 1 : -1)],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeOut",
+                      delay: i * 0.35,
+                    }}
+                  />
+                ))}
                 <motion.div
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-3xl border-2 border-primary"
-                />
-                <motion.div
-                  animate={{ scale: [1, 1.8, 1], opacity: [0.15, 0, 0.15] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
-                  className="absolute inset-0 rounded-3xl border border-primary"
-                />
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
+                  initial={{ scale: 0, rotate: -270 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  transition={{ type: "spring", stiffness: 180, damping: 12 }}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl gradient-warm flex items-center justify-center shadow-2xl relative"
                 >
                   <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                   >
                     <UtensilsCrossed className="w-10 h-10 sm:w-12 sm:h-12 text-primary-foreground" />
                   </motion.div>
@@ -141,22 +188,22 @@ export default function LandingPage() {
 
               {/* Brand */}
               <motion.h2
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="font-display text-3xl sm:text-4xl font-bold text-foreground"
+                transition={{ delay: 0.3, type: "spring", stiffness: 120 }}
+                className="font-display text-4xl sm:text-5xl font-bold text-foreground tracking-tight"
               >
                 Café X
               </motion.h2>
 
-              {/* Tagline with word reveal */}
+              {/* Tagline with character-staggered reveal */}
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-                {["Your", "table", "is", "being", "prepared", "🍽️"].map((word, i) => (
+                {["Ready", "to", "enjoy", "your", "meal?", "🍽️"].map((word, i) => (
                   <motion.span
                     key={i}
-                    initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    transition={{ delay: 0.5 + i * 0.12, duration: 0.4 }}
+                    initial={{ opacity: 0, y: 20, filter: "blur(8px)", scale: 0.8 }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+                    transition={{ delay: 0.5 + i * 0.1, duration: 0.5, type: "spring" }}
                     className="text-base sm:text-lg text-muted-foreground font-medium"
                   >
                     {word}
@@ -164,25 +211,49 @@ export default function LandingPage() {
                 ))}
               </div>
 
-              {/* Animated progress dots */}
-              <div className="flex items-center gap-3 mt-2">
-                {[0, 1, 2].map(i => (
+              {/* Progress bar */}
+              <div className="w-full max-w-xs mt-2">
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                   <motion.div
-                    key={i}
-                    className="w-2.5 h-2.5 rounded-full bg-primary"
-                    animate={{
-                      scale: [1, 1.6, 1],
-                      opacity: [0.3, 1, 0.3],
-                    }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.2,
-                    }}
+                    className="h-full rounded-full gradient-warm"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${loadProgress}%` }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   />
-                ))}
+                </div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="text-xs text-muted-foreground text-center mt-2"
+                >
+                  {loadProgress < 100 ? "Preparing your experience..." : ""}
+                </motion.p>
               </div>
+
+              {/* Tap to enter hint */}
+              <AnimatePresence>
+                {showTapHint && (
+                  <motion.button
+                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                    onClick={handleDismissLoader}
+                    className="mt-2 px-8 py-3 rounded-2xl gradient-warm text-primary-foreground font-semibold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-shadow"
+                  >
+                    <motion.span
+                      className="flex items-center gap-2"
+                      animate={{ scale: [1, 1.03, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      Tap to Enter
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
@@ -284,7 +355,7 @@ export default function LandingPage() {
       <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
         {/* 3D Scene - full coverage */}
         <div className="absolute inset-0 z-0">
-          <HeroScene onReady={() => setSceneReady(true)} />
+          <HeroScene />
         </div>
 
         {/* Left edge floating food emojis */}
