@@ -83,7 +83,7 @@ export function AdminSidebar() {
                 return (
                   <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}>
                     <motion.div
-                      className={`nav-item ${isActive ? "active" : "text-sidebar-foreground/70"}`}
+                      className={`nav-item ${isActive ? "active" : "text-muted-foreground hover:text-foreground"}`}
                       whileHover={{ x: 4 }}
                       whileTap={{ scale: 0.98 }}
                     >
