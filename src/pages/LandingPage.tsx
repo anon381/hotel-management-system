@@ -8,10 +8,6 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HeroScene } from "@/components/Scene3D";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   { icon: ShoppingCart, title: "Order Management", desc: "Track orders from placement to completion with real-time status updates." },
@@ -42,169 +38,24 @@ export default function LandingPage() {
   const portalsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Navbar shrink on scroll
-      ScrollTrigger.create({
-        trigger: mainRef.current,
-        start: "top top",
-        end: "100px top",
-        onUpdate: (self) => {
-          if (navRef.current) {
-            const progress = self.progress;
-            gsap.to(navRef.current, {
-              backdropFilter: `blur(${8 + progress * 16}px)`,
-              borderBottomWidth: `${progress}px`,
-              duration: 0.3,
-            });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const delay = Number(el.dataset.delay ?? 0);
+            setTimeout(() => el.classList.add("animate-visible"), delay);
+            observer.unobserve(el);
           }
-        },
-      });
-
-      // Features parallax
-      if (featuresRef.current) {
-        const cards = featuresRef.current.querySelectorAll(".feature-card");
-        cards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { y: 80, opacity: 0, scale: 0.9 },
-            {
-              y: 0, opacity: 1, scale: 1,
-              duration: 0.8,
-              delay: i * 0.1,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: { trigger: card, start: "top 98%", toggleActions: "play none none none" },
-            }
-          );
         });
-      }
+      },
+      { threshold: 0.1 }
+    );
 
-      // How it works parallax
-      if (howRef.current) {
-        const steps = howRef.current.querySelectorAll(".step-card");
-        steps.forEach((step, i) => {
-          gsap.fromTo(step,
-            { x: i % 2 === 0 ? -60 : 60, opacity: 0 },
-            {
-              x: 0, opacity: 1,
-              duration: 0.8,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: { trigger: step, start: "top 98%", toggleActions: "play none none none" },
-            }
-          );
-        });
-      }
+    const animatedElements = mainRef.current?.querySelectorAll(".animate-on-scroll");
+    animatedElements?.forEach((el) => observer.observe(el));
 
-      // Portals scale-in
-      if (portalsRef.current) {
-        const portalCards = portalsRef.current.querySelectorAll(".portal-card");
-        portalCards.forEach((card, i) => {
-          gsap.fromTo(card,
-            { y: 100, opacity: 0, rotateX: 15 },
-            {
-              y: 0, opacity: 1, rotateX: 0,
-              duration: 0.9,
-              delay: i * 0.15,
-              ease: "power3.out",
-              immediateRender: false,
-              scrollTrigger: { trigger: card, start: "top 98%", toggleActions: "play none none none" },
-            }
-          );
-        });
-      }
-
-      // Global decorative parallax
-      gsap.to(".parallax-bg", {
-        yPercent: -45,
-        ease: "none",
-        scrollTrigger: {
-          trigger: mainRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1.2,
-        },
-      });
-
-      // Section-level parallax (intense and obvious)
-      const layeredParallax = gsap.utils.toArray<HTMLElement>(".parallax-shift");
-      layeredParallax.forEach((el, i) => {
-        const depth = Number(el.dataset.depth ?? (i % 2 === 0 ? 40 : 28));
-        const parent = el.closest("section, .transition-band") as Element | null;
-
-        gsap.fromTo(
-          el,
-          { yPercent: -depth * 0.35, xPercent: depth * 0.12 },
-          {
-            yPercent: depth,
-            xPercent: -depth * 0.1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: parent || mainRef.current,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.15,
-            },
-          }
-        );
-      });
-
-      // Hero -> Features transition parallax (extra intense)
-      gsap.to(".hero-features-layer-back", {
-        yPercent: -85,
-        scale: 1.25,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 1.4,
-        },
-      });
-
-      gsap.to(".hero-features-layer-mid", {
-        yPercent: -60,
-        xPercent: 24,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 1.2,
-        },
-      });
-
-      gsap.to(".hero-features-layer-front", {
-        yPercent: -42,
-        xPercent: -20,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 1,
-        },
-      });
-
-      gsap.fromTo(
-        ".hero-features-glow",
-        { opacity: 0.25, scale: 1 },
-        {
-          opacity: 0.95,
-          scale: 1.15,
-          ease: "none",
-          scrollTrigger: {
-            trigger: "#features",
-            start: "top bottom",
-            end: "top center",
-            scrub: true,
-          },
-        }
-      );
-
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-    }, mainRef);
-
-    return () => ctx.revert();
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -307,15 +158,12 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Parallax decorative blobs - fill edges */}
-        <div className="parallax-bg absolute inset-0 z-[1] pointer-events-none">
-          <div data-depth="56" className="parallax-shift absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-          <div data-depth="48" className="parallax-shift absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-          <div data-depth="60" className="parallax-shift absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
-          <div data-depth="42" className="parallax-shift absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
-          <div data-depth="34" className="parallax-shift absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]" />
-          <div data-depth="38" className="parallax-shift absolute top-[15%] right-[15%] w-40 h-40 bg-accent/10 rounded-full blur-2xl" />
-          <div data-depth="44" className="parallax-shift absolute bottom-[10%] left-[15%] w-48 h-48 bg-primary/8 rounded-full blur-2xl" />
+        {/* Parallax decorative blobs */}
+        <div className="absolute inset-0 z-[1] pointer-events-none">
+          <div data-speed="1.2" className="parallax-blob absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+          <div data-speed="0.8" className="parallax-blob absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+          <div data-speed="1.5" className="parallax-blob absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
+          <div data-speed="0.6" className="parallax-blob absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -406,17 +254,11 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Transition: Hero → Features (intense parallax) */}
-      <div className="transition-band relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
-        <div data-depth="62" className="hero-features-glow parallax-shift absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
-
-        <div data-depth="75" className="hero-features-layer-back parallax-shift absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
-        <div data-depth="58" className="hero-features-layer-mid parallax-shift absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
-        <div data-depth="45" className="hero-features-layer-front parallax-shift absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
-
-        <svg className="parallax-shift absolute bottom-0 left-0 w-full h-28 sm:h-36" data-depth="36" viewBox="0 0 1440 140" preserveAspectRatio="none">
-          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.22)" />
-          <path d="M0,125 C220,100 380,130 560,110 C760,85 900,125 1120,95 C1260,78 1360,88 1440,100 L1440,140 L0,140 Z" fill="hsl(var(--accent) / 0.20)" />
+      {/* Transition: Hero → Features */}
+      <div className="relative -mt-16 h-32 sm:h-40 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent" />
+        <svg className="absolute bottom-0 left-0 w-full h-24 sm:h-32" viewBox="0 0 1440 140" preserveAspectRatio="none">
+          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.15)" />
           <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
         </svg>
       </div>
@@ -430,8 +272,8 @@ export default function LandingPage() {
             <p className="text-muted-foreground mt-3 max-w-xl mx-auto">Every module designed to streamline your restaurant operations.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => (
-              <div key={f.title} className="feature-card glass-card-elevated p-6 group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+            {features.map((f, i) => (
+              <div key={f.title} data-delay={i * 100} className="animate-on-scroll feature-card glass-card-elevated p-6 group hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
                   <f.icon className="w-6 h-6 text-primary" />
                 </div>
@@ -444,33 +286,25 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: Features → How It Works */}
-      <div className="transition-band relative -mt-1">
-        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="28" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
-              <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
-            </linearGradient>
-          </defs>
+      <div className="relative -mt-1">
+        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <path d="M0,0 L0,60 C360,100 720,20 1080,80 C1260,100 1380,40 1440,60 L1440,0 Z" className="fill-background" />
-          <path d="M0,50 C240,80 480,30 720,70 C960,100 1200,50 1440,70 L1440,100 L0,100 Z" fill="url(#wave-grad-2)" />
           <path d="M0,80 C360,50 720,90 1080,60 C1260,50 1380,70 1440,80 L1440,100 L0,100 Z" fill="hsl(var(--muted) / 0.3)" />
         </svg>
       </div>
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
-        <div data-depth="34" className="parallax-bg parallax-shift absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
-        <div data-depth="42" className="parallax-bg parallax-shift absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
         <div ref={howRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">How It Works</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {howItWorks.map((h) => (
-              <div key={h.step} className="step-card text-center">
+            {howItWorks.map((h, i) => (
+              <div key={h.step} data-delay={i * 150} className="animate-on-scroll step-card text-center">
                 <div className="w-16 h-16 rounded-2xl gradient-warm text-primary-foreground font-display font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   {h.step}
                 </div>
@@ -482,18 +316,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Transition: How It Works → Portals */}
-      <div className="transition-band relative -mt-1">
-        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="26" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave-grad-3" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-              <stop offset="50%" stopColor="hsl(var(--accent))" stopOpacity="0.15" />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
+      <div className="relative -mt-1">
+        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <path d="M0,0 L0,50 C240,80 480,20 720,60 C960,90 1200,30 1440,50 L1440,0 Z" fill="hsl(var(--muted) / 0.3)" />
-          <path d="M0,40 C360,80 720,30 1080,70 C1260,90 1380,50 1440,40 L1440,100 L0,100 Z" fill="url(#wave-grad-3)" />
           <path d="M0,70 C480,50 960,80 1440,60 L1440,100 L0,100 Z" className="fill-background" />
         </svg>
       </div>
@@ -506,8 +331,8 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Choose Your Portal</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {roles.map((r) => (
-              <Link key={r.title} to={r.path} className="portal-card">
+            {roles.map((r, i) => (
+              <Link key={r.title} to={r.path} className="animate-on-scroll portal-card" data-delay={i * 120}>
                 <motion.div
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="glass-card-elevated p-8 text-center group cursor-pointer h-full"
