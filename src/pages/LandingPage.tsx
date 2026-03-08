@@ -265,13 +265,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Transition: Features → How It Works */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <path d="M0,0 L0,60 C360,100 720,20 1080,80 C1260,100 1380,40 1440,60 L1440,0 Z" className="fill-background" />
-          <path d="M0,80 C360,50 720,90 1080,60 C1260,50 1380,70 1440,80 L1440,100 L0,100 Z" fill="hsl(var(--muted) / 0.3)" />
-        </svg>
-      </div>
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
