@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Users, Plus, Search, Mail, Phone, Clock, Star, MoreVertical, Calendar } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 const staff = [

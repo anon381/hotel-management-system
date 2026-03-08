@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Star, Clock, Flame, Leaf, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 const categories = ["All", "Breakfast", "Lunch", "Dinner", "Drinks", "Desserts", "Snacks"];
