@@ -113,22 +113,57 @@ export default function LandingPage() {
         });
       }
 
-      // Parallax background movement
+      // Global decorative parallax
       gsap.to(".parallax-bg", {
-        yPercent: -30,
+        yPercent: -45,
         ease: "none",
         scrollTrigger: {
           trigger: mainRef.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 1,
+          scrub: 1.2,
         },
       });
 
-      // Hero -> Features transition parallax (intense)
+      // Section-level parallax (intense and obvious)
+      const layeredParallax = gsap.utils.toArray<HTMLElement>(".parallax-shift");
+      layeredParallax.forEach((el, i) => {
+        const depth = Number(el.dataset.depth ?? (i % 2 === 0 ? 40 : 28));
+        const parent = el.closest("section, .transition-band") as Element | null;
+
+        gsap.fromTo(
+          el,
+          { yPercent: -depth * 0.35, xPercent: depth * 0.12 },
+          {
+            yPercent: depth,
+            xPercent: -depth * 0.1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: parent || mainRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.15,
+            },
+          }
+        );
+      });
+
+      // Hero -> Features transition parallax (extra intense)
       gsap.to(".hero-features-layer-back", {
-        yPercent: -55,
-        scale: 1.15,
+        yPercent: -85,
+        scale: 1.25,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.4,
+        },
+      });
+
+      gsap.to(".hero-features-layer-mid", {
+        yPercent: -60,
+        xPercent: 24,
         ease: "none",
         scrollTrigger: {
           trigger: "#features",
@@ -138,9 +173,9 @@ export default function LandingPage() {
         },
       });
 
-      gsap.to(".hero-features-layer-mid", {
-        yPercent: -35,
-        xPercent: 12,
+      gsap.to(".hero-features-layer-front", {
+        yPercent: -42,
+        xPercent: -20,
         ease: "none",
         scrollTrigger: {
           trigger: "#features",
@@ -150,28 +185,23 @@ export default function LandingPage() {
         },
       });
 
-      gsap.to(".hero-features-layer-front", {
-        yPercent: -20,
-        xPercent: -10,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top top",
-          scrub: 0.8,
-        },
-      });
+      gsap.fromTo(
+        ".hero-features-glow",
+        { opacity: 0.25, scale: 1 },
+        {
+          opacity: 0.95,
+          scale: 1.15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#features",
+            start: "top bottom",
+            end: "top center",
+            scrub: true,
+          },
+        }
+      );
 
-      gsap.fromTo(".hero-features-glow", { opacity: 0.2 }, {
-        opacity: 0.8,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#features",
-          start: "top bottom",
-          end: "top center",
-          scrub: true,
-        },
-      });
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     }, mainRef);
 
     return () => ctx.revert();
@@ -279,13 +309,13 @@ export default function LandingPage() {
 
         {/* Parallax decorative blobs - fill edges */}
         <div className="parallax-bg absolute inset-0 z-[1] pointer-events-none">
-          <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-          <div className="absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
-          <div className="absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
-          <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]" />
-          <div className="absolute top-[15%] right-[15%] w-40 h-40 bg-accent/10 rounded-full blur-2xl" />
-          <div className="absolute bottom-[10%] left-[15%] w-48 h-48 bg-primary/8 rounded-full blur-2xl" />
+          <div data-depth="56" className="parallax-shift absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+          <div data-depth="48" className="parallax-shift absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+          <div data-depth="60" className="parallax-shift absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
+          <div data-depth="42" className="parallax-shift absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
+          <div data-depth="34" className="parallax-shift absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]" />
+          <div data-depth="38" className="parallax-shift absolute top-[15%] right-[15%] w-40 h-40 bg-accent/10 rounded-full blur-2xl" />
+          <div data-depth="44" className="parallax-shift absolute bottom-[10%] left-[15%] w-48 h-48 bg-primary/8 rounded-full blur-2xl" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -377,14 +407,14 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: Hero → Features (intense parallax) */}
-      <div className="relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
-        <div className="hero-features-glow absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+      <div className="transition-band relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
+        <div data-depth="62" className="hero-features-glow parallax-shift absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
 
-        <div className="hero-features-layer-back absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
-        <div className="hero-features-layer-mid absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
-        <div className="hero-features-layer-front absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
+        <div data-depth="75" className="hero-features-layer-back parallax-shift absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
+        <div data-depth="58" className="hero-features-layer-mid parallax-shift absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
+        <div data-depth="45" className="hero-features-layer-front parallax-shift absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
 
-        <svg className="absolute bottom-0 left-0 w-full h-28 sm:h-36" viewBox="0 0 1440 140" preserveAspectRatio="none">
+        <svg className="parallax-shift absolute bottom-0 left-0 w-full h-28 sm:h-36" data-depth="36" viewBox="0 0 1440 140" preserveAspectRatio="none">
           <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.22)" />
           <path d="M0,125 C220,100 380,130 560,110 C760,85 900,125 1120,95 C1260,78 1360,88 1440,100 L1440,140 L0,140 Z" fill="hsl(var(--accent) / 0.20)" />
           <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
@@ -414,8 +444,8 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: Features → How It Works */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
+      <div className="transition-band relative -mt-1">
+        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="28" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <defs>
             <linearGradient id="wave-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
@@ -431,8 +461,8 @@ export default function LandingPage() {
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
-        <div className="parallax-bg absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
-        <div className="parallax-bg absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
+        <div data-depth="34" className="parallax-bg parallax-shift absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+        <div data-depth="42" className="parallax-bg parallax-shift absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
         <div ref={howRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
@@ -453,8 +483,8 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: How It Works → Portals */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
+      <div className="transition-band relative -mt-1">
+        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="26" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <defs>
             <linearGradient id="wave-grad-3" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
