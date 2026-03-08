@@ -82,34 +82,107 @@ export default function LandingPage() {
         {!sceneReady && (
           <motion.div
             key="loader"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center gap-5"
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden"
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-              className="w-14 h-14 rounded-2xl gradient-warm flex items-center justify-center shadow-xl"
-            >
-              <UtensilsCrossed className="w-7 h-7 text-primary-foreground" />
-            </motion.div>
-            <div className="text-center">
-              <h2 className="font-display text-xl font-bold text-foreground">Café X</h2>
-              <motion.p
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="text-sm text-muted-foreground mt-1"
+            {/* Background floating food */}
+            {["🍔", "🍕", "☕", "🍩", "🥐", "🍣", "🍰", "🌮", "🍝", "🍦"].map((emoji, i) => (
+              <motion.span
+                key={i}
+                className="absolute text-4xl sm:text-5xl select-none opacity-[0.06]"
+                style={{
+                  left: `${10 + (i * 17) % 80}%`,
+                  top: `${5 + (i * 23) % 85}%`,
+                }}
+                animate={{
+                  y: [0, -30, 0],
+                  rotate: [0, 15, -15, 0],
+                }}
+                transition={{
+                  duration: 3 + i * 0.3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.2,
+                }}
               >
-                Loading experience...
-              </motion.p>
-            </div>
-            <div className="w-40 h-1 rounded-full bg-muted overflow-hidden mt-2">
-              <motion.div
-                className="h-full rounded-full bg-primary"
-                animate={{ x: ["-100%", "100%"] }}
-                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                style={{ width: "50%" }}
-              />
+                {emoji}
+              </motion.span>
+            ))}
+
+            {/* Center content */}
+            <div className="relative z-10 flex flex-col items-center gap-6 px-6">
+              {/* Animated icon with ring pulse */}
+              <div className="relative">
+                <motion.div
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-3xl border-2 border-primary"
+                />
+                <motion.div
+                  animate={{ scale: [1, 1.8, 1], opacity: [0.15, 0, 0.15] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
+                  className="absolute inset-0 rounded-3xl border border-primary"
+                />
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl gradient-warm flex items-center justify-center shadow-2xl relative"
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <UtensilsCrossed className="w-10 h-10 sm:w-12 sm:h-12 text-primary-foreground" />
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              {/* Brand */}
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="font-display text-3xl sm:text-4xl font-bold text-foreground"
+              >
+                Café X
+              </motion.h2>
+
+              {/* Tagline with word reveal */}
+              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                {["Your", "table", "is", "being", "prepared", "🍽️"].map((word, i) => (
+                  <motion.span
+                    key={i}
+                    initial={{ opacity: 0, y: 15, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    transition={{ delay: 0.5 + i * 0.12, duration: 0.4 }}
+                    className="text-base sm:text-lg text-muted-foreground font-medium"
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </div>
+
+              {/* Animated progress dots */}
+              <div className="flex items-center gap-3 mt-2">
+                {[0, 1, 2].map(i => (
+                  <motion.div
+                    key={i}
+                    className="w-2.5 h-2.5 rounded-full bg-primary"
+                    animate={{
+                      scale: [1, 1.6, 1],
+                      opacity: [0.3, 1, 0.3],
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: i * 0.2,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
