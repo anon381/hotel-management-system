@@ -376,14 +376,14 @@ export default function LandingPage() {
           <div className="relative">
             {/* Horizontal connector line (desktop) */}
             <motion.div
-              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-0.5 bg-border"
+              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-1 bg-border rounded-full"
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.5, ease: "easeOut" }}
             />
             <motion.div
-              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-0.5 bg-gradient-to-r from-primary via-accent to-primary/40 origin-left"
+              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-1 bg-gradient-to-r from-[hsl(270,80%,60%)] via-[hsl(290,75%,55%)] to-[hsl(250,80%,60%)] origin-left rounded-full"
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
               viewport={{ once: true }}
@@ -392,14 +392,14 @@ export default function LandingPage() {
 
             {/* Vertical connector line (mobile) */}
             <motion.div
-              className="md:hidden absolute top-0 bottom-0 left-7 w-0.5 bg-border"
+              className="md:hidden absolute top-0 bottom-0 left-7 w-1 bg-border rounded-full"
               initial={{ scaleY: 0, originY: 0 }}
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.5 }}
             />
             <motion.div
-              className="md:hidden absolute top-0 bottom-0 left-7 w-0.5 bg-gradient-to-b from-primary via-accent to-primary/40 origin-top"
+              className="md:hidden absolute top-0 bottom-0 left-7 w-1 bg-gradient-to-b from-[hsl(270,80%,60%)] via-[hsl(290,75%,55%)] to-[hsl(250,80%,60%)] origin-top rounded-full"
               initial={{ scaleY: 0 }}
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true }}
