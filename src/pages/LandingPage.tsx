@@ -326,13 +326,27 @@ export default function LandingPage() {
       </section>
 
       {/* Section Transition: Hero → Features */}
-      <div className="section-divider relative h-32 sm:h-48 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-        <div className="parallax-bg absolute left-[10%] top-1/2 -translate-y-1/2 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
-        <div className="parallax-bg absolute right-[10%] top-1/2 -translate-y-1/2 w-40 h-40 bg-accent/8 rounded-full blur-2xl" />
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-          <div className="w-px h-16 bg-gradient-to-b from-transparent via-primary/30 to-transparent mx-auto" />
+      <div className="section-divider relative h-56 sm:h-72 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/15 to-background" />
+        {/* Large decorative orbs */}
+        <div className="parallax-bg absolute left-[5%] top-[20%] w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="parallax-bg absolute right-[5%] top-[30%] w-72 h-72 bg-accent/15 rounded-full blur-3xl" />
+        <div className="parallax-bg absolute left-[40%] top-[50%] w-48 h-48 bg-primary/12 rounded-full blur-2xl" />
+        {/* Decorative lines */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+          <div className="w-12 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="w-2 h-2 rounded-full bg-primary/30" />
+          <div className="w-px h-12 bg-gradient-to-b from-primary/40 via-primary/20 to-transparent" />
+          <div className="w-2 h-2 rounded-full bg-primary/30" />
+          <div className="w-12 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         </div>
+        {/* Wave shapes */}
+        <svg className="absolute top-0 left-0 w-full h-16" viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,60 C240,20 480,40 720,20 C960,0 1200,30 1440,60 L1440,60 L0,60 Z" fill="hsl(var(--primary) / 0.04)" />
+        </svg>
+        <svg className="absolute bottom-0 left-0 w-full h-16" viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,0 C240,40 480,20 720,40 C960,60 1200,30 1440,0 L1440,60 L0,60 Z" fill="hsl(var(--primary) / 0.04)" />
+        </svg>
         <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 60" preserveAspectRatio="none">
           <path d="M0,60 C360,0 1080,0 1440,60 L1440,60 L0,60 Z" className="fill-background" />
         </svg>
