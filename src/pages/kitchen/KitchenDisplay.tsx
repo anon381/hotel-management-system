@@ -179,5 +179,6 @@ export default function KitchenDisplay() {
         ))}
       </div>
     </div>
+    </KitchenLayout>
   );
 }

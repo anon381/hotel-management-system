@@ -119,7 +119,7 @@ export function AdminSidebar() {
           <ThemeToggle />
         </div>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/login/admin")}
           className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors text-sm"
         >
           <LogOut className="w-4 h-4" />

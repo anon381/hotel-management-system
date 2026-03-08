@@ -52,7 +52,7 @@ function KitchenSidebar() {
       </nav>
       <div className="p-4 border-t border-border/30 space-y-3">
         <div className="flex justify-center"><ThemeToggle /></div>
-        <button onClick={() => navigate("/")} className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors text-sm">
+        <button onClick={() => navigate("/login/kitchen")} className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors text-sm">
           <LogOut className="w-4 h-4" />{!collapsed && <span>Logout</span>}
         </button>
         <button onClick={() => setCollapsed(!collapsed)} className="hidden lg:flex items-center justify-center w-full py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
