@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Filter, Eye, Clock, CheckCircle, XCircle, ChefHat } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 type OrderStatus = "Pending" | "Confirmed" | "Preparing" | "Ready" | "Completed" | "Cancelled";

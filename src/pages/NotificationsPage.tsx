@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Bell, ShoppingCart, ChefHat, Package, CreditCard, CheckCircle, Clock, AlertTriangle } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 interface Notification {

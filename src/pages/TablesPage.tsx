@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Users, Utensils, Clock, Sparkles, ArrowRightLeft } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 type TableStatus = "Available" | "Occupied" | "Reserved" | "Cleaning";

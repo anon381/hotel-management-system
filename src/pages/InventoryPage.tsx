@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Package, AlertTriangle, TrendingDown, Plus, Search, Truck } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 const inventory = [

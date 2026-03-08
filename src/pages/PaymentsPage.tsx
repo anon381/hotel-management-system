@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { CreditCard, DollarSign, Receipt, TrendingUp, Percent, ArrowDownRight, Banknote, Smartphone } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { StatCard } from "@/components/StatCard";
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Shield, Plus, Search, UserCheck, UserX, Key, Activity, Edit2, Trash2 } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 type Role = "Admin" | "Manager" | "Cashier" | "Kitchen Staff" | "Customer";

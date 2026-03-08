@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, DollarSign, UtensilsCrossed, Users, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-import { AppLayout } from "@/components/AppLayout";
+import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
 
 const weeklyRevenue = [
