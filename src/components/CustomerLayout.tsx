@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { UtensilsCrossed, LayoutDashboard, ShoppingCart, Heart, User, Bell, LogOut, Menu, ChevronLeft, ChevronRight } from "lucide-react";
+import { UtensilsCrossed, LayoutDashboard, ShoppingCart, Heart, User, Bell, LogOut, Menu, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navItems = [
