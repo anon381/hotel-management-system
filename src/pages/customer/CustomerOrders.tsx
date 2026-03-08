@@ -83,21 +83,26 @@ const statusConfig: Record<string, { icon: typeof Clock; color: string; label: s
 
 function TrackingTimeline({ steps }: { steps: TrackingStep[] }) {
   return (
-    <div className="relative pl-6 space-y-3 py-2">
-      <div className="absolute left-[11px] top-4 bottom-4 w-0.5 bg-border" />
+    <div className="py-2 space-y-0">
       {steps.map((step, i) => {
         const isDone = step.completedAt !== null;
         const isCurrent = step.isCurrent && !isDone;
+        const isLast = i === steps.length - 1;
         return (
-          <div key={i} className="relative flex items-start gap-3">
-            <div className={`absolute left-[-13px] w-5 h-5 rounded-full border-2 flex items-center justify-center z-10 ${
-              isDone ? "bg-success border-success" : isCurrent ? "bg-primary border-primary animate-pulse" : "bg-muted border-border"
-            }`}>
-              {isDone && <CheckCircle2 className="w-3 h-3 text-success-foreground" />}
-              {step.isCurrent && !isDone && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+          <div key={i} className="flex gap-3">
+            {/* Dot + connector line column */}
+            <div className="flex flex-col items-center flex-shrink-0">
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                isDone ? "bg-success border-success" : isCurrent ? "bg-primary border-primary animate-pulse" : "bg-muted border-border"
+              }`}>
+                {isDone && <CheckCircle2 className="w-3 h-3 text-success-foreground" />}
+                {step.isCurrent && !isDone && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+              </div>
+              {!isLast && <div className="w-0.5 flex-1 min-h-[16px] bg-border" />}
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
+            {/* Text column */}
+            <div className="min-w-0 flex-1 pb-3">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                 <p className={`text-sm font-semibold ${isDone || step.isCurrent ? "text-foreground" : "text-muted-foreground"}`}>{step.title}</p>
                 {step.completedAt && <span className="text-[10px] text-muted-foreground">{step.completedAt}</span>}
               </div>
