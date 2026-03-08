@@ -325,17 +325,11 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Transition: Hero → Features (intense parallax) */}
-      <div className="transition-band relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
-        <div data-depth="62" className="hero-features-glow parallax-shift absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
-
-        <div data-depth="75" className="hero-features-layer-back parallax-shift absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
-        <div data-depth="58" className="hero-features-layer-mid parallax-shift absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
-        <div data-depth="45" className="hero-features-layer-front parallax-shift absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
-
-        <svg className="parallax-shift absolute bottom-0 left-0 w-full h-28 sm:h-36" data-depth="36" viewBox="0 0 1440 140" preserveAspectRatio="none">
-          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.22)" />
-          <path d="M0,125 C220,100 380,130 560,110 C760,85 900,125 1120,95 C1260,78 1360,88 1440,100 L1440,140 L0,140 Z" fill="hsl(var(--accent) / 0.20)" />
+      {/* Transition: Hero → Features */}
+      <div className="relative -mt-16 h-32 sm:h-40 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent" />
+        <svg className="absolute bottom-0 left-0 w-full h-24 sm:h-32" viewBox="0 0 1440 140" preserveAspectRatio="none">
+          <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.15)" />
           <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
         </svg>
       </div>
