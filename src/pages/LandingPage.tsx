@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  UtensilsCrossed, ShieldCheck, ChefHat, Users, ArrowRight,
-  BarChart3, ShoppingCart, Grid3X3, CreditCard, Package, Bell,
+  UtensilsCrossed, ChefHat, Users, ArrowRight,
+  BarChart3, ShoppingCart, Grid3X3, CreditCard, Package,
   Zap, Star, Sparkles, Coffee
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
