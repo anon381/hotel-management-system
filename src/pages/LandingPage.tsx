@@ -153,13 +153,6 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Parallax decorative blobs */}
-        <div className="absolute inset-0 z-[1] pointer-events-none">
-          <div data-speed="1.2" className="parallax-blob absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-          <div data-speed="0.8" className="parallax-blob absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-          <div data-speed="1.5" className="parallax-blob absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
-          <div data-speed="0.6" className="parallax-blob absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
-        </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
