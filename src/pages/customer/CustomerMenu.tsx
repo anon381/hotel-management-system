@@ -41,6 +41,7 @@ interface CartItem {
   emoji: string;
   price: number;
   quantity: number;
+  notes: string;
 }
 
 const tableZones = [
@@ -88,7 +89,7 @@ export default function CustomerMenu() {
       if (existing) {
         return prev.map((c) => c.name === quantityModal.name ? { ...c, quantity: c.quantity + tempQty } : c);
       }
-      return [...prev, { name: quantityModal.name, emoji: quantityModal.emoji, price: quantityModal.price, quantity: tempQty }];
+      return [...prev, { name: quantityModal.name, emoji: quantityModal.emoji, price: quantityModal.price, quantity: tempQty, notes: "" }];
     });
     setJustAdded(quantityModal.name);
   };
@@ -351,24 +352,33 @@ export default function CustomerMenu() {
                   </div>
                 ) : (
                   cart.map((c) => (
-                    <motion.div key={c.name} layout className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                      <span className="text-2xl">{c.emoji}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-foreground truncate">{c.name}</p>
-                        <p className="text-xs text-muted-foreground">${c.price} each</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, -1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-                          <Minus className="w-3 h-3" />
+                    <motion.div key={c.name} layout className="p-3 rounded-xl bg-secondary/50 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{c.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">{c.name}</p>
+                          <p className="text-xs text-muted-foreground">${c.price} each</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, -1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                            <Minus className="w-3 h-3" />
+                          </motion.button>
+                          <span className="text-sm font-bold w-6 text-center text-foreground">{c.quantity}</span>
+                          <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, 1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                            <Plus className="w-3 h-3" />
+                          </motion.button>
+                        </div>
+                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeFromCart(c.name)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                          <X className="w-3 h-3" />
                         </motion.button>
-                        <span className="text-sm font-bold w-6 text-center text-foreground">{c.quantity}</span>
-                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, 1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-                          <Plus className="w-3 h-3" />
-                        </motion.button>
                       </div>
-                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeFromCart(c.name)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
-                        <X className="w-3 h-3" />
-                      </motion.button>
+                      <input
+                        type="text"
+                        placeholder="Special instructions (e.g., no onions, extra sauce)"
+                        value={c.notes}
+                        onChange={(e) => setCart(prev => prev.map(item => item.name === c.name ? { ...item, notes: e.target.value } : item))}
+                        className="w-full h-8 px-3 rounded-lg border border-border/50 bg-background text-xs text-foreground placeholder:text-muted-foreground/60 focus:ring-1 focus:ring-ring outline-none"
+                      />
                     </motion.div>
                   ))
                 )}
@@ -415,9 +425,12 @@ export default function CustomerMenu() {
                 <h3 className="font-display font-bold text-lg text-foreground mb-4">Checkout</h3>
                 <div className="space-y-2 mb-4">
                   {cart.map((c) => (
-                    <div key={c.name} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
-                      <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+                    <div key={c.name} className="text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
+                        <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+                      </div>
+                      {c.notes && <p className="text-xs text-muted-foreground/70 italic ml-4">"{c.notes}"</p>}
                     </div>
                   ))}
                   <div className="pt-2 border-t border-border flex justify-between">
