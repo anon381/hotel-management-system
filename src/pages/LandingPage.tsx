@@ -55,7 +55,6 @@ export default function LandingPage() {
               backdropFilter: `blur(${8 + progress * 16}px)`,
               borderBottomWidth: `${progress}px`,
               duration: 0.3,
-              duration: 0.3,
             });
           }
         },
