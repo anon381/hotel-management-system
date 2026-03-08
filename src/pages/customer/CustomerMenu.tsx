@@ -444,12 +444,12 @@ export default function CustomerMenu() {
         {orderPlaced && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-[60]" />
-            <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="w-full max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+                className="w-full max-w-md bg-background border border-border rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="text-center mb-5">
                 <motion.div
