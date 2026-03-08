@@ -292,7 +292,7 @@ export default function LandingPage() {
 
       {/* Portals */}
       <section id="portals" className="py-20 sm:py-32">
-        <div ref={portalsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Role-Based Access</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Choose Your Portal</h2>
