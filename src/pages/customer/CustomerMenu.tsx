@@ -474,7 +474,7 @@ export default function CustomerMenu() {
               </div>
 
               {/* Table selection */}
-              <div className="space-y-3 mb-5 max-h-48 overflow-y-auto">
+              <div className="space-y-3 mb-4 sm:mb-5 max-h-40 sm:max-h-48 overflow-y-auto">
                 {tableZones.map((zone) => (
                   <div key={zone.zone}>
                     <p className="text-xs font-semibold text-muted-foreground mb-2">{zone.zone} Zone</p>
