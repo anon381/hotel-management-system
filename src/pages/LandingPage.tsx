@@ -245,7 +245,7 @@ export default function LandingPage() {
 
       {/* Features */}
       <section id="features" className="pt-10 sm:pt-14 pb-20 sm:pb-32 relative">
-        <div ref={featuresRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Everything You Need</span>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Powerful Features</h2>
