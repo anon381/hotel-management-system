@@ -430,15 +430,8 @@ export default function CustomerMenu() {
           </>
         )}
       </AnimatePresence>
-                      <Check className="w-4 h-4" /> Place Order
-                    </motion.button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+
+
 
       {/* Post-Order: Reserve Table Modal */}
       <AnimatePresence>
