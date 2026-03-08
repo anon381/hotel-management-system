@@ -829,9 +829,9 @@ export default function LandingPage() {
                   {link.label}
                 </a>
               ))}
-              <a href="#hero" className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity">
+              <Link to="/login/customer" className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity">
                 Get Started
-              </a>
+              </Link>
             </motion.div>
           </div>
 
