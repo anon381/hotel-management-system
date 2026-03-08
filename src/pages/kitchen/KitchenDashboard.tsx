@@ -18,7 +18,7 @@ interface Order {
   items: OrderItem[];
   priority: "high" | "medium" | "low";
   status: string;
-  placedAt: number; // timestamp ms
+  placedAt: number;
   estimatedMin: number | null;
 }
 
@@ -53,12 +53,12 @@ function ElapsedTimer({ placedAt, estimatedMin }: { placedAt: number; estimatedM
   const nearLimit = estimatedMin !== null && mins >= estimatedMin * 0.8 && !exceeds;
 
   return (
-    <div className={`flex items-center gap-1.5 text-xs font-mono font-bold px-2 py-1 rounded-lg ${
+    <div className={`flex items-center gap-1.5 text-xs font-mono font-bold px-2 py-1 rounded-lg whitespace-nowrap ${
       exceeds ? "bg-destructive/15 text-destructive animate-pulse" : nearLimit ? "bg-warning/15 text-warning" : "bg-muted/50 text-muted-foreground"
     }`}>
-      <Clock className="w-3 h-3" />
+      <Clock className="w-3 h-3 flex-shrink-0" />
       <span>{String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}</span>
-      {exceeds && <AlertTriangle className="w-3 h-3" />}
+      {exceeds && <AlertTriangle className="w-3 h-3 flex-shrink-0" />}
     </div>
   );
 }
@@ -98,24 +98,24 @@ export default function KitchenDashboard() {
     <KitchenLayout>
       <PageHeader title="Kitchen Dashboard" subtitle="Manage incoming orders and preparation." />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         <StatCard icon={ChefHat} title="In Queue" value={String(queueOrders.length)} change="Waiting" changeType="neutral" delay={0} />
         <StatCard icon={Flame} title="Preparing" value={String(preparingOrders.length)} change="Active" changeType="positive" delay={0.1} />
         <StatCard icon={CheckCircle2} title="Ready" value={String(readyOrders.length)} change="Pickup" changeType="positive" delay={0.2} />
-        <StatCard icon={Timer} title="Items Done" value={`${completedItems}/${totalItems}`} change={`${totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0}% complete`} changeType="positive" delay={0.3} />
+        <StatCard icon={Timer} title="Items Done" value={`${completedItems}/${totalItems}`} change={`${totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0}%`} changeType="positive" delay={0.3} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {[
-          { title: "Queue", icon: Clock, list: queueOrders, nextStatus: "preparing", nextLabel: "Start Preparing" },
-          { title: "Preparing", icon: Flame, list: preparingOrders, nextStatus: "ready", nextLabel: "Mark Ready" },
+          { title: "Queue", icon: Clock, list: queueOrders, nextStatus: "preparing", nextLabel: "Start" },
+          { title: "Preparing", icon: Flame, list: preparingOrders, nextStatus: "ready", nextLabel: "Ready" },
           { title: "Ready for Pickup", icon: CheckCircle2, list: readyOrders, nextStatus: null, nextLabel: null },
         ].map((col) => (
-          <div key={col.title}>
+          <div key={col.title} className="min-w-0">
             <div className="flex items-center gap-2 mb-4">
-              <col.icon className="w-5 h-5 text-primary" />
-              <h2 className="font-display font-semibold text-lg text-foreground">{col.title}</h2>
-              <span className="ml-auto text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{col.list.length}</span>
+              <col.icon className="w-5 h-5 text-primary flex-shrink-0" />
+              <h2 className="font-display font-semibold text-lg text-foreground truncate">{col.title}</h2>
+              <span className="ml-auto text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full flex-shrink-0">{col.list.length}</span>
             </div>
             <div className="space-y-3">
               <AnimatePresence>
@@ -129,18 +129,17 @@ export default function KitchenDashboard() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="glass-card-elevated p-4"
+                      className="glass-card-elevated p-4 overflow-hidden"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground text-sm">{order.id}</span>
-                          <span className="text-xs text-muted-foreground">· {order.table}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
+                      {/* Header row */}
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="font-semibold text-foreground text-sm">{order.id}</span>
+                        <span className="text-xs text-muted-foreground">· {order.table}</span>
+                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${priorityColors[order.priority]}`}>
+                          {order.priority}
+                        </span>
+                        <div className="ml-auto">
                           <ElapsedTimer placedAt={order.placedAt} estimatedMin={order.estimatedMin} />
-                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${priorityColors[order.priority]}`}>
-                            {order.priority}
-                          </span>
                         </div>
                       </div>
 
@@ -156,33 +155,37 @@ export default function KitchenDashboard() {
                         </div>
                       )}
 
-                      {/* Items with checkboxes */}
+                      {/* Items */}
                       <div className="space-y-1.5 mb-3">
                         {order.items.map((it, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm">
+                          <div key={i} className="flex items-start gap-2 text-sm min-w-0">
                             {(order.status === "preparing" || order.status === "ready") && (
                               <button
                                 onClick={() => toggleItemDone(order.id, i)}
-                                className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                                className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
                                   it.done ? "bg-success border-success text-success-foreground" : "border-border hover:border-primary"
                                 }`}
                               >
                                 {it.done && <Check className="w-3 h-3" />}
                               </button>
                             )}
-                            <span className={`flex-1 ${it.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                              {it.qty}x {it.name}
-                            </span>
-                            {it.notes && <span className="text-[11px] text-warning italic">{it.notes}</span>}
+                            <div className="min-w-0 flex-1">
+                              <span className={`block ${it.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                                {it.qty}x {it.name}
+                              </span>
+                              {it.notes && <span className="block text-[11px] text-warning italic truncate">{it.notes}</span>}
+                            </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* Estimated time editor */}
+                      {/* ETA editor */}
                       {order.status !== "ready" && (
-                        <div className="flex items-center gap-2 mb-3 p-2 rounded-lg bg-muted/50">
-                          <Timer className="w-3.5 h-3.5 text-muted-foreground" />
-                          <span className="text-[11px] text-muted-foreground">ETA:</span>
+                        <div className="flex flex-wrap items-center gap-2 mb-3 p-2 rounded-lg bg-muted/50">
+                          <div className="flex items-center gap-1.5">
+                            <Timer className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-[11px] text-muted-foreground">ETA:</span>
+                          </div>
                           <div className="flex items-center gap-1">
                             <button onClick={() => adjustTime(order.id, -5)} className="w-5 h-5 rounded bg-background border border-border flex items-center justify-center hover:bg-accent transition-colors">
                               <Minus className="w-3 h-3 text-foreground" />
@@ -194,32 +197,35 @@ export default function KitchenDashboard() {
                               <Plus className="w-3 h-3 text-foreground" />
                             </button>
                           </div>
-                          {[5, 10, 15, 20].map(t => (
-                            <button
-                              key={t}
-                              onClick={() => setEstimatedTime(order.id, t)}
-                              className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
-                                order.estimatedMin === t ? "bg-primary text-primary-foreground" : "bg-background border border-border text-muted-foreground hover:text-foreground"
-                              }`}
-                            >
-                              {t}m
-                            </button>
-                          ))}
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {[5, 10, 15, 20].map(t => (
+                              <button
+                                key={t}
+                                onClick={() => setEstimatedTime(order.id, t)}
+                                className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+                                  order.estimatedMin === t ? "bg-primary text-primary-foreground" : "bg-background border border-border text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {t}m
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between">
+                      {/* Footer */}
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <ElapsedTimer placedAt={order.placedAt} estimatedMin={null} />
                         <div className="flex items-center gap-2">
                           {order.status === "preparing" && doneCount === order.items.length && (
-                            <span className="text-[10px] text-success font-semibold animate-pulse">All items done!</span>
+                            <span className="text-[10px] text-success font-semibold animate-pulse">All done!</span>
                           )}
                           {col.nextStatus && (
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => updateStatus(order.id, col.nextStatus!)}
-                              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-primary text-primary-foreground"
+                              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-primary text-primary-foreground whitespace-nowrap"
                             >
                               {col.nextLabel}
                             </motion.button>
