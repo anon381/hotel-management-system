@@ -56,38 +56,29 @@ export default function LandingPage() {
   const [sceneReady, setSceneReady] = useState(hasVisited.current);
   const [loadProgress, setLoadProgress] = useState(0);
   const [showTapHint, setShowTapHint] = useState(false);
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-  const [threeReady, setThreeReady] = useState(false);
-
   // Minimum 4-second timer
   useEffect(() => {
     if (hasVisited.current) return;
-    const timer = setTimeout(() => setMinTimeElapsed(true), 4000);
+    const timer = setTimeout(() => {
+      setLoadProgress(100);
+      setTimeout(() => setShowTapHint(true), 300);
+    }, 4000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Progress bar — takes ~4s to fill (slows down toward end)
+  // Animated progress bar filling over 4s
   useEffect(() => {
     if (hasVisited.current) return;
-    let progress = 0;
-    const interval = setInterval(() => {
-      const remaining = 100 - progress;
-      progress += Math.random() * (remaining * 0.06) + 0.5;
-      if (progress >= 100) progress = 100;
-      setLoadProgress(progress);
-      if (progress >= 100) clearInterval(interval);
-    }, 100);
-    return () => clearInterval(interval);
+    const start = Date.now();
+    const duration = 4000;
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      const p = Math.min((elapsed / duration) * 100, 99);
+      setLoadProgress(p);
+      if (elapsed < duration) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }, []);
-
-  // Show "Tap to Enter" only when ALL conditions are met:
-  // 1) Minimum 4 seconds elapsed  2) Progress bar full  3) 3D scene loaded
-  useEffect(() => {
-    if (hasVisited.current) return;
-    if (minTimeElapsed && loadProgress >= 100 && threeReady) {
-      setTimeout(() => setShowTapHint(true), 300);
-    }
-  }, [minTimeElapsed, loadProgress, threeReady]);
 
   const handleDismissLoader = () => {
     if (!showTapHint) return;
