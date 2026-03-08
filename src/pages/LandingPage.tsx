@@ -58,7 +58,6 @@ export default function LandingPage() {
     <div ref={mainRef} className="min-h-screen bg-background overflow-x-hidden">
       {/* Animated Navbar */}
       <motion.nav
-        ref={navRef}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", damping: 20, stiffness: 120 }}
