@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Trash2, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { Search, Eye, EyeOff } from "lucide-react";
 import { KitchenLayout } from "@/components/KitchenLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { toast } from "@/hooks/use-toast";
@@ -29,7 +29,6 @@ const initialMenuItems = [
 export default function KitchenManageMenu() {
   const [items, setItems] = useState(initialMenuItems);
   const [search, setSearch] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
   const toggleAvailability = (id: number) => {
     setItems((prev) =>
@@ -47,28 +46,20 @@ export default function KitchenManageMenu() {
     );
   };
 
-  const deleteItem = (id: number) => {
-    const item = items.find((i) => i.id === id);
-    setItems((prev) => prev.filter((i) => i.id !== id));
-    setConfirmDelete(null);
-    toast({ title: "Dish Removed", description: `${item?.name} has been removed from the menu.`, variant: "destructive" });
-  };
-
   const filtered = items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()));
   const unavailableCount = items.filter((i) => !i.available).length;
 
   return (
     <KitchenLayout>
-      <PageHeader title="Manage Menu" subtitle="Toggle availability or remove dishes from the menu" />
+      <PageHeader title="Manage Menu" subtitle="Toggle availability of dishes on the menu" />
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
         <div className="glass-card p-4 text-center">
           <p className="text-2xl font-display font-bold text-foreground">{items.length}</p>
           <p className="text-xs text-muted-foreground">Total Items</p>
         </div>
         <div className="glass-card p-4 text-center">
-          <p className="text-2xl font-display font-bold text-success">{items.length - unavailableCount}</p>
+          <p className="text-2xl font-display font-bold text-primary">{items.length - unavailableCount}</p>
           <p className="text-xs text-muted-foreground">Available</p>
         </div>
         <div className="glass-card p-4 text-center">
@@ -77,7 +68,6 @@ export default function KitchenManageMenu() {
         </div>
       </div>
 
-      {/* Search */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
@@ -89,7 +79,6 @@ export default function KitchenManageMenu() {
         />
       </div>
 
-      {/* List */}
       <div className="space-y-2">
         <AnimatePresence>
           {filtered.map((item) => (
@@ -112,54 +101,18 @@ export default function KitchenManageMenu() {
                 <p className="text-xs text-muted-foreground">{item.category} · {item.price}</p>
               </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {/* Toggle availability */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleAvailability(item.id)}
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-                    item.available
-                      ? "bg-success/10 text-success hover:bg-success/20"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                  title={item.available ? "Mark as unavailable" : "Mark as available"}
-                >
-                  {item.available ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </motion.button>
-
-                {/* Delete */}
-                {confirmDelete === item.id ? (
-                  <div className="flex items-center gap-1">
-                    <motion.button
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => deleteItem(item.id)}
-                      className="w-9 h-9 rounded-lg bg-destructive text-destructive-foreground flex items-center justify-center"
-                    >
-                      <AlertTriangle className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => setConfirmDelete(null)}
-                      className="w-9 h-9 rounded-lg bg-muted text-muted-foreground flex items-center justify-center text-xs font-bold"
-                    >
-                      ✕
-                    </motion.button>
-                  </div>
-                ) : (
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setConfirmDelete(item.id)}
-                    className="w-9 h-9 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center justify-center transition-colors"
-                    title="Remove from menu"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </motion.button>
-                )}
-              </div>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => toggleAvailability(item.id)}
+                className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                  item.available
+                    ? "bg-primary/10 text-primary hover:bg-primary/20"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+                title={item.available ? "Mark as unavailable" : "Mark as available"}
+              >
+                {item.available ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              </motion.button>
             </motion.div>
           ))}
         </AnimatePresence>
