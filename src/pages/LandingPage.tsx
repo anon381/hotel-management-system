@@ -42,91 +42,24 @@ export default function LandingPage() {
   const portalsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Navbar shrink on scroll
-      ScrollTrigger.create({
-        trigger: mainRef.current,
-        start: "top top",
-        end: "100px top",
-        onUpdate: (self) => {
-          if (navRef.current) {
-            const progress = self.progress;
-            gsap.to(navRef.current, {
-              backdropFilter: `blur(${8 + progress * 16}px)`,
-              borderBottomWidth: `${progress}px`,
-              duration: 0.3,
-            });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const delay = Number(el.dataset.delay ?? 0);
+            setTimeout(() => el.classList.add("animate-visible"), delay);
+            observer.unobserve(el);
           }
-        },
-      });
-
-      // Features cards - simple fade up
-      if (featuresRef.current) {
-        const cards = featuresRef.current.querySelectorAll(".feature-card");
-        cards.forEach((card, i) => {
-          gsap.set(card, { y: 60, opacity: 0 });
-          ScrollTrigger.create({
-            trigger: card,
-            start: "top 90%",
-            onEnter: () => {
-              gsap.to(card, { y: 0, opacity: 1, duration: 0.7, delay: i * 0.08, ease: "power2.out" });
-            },
-            once: true,
-          });
         });
-      }
+      },
+      { threshold: 0.1 }
+    );
 
-      // How it works steps
-      if (howRef.current) {
-        const steps = howRef.current.querySelectorAll(".step-card");
-        steps.forEach((step, i) => {
-          gsap.set(step, { y: 50, opacity: 0 });
-          ScrollTrigger.create({
-            trigger: step,
-            start: "top 90%",
-            onEnter: () => {
-              gsap.to(step, { y: 0, opacity: 1, duration: 0.7, delay: i * 0.12, ease: "power2.out" });
-            },
-            once: true,
-          });
-        });
-      }
+    const animatedElements = mainRef.current?.querySelectorAll(".animate-on-scroll");
+    animatedElements?.forEach((el) => observer.observe(el));
 
-      // Portal cards
-      if (portalsRef.current) {
-        const portalCards = portalsRef.current.querySelectorAll(".portal-card");
-        portalCards.forEach((card, i) => {
-          gsap.set(card, { y: 60, opacity: 0 });
-          ScrollTrigger.create({
-            trigger: card,
-            start: "top 90%",
-            onEnter: () => {
-              gsap.to(card, { y: 0, opacity: 1, duration: 0.8, delay: i * 0.12, ease: "power2.out" });
-            },
-            once: true,
-          });
-        });
-      }
-
-      // Simple parallax on decorative blobs
-      gsap.utils.toArray<HTMLElement>(".parallax-blob").forEach((el) => {
-        const speed = Number(el.dataset.speed ?? 0.3);
-        gsap.to(el, {
-          yPercent: -30 * speed,
-          ease: "none",
-          scrollTrigger: {
-            trigger: mainRef.current,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1,
-          },
-        });
-      });
-
-      requestAnimationFrame(() => ScrollTrigger.refresh());
-    }, mainRef);
-
-    return () => ctx.revert();
+    return () => observer.disconnect();
   }, []);
 
   return (
