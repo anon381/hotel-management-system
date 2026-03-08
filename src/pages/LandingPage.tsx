@@ -407,14 +407,14 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: Hero → Features (intense parallax) */}
-      <div className="relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
-        <div className="hero-features-glow absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
+      <div className="transition-band relative -mt-24 sm:-mt-28 h-48 sm:h-64 overflow-hidden pointer-events-none">
+        <div data-depth="62" className="hero-features-glow parallax-shift absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent" />
 
-        <div className="hero-features-layer-back absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
-        <div className="hero-features-layer-mid absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
-        <div className="hero-features-layer-front absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
+        <div data-depth="75" className="hero-features-layer-back parallax-shift absolute -left-[10%] -right-[10%] top-4 h-40 sm:h-52 rounded-[100%] bg-primary/20 blur-3xl" />
+        <div data-depth="58" className="hero-features-layer-mid parallax-shift absolute left-[-5%] right-[-5%] top-10 h-28 sm:h-40 rounded-[100%] bg-accent/20 blur-2xl" />
+        <div data-depth="45" className="hero-features-layer-front parallax-shift absolute left-0 right-0 top-16 h-20 sm:h-28 rounded-[100%] bg-primary/25 blur-xl" />
 
-        <svg className="absolute bottom-0 left-0 w-full h-28 sm:h-36" viewBox="0 0 1440 140" preserveAspectRatio="none">
+        <svg className="parallax-shift absolute bottom-0 left-0 w-full h-28 sm:h-36" data-depth="36" viewBox="0 0 1440 140" preserveAspectRatio="none">
           <path d="M0,120 C160,80 300,130 460,95 C620,60 780,120 940,85 C1100,50 1280,100 1440,70 L1440,140 L0,140 Z" fill="hsl(var(--primary) / 0.22)" />
           <path d="M0,125 C220,100 380,130 560,110 C760,85 900,125 1120,95 C1260,78 1360,88 1440,100 L1440,140 L0,140 Z" fill="hsl(var(--accent) / 0.20)" />
           <path d="M0,132 C320,115 700,138 1020,118 C1220,105 1340,110 1440,114 L1440,140 L0,140 Z" className="fill-background" />
@@ -444,8 +444,8 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: Features → How It Works */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
+      <div className="transition-band relative -mt-1">
+        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="28" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <defs>
             <linearGradient id="wave-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.12" />
@@ -461,8 +461,8 @@ export default function LandingPage() {
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
-        <div className="parallax-bg absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
-        <div className="parallax-bg absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
+        <div data-depth="34" className="parallax-bg parallax-shift absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+        <div data-depth="42" className="parallax-bg parallax-shift absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
         <div ref={howRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
@@ -483,8 +483,8 @@ export default function LandingPage() {
       </section>
 
       {/* Transition: How It Works → Portals */}
-      <div className="relative -mt-1">
-        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
+      <div className="transition-band relative -mt-1">
+        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="26" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <defs>
             <linearGradient id="wave-grad-3" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
