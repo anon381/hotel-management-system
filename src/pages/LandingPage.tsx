@@ -229,15 +229,12 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Parallax decorative blobs - fill edges */}
-        <div className="parallax-bg absolute inset-0 z-[1] pointer-events-none">
-          <div data-depth="56" className="parallax-shift absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-          <div data-depth="48" className="parallax-shift absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
-          <div data-depth="60" className="parallax-shift absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
-          <div data-depth="42" className="parallax-shift absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
-          <div data-depth="34" className="parallax-shift absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]" />
-          <div data-depth="38" className="parallax-shift absolute top-[15%] right-[15%] w-40 h-40 bg-accent/10 rounded-full blur-2xl" />
-          <div data-depth="44" className="parallax-shift absolute bottom-[10%] left-[15%] w-48 h-48 bg-primary/8 rounded-full blur-2xl" />
+        {/* Parallax decorative blobs */}
+        <div className="absolute inset-0 z-[1] pointer-events-none">
+          <div data-speed="1.2" className="parallax-blob absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+          <div data-speed="0.8" className="parallax-blob absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+          <div data-speed="1.5" className="parallax-blob absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
+          <div data-speed="0.6" className="parallax-blob absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
