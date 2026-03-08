@@ -174,75 +174,75 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Left edge floating orbs */}
-        <div className="absolute left-0 top-0 bottom-0 w-28 sm:w-44 lg:w-64 z-[1] pointer-events-none">
-          {[...Array(8)].map((_, i) => (
+        {/* Left edge floating food emojis */}
+        <div className="absolute left-0 top-0 bottom-0 w-28 sm:w-48 lg:w-72 z-[1] pointer-events-none">
+          {["🍔", "🍕", "🍩", "☕", "🥐", "🍣", "🎂"].map((emoji, i) => (
             <motion.div
               key={`l${i}`}
-              className="absolute rounded-full"
+              className="absolute text-3xl sm:text-4xl lg:text-5xl select-none"
               style={{
-                width: 20 + i * 22,
-                height: 20 + i * 22,
-                left: 4 + (i % 4) * 16,
-                top: `${8 + i * 11}%`,
-                background: `radial-gradient(circle, hsl(var(--primary) / ${0.25 + (i % 3) * 0.1}) 0%, transparent 70%)`,
-                boxShadow: `0 0 ${20 + i * 10}px ${6 + i * 3}px hsl(var(--primary) / ${0.15 + (i % 3) * 0.08})`,
+                left: 8 + (i % 3) * 28,
+                top: `${10 + i * 12}%`,
+                filter: `drop-shadow(0 0 8px hsl(var(--primary) / 0.2))`,
               }}
               animate={{
-                y: [0, -35 - i * 8, 10, 0],
-                x: [0, 15 + i * 3, -8, 0],
-                opacity: [0.35, 0.8, 0.4, 0.35],
-                scale: [1, 1.25, 0.9, 1],
+                y: [0, -15 - i * 4, 8, 0],
+                x: [0, 10, -5, 0],
+                rotate: [0, 8, -8, 0],
+                opacity: [0.15, 0.35, 0.2, 0.15],
+                scale: [1, 1.1, 0.95, 1],
               }}
               transition={{
-                duration: 3 + i * 0.5,
+                duration: 5 + i * 0.7,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: i * 0.3,
+                delay: i * 0.5,
               }}
-            />
+            >
+              {emoji}
+            </motion.div>
           ))}
           <motion.div
-            className="absolute left-6 sm:left-12 top-[5%] bottom-[5%] w-0.5 rounded-full"
-            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--primary) / 0.5), hsl(var(--primary) / 0.2), transparent)" }}
-            animate={{ opacity: [0.3, 0.9, 0.3], scaleY: [0.95, 1, 0.95] }}
-            transition={{ duration: 2.5, repeat: Infinity }}
+            className="absolute left-6 sm:left-12 top-[5%] bottom-[5%] w-px rounded-full"
+            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--primary) / 0.15), transparent)" }}
+            animate={{ opacity: [0.15, 0.4, 0.15] }}
+            transition={{ duration: 3, repeat: Infinity }}
           />
         </div>
 
-        {/* Right edge floating orbs */}
-        <div className="absolute right-0 top-0 bottom-0 w-28 sm:w-44 lg:w-64 z-[1] pointer-events-none">
-          {[...Array(8)].map((_, i) => (
+        {/* Right edge floating food emojis */}
+        <div className="absolute right-0 top-0 bottom-0 w-28 sm:w-48 lg:w-72 z-[1] pointer-events-none">
+          {["🍰", "🥗", "🍦", "🌮", "🍷", "🧁", "🍝"].map((emoji, i) => (
             <motion.div
               key={`r${i}`}
-              className="absolute rounded-full"
+              className="absolute text-3xl sm:text-4xl lg:text-5xl select-none"
               style={{
-                width: 18 + i * 24,
-                height: 18 + i * 24,
-                right: 6 + (i % 4) * 14,
-                top: `${12 + i * 10}%`,
-                background: `radial-gradient(circle, hsl(var(--accent) / ${0.2 + (i % 3) * 0.12}) 0%, transparent 70%)`,
-                boxShadow: `0 0 ${18 + i * 12}px ${5 + i * 4}px hsl(var(--accent) / ${0.12 + (i % 3) * 0.1})`,
+                right: 10 + (i % 3) * 24,
+                top: `${8 + i * 13}%`,
+                filter: `drop-shadow(0 0 8px hsl(var(--accent) / 0.2))`,
               }}
               animate={{
-                y: [0, 30 + i * 6, -12, 0],
-                x: [0, -18 - i * 2, 6, 0],
-                opacity: [0.3, 0.75, 0.35, 0.3],
-                scale: [1, 1.2, 0.85, 1],
+                y: [0, 12 + i * 3, -10, 0],
+                x: [0, -12, 6, 0],
+                rotate: [0, -10, 10, 0],
+                opacity: [0.15, 0.35, 0.18, 0.15],
+                scale: [1, 1.12, 0.92, 1],
               }}
               transition={{
-                duration: 3.5 + i * 0.4,
+                duration: 5.5 + i * 0.6,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: i * 0.35,
+                delay: i * 0.45,
               }}
-            />
+            >
+              {emoji}
+            </motion.div>
           ))}
           <motion.div
-            className="absolute right-6 sm:right-12 top-[5%] bottom-[5%] w-0.5 rounded-full"
-            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--accent) / 0.5), hsl(var(--accent) / 0.2), transparent)" }}
-            animate={{ opacity: [0.3, 0.9, 0.3], scaleY: [0.95, 1, 0.95] }}
-            transition={{ duration: 2.8, repeat: Infinity }}
+            className="absolute right-6 sm:right-12 top-[5%] bottom-[5%] w-px rounded-full"
+            style={{ background: "linear-gradient(to bottom, transparent, hsl(var(--accent) / 0.15), transparent)" }}
+            animate={{ opacity: [0.15, 0.4, 0.15] }}
+            transition={{ duration: 3.5, repeat: Infinity }}
           />
         </div>
 
