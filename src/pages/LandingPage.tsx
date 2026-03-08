@@ -387,18 +387,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Transition: How It Works → Portals */}
-      <div className="transition-band relative -mt-1">
-        <svg className="parallax-shift w-full h-20 sm:h-28" data-depth="26" viewBox="0 0 1440 100" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="wave-grad-3" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-              <stop offset="50%" stopColor="hsl(var(--accent))" stopOpacity="0.15" />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
+      <div className="relative -mt-1">
+        <svg className="w-full h-20 sm:h-28" viewBox="0 0 1440 100" preserveAspectRatio="none">
           <path d="M0,0 L0,50 C240,80 480,20 720,60 C960,90 1200,30 1440,50 L1440,0 Z" fill="hsl(var(--muted) / 0.3)" />
-          <path d="M0,40 C360,80 720,30 1080,70 C1260,90 1380,50 1440,40 L1440,100 L0,100 Z" fill="url(#wave-grad-3)" />
           <path d="M0,70 C480,50 960,80 1440,60 L1440,100 L0,100 Z" className="fill-background" />
         </svg>
       </div>
