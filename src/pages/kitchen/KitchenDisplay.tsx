@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Check, Flame, AlertTriangle, Volume2, VolumeX, Maximize, ChefHat, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Clock, Check, Flame, AlertTriangle, Volume2, VolumeX, Maximize, ChefHat } from "lucide-react";
+import { KitchenLayout } from "@/components/KitchenLayout";
 
 interface DisplayOrder {
   id: string;
@@ -93,13 +93,11 @@ export default function KitchenDisplay() {
   const readyOrders = orders.filter(o => o.status === "ready");
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4">
+    <KitchenLayout>
+    <div className="text-foreground">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Link to="/kitchen" className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-success to-emerald-600 flex items-center justify-center">
             <ChefHat className="w-5 h-5 text-primary-foreground" />
           </div>
@@ -181,5 +179,6 @@ export default function KitchenDisplay() {
         ))}
       </div>
     </div>
+    </KitchenLayout>
   );
 }
