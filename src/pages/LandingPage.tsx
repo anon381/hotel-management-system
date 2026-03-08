@@ -121,7 +121,54 @@ export default function LandingPage() {
           scrub: 1,
         },
       });
-    }, mainRef);
+
+      // Hero -> Features transition parallax (intense)
+      gsap.to(".hero-features-layer-back", {
+        yPercent: -55,
+        scale: 1.15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.2,
+        },
+      });
+
+      gsap.to(".hero-features-layer-mid", {
+        yPercent: -35,
+        xPercent: 12,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top bottom",
+          end: "top top",
+          scrub: 1,
+        },
+      });
+
+      gsap.to(".hero-features-layer-front", {
+        yPercent: -20,
+        xPercent: -10,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top bottom",
+          end: "top top",
+          scrub: 0.8,
+        },
+      });
+
+      gsap.fromTo(".hero-features-glow", { opacity: 0.2 }, {
+        opacity: 0.8,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top bottom",
+          end: "top center",
+          scrub: true,
+        },
+      });
 
     return () => ctx.revert();
   }, []);
