@@ -380,7 +380,7 @@ export default function CustomerMenu() {
                   >
                     <Plus className="w-4 h-4" /> Add More Items
                   </motion.button>
-                  <div className="flex justify-between text-sm">
+                <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Total</span>
                     <span className="font-display font-bold text-lg text-foreground">${cartTotal}</span>
                   </div>
