@@ -29,7 +29,7 @@ const howItWorks = [
 ];
 
 const roles = [
-  { icon: ShieldCheck, title: "Admin Portal", desc: "Full system control — menu, staff, inventory, reports, and user management.", path: "/login/admin", color: "from-primary to-orange-600" },
+  { icon: ShieldCheck, title: "Admin Portal", desc: "Full system control — menu, staff, inventory, reports, and user management.", path: "/login/admin", color: "from-primary to-purple-700" },
   { icon: Users, title: "Customer Portal", desc: "Browse menus, place orders, track history, and earn loyalty rewards.", path: "/login/customer", color: "from-info to-blue-600" },
   { icon: ChefHat, title: "Kitchen Portal", desc: "Real-time order queue, priority management, and preparation tracking.", path: "/login/kitchen", color: "from-success to-emerald-600" },
 ];
@@ -156,7 +156,7 @@ export default function LandingPage() {
             <div>
               <span className="font-display font-bold text-lg text-foreground">Café X</span>
               <motion.div
-                className="h-0.5 bg-gradient-to-r from-primary to-orange-500 rounded-full"
+                className="h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
@@ -226,11 +226,15 @@ export default function LandingPage() {
           <HeroScene />
         </div>
 
-        {/* Parallax decorative blobs */}
-        <div className="parallax-bg absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-info/5 rounded-full blur-3xl" />
+        {/* Parallax decorative blobs - fill edges */}
+        <div className="parallax-bg absolute inset-0 z-[1] pointer-events-none">
+          <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute top-[30%] right-[5%] w-80 h-80 bg-primary/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-[20%] left-[8%] w-96 h-96 bg-accent/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-[30%] right-[10%] w-64 h-64 bg-primary/6 rounded-full blur-3xl" />
+          <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px]" />
+          <div className="absolute top-[15%] right-[15%] w-40 h-40 bg-accent/10 rounded-full blur-2xl" />
+          <div className="absolute bottom-[10%] left-[15%] w-48 h-48 bg-primary/8 rounded-full blur-2xl" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -247,7 +251,7 @@ export default function LandingPage() {
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-bold text-foreground leading-tight mb-6">
               Welcome to <br />
               <motion.span
-                className="bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent bg-[length:200%]"
+                className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%]"
                 animate={{ backgroundPosition: ["0%", "100%", "0%"] }}
                 transition={{ duration: 5, repeat: Infinity }}
               >
@@ -346,7 +350,7 @@ export default function LandingPage() {
       {/* How It Works */}
       <section id="how-it-works" className="py-20 sm:py-32 bg-muted/30 relative overflow-hidden">
         <div className="parallax-bg absolute -top-20 left-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
-        <div className="parallax-bg absolute -bottom-20 right-0 w-60 h-60 bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="parallax-bg absolute -bottom-20 right-0 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
         <div ref={howRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">Simple & Effective</span>
