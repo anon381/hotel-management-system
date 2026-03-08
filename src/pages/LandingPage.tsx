@@ -55,36 +55,39 @@ export default function LandingPage() {
   const hasVisited = useRef(sessionStorage.getItem("cafex-visited") === "true");
   const [sceneReady, setSceneReady] = useState(hasVisited.current);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [showTapHint, setShowTapHint] = useState(false);
-  // Minimum 4-second timer
-  useEffect(() => {
-    if (hasVisited.current) return;
-    const timer = setTimeout(() => {
-      setLoadProgress(100);
-      setTimeout(() => setShowTapHint(true), 300);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
 
-  // Animated progress bar filling over 4s
+  // Lock scroll during loader
+  useEffect(() => {
+    if (!sceneReady && !hasVisited.current) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [sceneReady]);
+
+  // 4-second loader then auto-dismiss
   useEffect(() => {
     if (hasVisited.current) return;
     const start = Date.now();
     const duration = 4000;
     const tick = () => {
       const elapsed = Date.now() - start;
-      const p = Math.min((elapsed / duration) * 100, 99);
+      const p = Math.min((elapsed / duration) * 100, 100);
       setLoadProgress(p);
-      if (elapsed < duration) requestAnimationFrame(tick);
+      if (elapsed < duration) {
+        requestAnimationFrame(tick);
+      } else {
+        // Auto-dismiss after bar completes
+        setTimeout(() => {
+          sessionStorage.setItem("cafex-visited", "true");
+          window.scrollTo(0, 0);
+          setSceneReady(true);
+        }, 400);
+      }
     };
     requestAnimationFrame(tick);
   }, []);
-
-  const handleDismissLoader = () => {
-    if (!showTapHint) return;
-    sessionStorage.setItem("cafex-visited", "true");
-    setSceneReady(true);
-  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -116,8 +119,7 @@ export default function LandingPage() {
             key="loader"
             exit={{ opacity: 0, scale: 1.08, filter: "blur(10px)" }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden cursor-pointer"
-            onClick={handleDismissLoader}
+            className="fixed inset-0 z-[999] bg-background flex flex-col items-center justify-center overflow-hidden"
           >
             {/* Radial gradient bg */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.08)_0%,transparent_70%)]" />
@@ -234,33 +236,9 @@ export default function LandingPage() {
                   transition={{ delay: 0.8 }}
                   className="text-xs text-muted-foreground text-center mt-2"
                 >
-                  {loadProgress < 100 ? "Preparing your experience..." : ""}
+                  {loadProgress < 100 ? "Preparing your experience..." : "Welcome!"}
                 </motion.p>
               </div>
-
-              {/* Tap to enter hint */}
-              <AnimatePresence>
-                {showTapHint && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                    onClick={handleDismissLoader}
-                    className="mt-2 px-8 py-3 rounded-2xl gradient-warm text-primary-foreground font-semibold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-shadow"
-                  >
-                    <motion.span
-                      className="flex items-center gap-2"
-                      animate={{ scale: [1, 1.03, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <Sparkles className="w-5 h-5" />
-                      Tap to Enter
-                      <ArrowRight className="w-5 h-5" />
-                    </motion.span>
-                  </motion.button>
-                )}
-              </AnimatePresence>
             </div>
           </motion.div>
         )}
