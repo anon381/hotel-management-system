@@ -71,7 +71,7 @@ export function AdminSidebar() {
             <AnimatePresence>
               {!collapsed && (
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="text-[10px] uppercase tracking-widest text-sidebar-foreground/40 font-semibold mb-2 px-3"
+                  className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-semibold mb-2 px-3"
                 >
                   {section.label}
                 </motion.p>
