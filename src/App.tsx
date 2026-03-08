@@ -24,6 +24,9 @@ import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminCoins from "./pages/admin/AdminCoins";
+import AdminScheduling from "./pages/admin/AdminScheduling";
+import AdminDeals from "./pages/admin/AdminDeals";
+import AdminReviews from "./pages/admin/AdminReviews";
 
 // Kitchen pages
 import KitchenDashboard from "./pages/kitchen/KitchenDashboard";
@@ -31,6 +34,7 @@ import KitchenOrders from "./pages/kitchen/KitchenOrders";
 import KitchenCreateDish from "./pages/kitchen/KitchenCreateDish";
 import KitchenManageMenu from "./pages/kitchen/KitchenManageMenu";
 import KitchenNotifications from "./pages/kitchen/KitchenNotifications";
+import KitchenDisplay from "./pages/kitchen/KitchenDisplay";
 
 // Customer pages
 import CustomerDashboard from "./pages/customer/CustomerDashboard";
@@ -41,6 +45,10 @@ import CustomerNotifications from "./pages/customer/CustomerNotifications";
 import CustomerProfile from "./pages/customer/CustomerProfile";
 import CustomerReservation from "./pages/customer/CustomerReservation";
 import CustomerCoins from "./pages/customer/CustomerCoins";
+import CustomerReviews from "./pages/customer/CustomerReviews";
+import CustomerReferrals from "./pages/customer/CustomerReferrals";
+import CustomerDeals from "./pages/customer/CustomerDeals";
+import CustomerRecommendations from "./pages/customer/CustomerRecommendations";
 
 import NotFound from "./pages/NotFound";
 
@@ -72,6 +80,9 @@ const App = () => (
             <Route path="/admin/notifications" element={<AdminNotifications />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/coins" element={<AdminCoins />} />
+            <Route path="/admin/scheduling" element={<AdminScheduling />} />
+            <Route path="/admin/deals" element={<AdminDeals />} />
+            <Route path="/admin/reviews" element={<AdminReviews />} />
 
             {/* Kitchen */}
             <Route path="/kitchen" element={<KitchenDashboard />} />
@@ -79,6 +90,7 @@ const App = () => (
             <Route path="/kitchen/create-dish" element={<KitchenCreateDish />} />
             <Route path="/kitchen/manage-menu" element={<KitchenManageMenu />} />
             <Route path="/kitchen/notifications" element={<KitchenNotifications />} />
+            <Route path="/kitchen/display" element={<KitchenDisplay />} />
 
             {/* Customer */}
             <Route path="/customer" element={<CustomerDashboard />} />
@@ -89,6 +101,10 @@ const App = () => (
             <Route path="/customer/profile" element={<CustomerProfile />} />
             <Route path="/customer/reservation" element={<CustomerReservation />} />
             <Route path="/customer/coins" element={<CustomerCoins />} />
+            <Route path="/customer/reviews" element={<CustomerReviews />} />
+            <Route path="/customer/referrals" element={<CustomerReferrals />} />
+            <Route path="/customer/deals" element={<CustomerDeals />} />
+            <Route path="/customer/recommendations" element={<CustomerRecommendations />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

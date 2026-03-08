@@ -2,14 +2,18 @@ import { ReactNode } from "react";
 import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { UtensilsCrossed, LayoutDashboard, ShoppingCart, Heart, User, Bell, LogOut, Menu, ChevronLeft, ChevronRight, CalendarDays, Coins } from "lucide-react";
+import { UtensilsCrossed, LayoutDashboard, ShoppingCart, Heart, User, Bell, LogOut, Menu, ChevronLeft, ChevronRight, CalendarDays, Coins, Star, Gift, Flame, Sparkles } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navItems = [
   { title: "Home", icon: LayoutDashboard, path: "/customer" },
   { title: "Menu", icon: UtensilsCrossed, path: "/customer/menu" },
   { title: "My Orders", icon: ShoppingCart, path: "/customer/orders" },
+  { title: "For You", icon: Sparkles, path: "/customer/recommendations" },
+  { title: "Deals & Happy Hour", icon: Flame, path: "/customer/deals" },
   { title: "Coins & Rewards", icon: Coins, path: "/customer/coins" },
+  { title: "Refer Friends", icon: Gift, path: "/customer/referrals" },
+  { title: "My Reviews", icon: Star, path: "/customer/reviews" },
   { title: "Favorites", icon: Heart, path: "/customer/favorites" },
   { title: "Reserve Table", icon: CalendarDays, path: "/customer/reservation" },
   { title: "Notifications", icon: Bell, path: "/customer/notifications" },

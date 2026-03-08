@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingCart, Grid3X3, ChefHat,
   CreditCard, Package, Users, BarChart3, Heart, Bell, Shield,
-  ChevronLeft, ChevronRight, Menu, LogOut, Coins
+  ChevronLeft, ChevronRight, Menu, LogOut, Coins, Calendar, Flame, Star
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -30,14 +30,22 @@ const navSections = [
       { title: "Payments", icon: CreditCard, path: "/admin/payments" },
       { title: "Inventory", icon: Package, path: "/admin/inventory" },
       { title: "Staff", icon: Users, path: "/admin/staff" },
+      { title: "Scheduling", icon: Calendar, path: "/admin/scheduling" },
       { title: "Reports", icon: BarChart3, path: "/admin/reports" },
     ],
   },
   {
-    label: "More",
+    label: "Engagement",
     items: [
-      { title: "Customers", icon: Heart, path: "/admin/customers" },
+      { title: "Deals & Happy Hour", icon: Flame, path: "/admin/deals" },
+      { title: "Reviews & Ratings", icon: Star, path: "/admin/reviews" },
       { title: "Coins & Rewards", icon: Coins, path: "/admin/coins" },
+      { title: "Customers", icon: Heart, path: "/admin/customers" },
+    ],
+  },
+  {
+    label: "System",
+    items: [
       { title: "Notifications", icon: Bell, path: "/admin/notifications" },
       { title: "Users & Roles", icon: Shield, path: "/admin/users" },
     ],
