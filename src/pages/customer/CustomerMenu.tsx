@@ -310,11 +310,11 @@ export default function CustomerMenu() {
         )}
       </AnimatePresence>
 
-      {/* Cart Drawer */}
+      {/* Cart Drawer (items list only) */}
       <AnimatePresence>
-        {cartOpen && (
+        {cartOpen && !checkoutOpen && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" onClick={() => { setCartOpen(false); setCheckoutOpen(false); }} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" onClick={() => setCartOpen(false)} />
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -324,100 +324,112 @@ export default function CustomerMenu() {
             >
               <div className="flex items-center justify-between p-5 border-b border-border">
                 <h2 className="font-display font-bold text-lg text-foreground">Your Cart ({cartCount})</h2>
-                <motion.button whileTap={{ scale: 0.9 }} onClick={() => { setCartOpen(false); setCheckoutOpen(false); }} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
+                <motion.button whileTap={{ scale: 0.9 }} onClick={() => setCartOpen(false)} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
                   <X className="w-4 h-4" />
                 </motion.button>
               </div>
-
-              {!checkoutOpen ? (
-                <>
-                  <div className="flex-1 overflow-y-auto p-5 space-y-3">
-                    {cart.length === 0 ? (
-                      <div className="text-center py-12">
-                        <ShoppingCart className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-                        <p className="text-muted-foreground text-sm">Your cart is empty</p>
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setCartOpen(false)}
-                          className="mt-4 px-6 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold"
-                        >
-                          Browse Menu
-                        </motion.button>
-                      </div>
-                    ) : (
-                      cart.map((c) => (
-                        <motion.div key={c.name} layout className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                          <span className="text-2xl">{c.emoji}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm text-foreground truncate">{c.name}</p>
-                            <p className="text-xs text-muted-foreground">${c.price} each</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, -1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-                              <Minus className="w-3 h-3" />
-                            </motion.button>
-                            <span className="text-sm font-bold w-6 text-center text-foreground">{c.quantity}</span>
-                            <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, 1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
-                              <Plus className="w-3 h-3" />
-                            </motion.button>
-                          </div>
-                          <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeFromCart(c.name)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
-                            <X className="w-3 h-3" />
-                          </motion.button>
-                        </motion.div>
-                      ))
-                    )}
-                  </div>
-                  {cart.length > 0 && (
-                    <div className="p-5 border-t border-border space-y-3">
-                      {/* Add more items button */}
-                      <motion.button
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => setCartOpen(false)}
-                        className="w-full py-2.5 rounded-xl border border-dashed border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
-                      >
-                        <Plus className="w-4 h-4" /> Add More Items
-                      </motion.button>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Total</span>
-                        <span className="font-display font-bold text-lg text-foreground">${cartTotal}</span>
-                      </div>
-                      <motion.button
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => setCheckoutOpen(true)}
-                        className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
-                      >
-                        Proceed to Checkout
-                      </motion.button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* Checkout — order summary then place */
-                <div className="flex-1 overflow-y-auto p-5 space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-3">Order Summary</h3>
-                    <div className="space-y-2">
-                      {cart.map((c) => (
-                        <div key={c.name} className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
-                          <span className="text-foreground font-medium">${c.price * c.quantity}</span>
-                        </div>
-                      ))}
-                      <div className="pt-2 border-t border-border flex justify-between">
-                        <span className="font-semibold text-foreground">Total</span>
-                        <span className="font-display font-bold text-lg text-primary">${cartTotal}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button onClick={() => setCheckoutOpen(false)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Back</button>
+              <div className="flex-1 overflow-y-auto p-5 space-y-3">
+                {cart.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ShoppingCart className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">Your cart is empty</p>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      onClick={placeOrder}
-                      className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2"
+                      onClick={() => setCartOpen(false)}
+                      className="mt-4 px-6 py-2 rounded-xl bg-primary/10 text-primary text-sm font-semibold"
                     >
+                      Browse Menu
+                    </motion.button>
+                  </div>
+                ) : (
+                  cart.map((c) => (
+                    <motion.div key={c.name} layout className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+                      <span className="text-2xl">{c.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-foreground truncate">{c.name}</p>
+                        <p className="text-xs text-muted-foreground">${c.price} each</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, -1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                          <Minus className="w-3 h-3" />
+                        </motion.button>
+                        <span className="text-sm font-bold w-6 text-center text-foreground">{c.quantity}</span>
+                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateCartQty(c.name, 1)} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center">
+                          <Plus className="w-3 h-3" />
+                        </motion.button>
+                      </div>
+                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeFromCart(c.name)} className="w-7 h-7 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center">
+                        <X className="w-3 h-3" />
+                      </motion.button>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+              {cart.length > 0 && (
+                <div className="p-5 border-t border-border space-y-3">
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setCartOpen(false)}
+                    className="w-full py-2.5 rounded-xl border border-dashed border-primary/40 text-primary text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Add More Items
+                  </motion.button>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total</span>
+                    <span className="font-display font-bold text-lg text-foreground">${cartTotal}</span>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => { setCartOpen(false); setCheckoutOpen(true); }}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+                  >
+                    Proceed to Checkout
+                  </motion.button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Checkout Modal (centered) */}
+      <AnimatePresence>
+        {checkoutOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-foreground/30 backdrop-blur-sm z-50" onClick={() => setCheckoutOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92%] max-w-md bg-background border border-border rounded-2xl p-6 shadow-2xl max-h-[80vh] overflow-y-auto"
+            >
+              <h3 className="font-display font-bold text-lg text-foreground mb-4">Checkout</h3>
+              <div className="space-y-2 mb-4">
+                {cart.map((c) => (
+                  <div key={c.name} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{c.quantity}x {c.name}</span>
+                    <span className="text-foreground font-medium">${c.price * c.quantity}</span>
+                  </div>
+                ))}
+                <div className="pt-2 border-t border-border flex justify-between">
+                  <span className="font-semibold text-foreground">Total</span>
+                  <span className="font-display font-bold text-lg text-primary">${cartTotal}</span>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setCheckoutOpen(false)} className="flex-1 py-3 rounded-xl border border-border text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors">Back</button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={placeOrder}
+                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2"
+                >
+                  <Check className="w-4 h-4" /> Place Order
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
                       <Check className="w-4 h-4" /> Place Order
                     </motion.button>
                   </div>
