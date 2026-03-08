@@ -52,7 +52,32 @@ function TypingText({ text, className }: { text: string; className?: string }) {
 
 export default function LandingPage() {
   const mainRef = useRef<HTMLDivElement>(null);
-  const [sceneReady, setSceneReady] = useState(false);
+  const hasVisited = useRef(sessionStorage.getItem("cafex-visited") === "true");
+  const [sceneReady, setSceneReady] = useState(hasVisited.current);
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [showTapHint, setShowTapHint] = useState(false);
+
+  // Simulate progress and mark visited
+  useEffect(() => {
+    if (hasVisited.current) return;
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 8 + 2;
+      if (progress >= 100) progress = 100;
+      setLoadProgress(progress);
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => setShowTapHint(true), 400);
+      }
+    }, 120);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDismissLoader = () => {
+    if (loadProgress < 100) return;
+    sessionStorage.setItem("cafex-visited", "true");
+    setSceneReady(true);
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
