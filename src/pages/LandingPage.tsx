@@ -811,10 +811,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-10 border-t border-border/50 overflow-hidden">
+      <footer className="relative py-5 border-t border-border/50 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-muted/30 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col items-center text-center gap-4">
+          <div className="flex flex-col items-center text-center gap-2.5">
             <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg gradient-warm flex items-center justify-center">
                 <UtensilsCrossed className="w-4 h-4 text-primary-foreground" />
@@ -833,12 +833,12 @@ export default function LandingPage() {
             <motion.a
               href="#hero"
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.15 }}
-              className="mt-1 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
             >
               Get Started
             </motion.a>
 
-            <div className="w-16 h-px bg-border mt-1" />
+            <div className="w-12 h-px bg-border" />
 
             <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-xs text-muted-foreground">
               © 2026 Café X Restaurant Management System. Crafted with ♥
