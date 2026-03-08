@@ -115,7 +115,7 @@ export default function CustomerReservation() {
             <label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
               <Users className="w-4 h-4 text-primary" /> Number of Guests
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                 <motion.button
                   key={n}
