@@ -304,6 +304,89 @@ export default function LandingPage() {
       </section>
 
 
+      {/* Our Story Timeline */}
+      <section id="portals" className="py-20 sm:py-32 relative overflow-hidden">
+        <div className="absolute top-1/4 -left-20 w-60 h-60 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-20">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Since 2000</span>
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground mt-3">Our Story</h2>
+            <p className="text-muted-foreground mt-3 max-w-xl mx-auto">From a single café to a beloved brand — here's how Café X grew over the years.</p>
+          </div>
+
+          <div className="relative">
+            {/* Timeline line */}
+            <motion.div
+              className="absolute left-6 sm:left-1/2 sm:-translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/60 via-accent/40 to-primary/20 rounded-full"
+              initial={{ scaleY: 0, originY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+            />
+
+            {[
+              { year: "2000", title: "The Beginning", desc: "Chef Marco Valentino opens the first Café X in downtown Milan — a 20-seat bistro with a dream of redefining casual dining.", icon: Coffee },
+              { year: "2005", title: "Second Branch", desc: "Café X expands to a second location in Rome, doubling capacity and introducing our signature brunch menu.", icon: UtensilsCrossed },
+              { year: "2010", title: "Award-Winning", desc: "Recognized as 'Best Urban Café' by Gourmet Weekly, with our espresso blend winning three international taste awards.", icon: Star },
+              { year: "2015", title: "Going Digital", desc: "Launched our first online ordering system and loyalty program, serving 1,000+ digital orders in the first month.", icon: Zap },
+              { year: "2020", title: "Five Locations", desc: "Expanded to five branches across Europe with a unified kitchen management system and centralized supply chain.", icon: Users },
+              { year: "2026", title: "Café X Platform", desc: "Introducing our full-stack restaurant management platform — the system you're looking at right now.", icon: Sparkles },
+            ].map((item, i) => {
+              const isLeft = i % 2 === 0;
+              return (
+                <motion.div
+                  key={item.year}
+                  initial={{ opacity: 0, x: isLeft ? -60 : 60 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.6, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className={`relative flex items-start gap-4 sm:gap-0 mb-12 last:mb-0 ${
+                    isLeft ? "sm:flex-row" : "sm:flex-row-reverse"
+                  }`}
+                >
+                  {/* Dot on timeline */}
+                  <motion.div
+                    className="absolute left-6 sm:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background shadow-lg shadow-primary/30 z-10"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
+                  />
+
+                  {/* Content card */}
+                  <div className={`ml-14 sm:ml-0 sm:w-[calc(50%-2rem)] ${isLeft ? "sm:pr-0 sm:text-right" : "sm:pl-0 sm:text-left"}`}>
+                    <motion.div
+                      whileHover={{ y: -4, scale: 1.02 }}
+                      transition={{ duration: 0.25 }}
+                      className="glass-card-elevated p-5 group hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+                    >
+                      <div className={`flex items-center gap-3 mb-3 ${isLeft ? "sm:flex-row-reverse" : ""}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                          <item.icon className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-primary tracking-wider">{item.year}</span>
+                          <h3 className="font-display font-semibold text-foreground">{item.title}</h3>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                      <motion.div
+                        className={`h-0.5 bg-gradient-to-r from-primary/60 to-accent/40 rounded-full mt-3 ${isLeft ? "sm:origin-right origin-left" : "origin-left"}`}
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                      />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
 
 
       {/* Footer */}
