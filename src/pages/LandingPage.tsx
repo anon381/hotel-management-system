@@ -71,7 +71,7 @@ export default function LandingPage() {
               duration: 0.8,
               delay: i * 0.1,
               ease: "power3.out",
-              scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none reverse" },
+              scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none none" },
             }
           );
         });
@@ -87,7 +87,7 @@ export default function LandingPage() {
               x: 0, opacity: 1,
               duration: 0.8,
               ease: "power3.out",
-              scrollTrigger: { trigger: step, start: "top 85%", toggleActions: "play none none reverse" },
+              scrollTrigger: { trigger: step, start: "top 85%", toggleActions: "play none none none" },
             }
           );
         });
