@@ -160,13 +160,13 @@ export default function CustomerCoins() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Spin Wheel - Left side */}
+      <div className="flex flex-col gap-6 lg:min-h-[80vh]">
+        {/* Spin Wheel - Top / Left depending on screen */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
-          className="lg:col-span-2 glass-card-elevated p-6 flex flex-col items-center"
+          className="glass-card-elevated p-6 flex flex-col items-center justify-center lg:min-h-[60vh] lg:w-full"
         >
           <h3 className="font-display font-semibold text-lg text-foreground mb-2 flex items-center gap-2">
             <Zap className="w-5 h-5 text-warning" /> Lucky Spin
@@ -274,8 +274,8 @@ export default function CustomerCoins() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Right side - Tabs: Rewards / History / Milestones */}
-        <div className="lg:col-span-3">
+        {/* Right side / Bottom - Tabs: Rewards / History / Milestones */}
+        <div className="w-full">
           {/* Tab switcher */}
           <div className="flex gap-1 p-1 rounded-2xl bg-muted/50 mb-6">
             {(["rewards", "history", "milestones"] as const).map((tab) => (

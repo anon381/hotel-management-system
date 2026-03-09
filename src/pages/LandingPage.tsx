@@ -337,7 +337,7 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* Hero - Full screen 3D */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+      <section id="hero" className="relative min-h-[100dvh] flex items-center justify-center pt-28 pb-12 sm:pt-20 lg:pt-16 overflow-hidden">
         {/* 3D Scene - full coverage */}
         <div className="absolute inset-0 z-0">
           <HeroScene />
