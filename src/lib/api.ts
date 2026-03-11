@@ -46,18 +46,19 @@ class ApiClient {
 
   private async handleResponse(response: Response) {
     if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/log-in'; // Redirect to login on token expiry
-      }
-      
       let errorData;
       try {
         errorData = await response.json();
       } catch (err) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        errorData = { error: `HTTP error! status: ${response.status}` };
       }
+
+      // Instead of hard-redirecting on 401, we just return the error so the component can show it.
+      // E.g. "Invalid password" should just show in red on the form, not redirect to a 404 page!
+      if (response.status === 401) {
+        throw new Error(errorData.error || errorData.message || 'Unauthorized');
+      }
+      
       throw new Error(errorData.error || errorData.message || 'Something went wrong');
     }
     
