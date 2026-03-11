@@ -79,11 +79,30 @@ export default function AuthPage() {
           password: formData.password,
         });
 
+        // Role-based access control check
+        const userRoles = response.roles || [];
+        const requestedRole = role || "customer";
+
+        let hasAccess = false;
+        if (requestedRole === "admin") {
+          hasAccess = userRoles.includes("admin") || userRoles.includes("manager");
+        } else if (requestedRole === "kitchen") {
+          hasAccess = userRoles.includes("kitchen_staff") || userRoles.includes("admin") || userRoles.includes("manager");
+        } else {
+          hasAccess = true; // Customers can always log into the customer portal
+        }
+
+        if (!hasAccess) {
+          setError(`Access denied. This account does not have ${requestedRole} privileges.`);
+          setIsLoading(false);
+          return;
+        }
+
         // The Supabase backend returns session inside response.session
         const token = response.session?.access_token || response.token;
         if (token) {
           localStorage.setItem("token", token);
-          localStorage.setItem("user", JSON.stringify({ ...response.user, role: role || "customer" }));
+          localStorage.setItem("user", JSON.stringify({ ...response.user, role: requestedRole, roles: userRoles }));
           navigate(config.redirectTo);
         } else {
           setError("Login failed: No access token returned.");
