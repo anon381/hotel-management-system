@@ -53,8 +53,8 @@ export default function AuthPage() {
     try {
       if (isSignUp) {
         // Register flow
-        const response = await api.post("/auth/register", {
-          name: formData.name,
+        const response = await api.post("/auth/signup", {
+          full_name: formData.name, // the backend expects 'full_name' not 'name'
           email: formData.email,
           password: formData.password,
           role: role || "customer",
