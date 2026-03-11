@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ShieldCheck, ChefHat, Users, UtensilsCrossed, Eye, EyeOff,
-  ArrowLeft, Mail, Lock, User, Phone
+  ArrowLeft, Mail, Lock, User, Phone, Loader2
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SmallScene3D } from "@/components/Scene3D";
+import { api } from "@/lib/api";
 
 const roleConfig = {
   admin: {
@@ -38,13 +39,56 @@ export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.admin;
   const Icon = config.icon;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(config.redirectTo);
+    setError("");
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        // Register flow
+        const response = await api.post("/auth/register", {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: role || "customer",
+          phone: formData.phone,
+        });
+
+        // Registration usually returns a token directly
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("user", JSON.stringify(response.user));
+          navigate(config.redirectTo);
+        } else {
+          // If no token is returned, meaning they need to log in manually afterwards
+          setIsSignUp(false);
+          setError("Registration successful! Please log in.");
+        }
+      } else {
+        // Login flow
+        const response = await api.post("/auth/login", {
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("user", JSON.stringify({ ...response.user, role: role || "customer" }));
+          navigate(config.redirectTo);
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -121,6 +165,12 @@ export default function AuthPage() {
                 {isSignUp ? `Sign up for ${config.title}` : `Sign in to ${config.title}`}
               </p>
             </div>
+
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <AnimatePresence mode="wait">
@@ -214,8 +264,10 @@ export default function AuthPage() {
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`w-full h-12 rounded-xl bg-gradient-to-r ${config.color} text-primary-foreground font-semibold text-sm shadow-lg hover:shadow-xl transition-shadow`}
+                disabled={isLoading}
+                className={`w-full h-12 rounded-xl bg-gradient-to-r ${config.color} text-primary-foreground font-semibold text-sm shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed`}
               >
+                {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isSignUp ? "Create Account" : "Sign In"}
               </motion.button>
             </form>
