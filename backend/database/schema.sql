@@ -119,7 +119,7 @@ CREATE TABLE public.menu_item_tags (
 CREATE TABLE public.menu_item_ingredients (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     menu_item_id UUID REFERENCES public.menu_items(id) ON DELETE CASCADE NOT NULL,
-    inventory_id UUID REFERENCES public.inventory(id) ON DELETE SET NULL,
+    inventory_id UUID,
     ingredient_name TEXT NOT NULL,
     quantity_needed DECIMAL(10, 2) NOT NULL DEFAULT 1,
     unit inventory_unit DEFAULT 'g',
@@ -350,6 +350,9 @@ CREATE TABLE public.inventory_usage_log (
     logged_by UUID REFERENCES auth.users(id),
     created_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Put foreign key here after inventory is created
+ALTER TABLE public.menu_item_ingredients ADD CONSTRAINT fk_menu_item_ingredients_inventory FOREIGN KEY (inventory_id) REFERENCES public.inventory(id) ON DELETE SET NULL;
 
 -- ==================== STAFF MANAGEMENT ====================
 
