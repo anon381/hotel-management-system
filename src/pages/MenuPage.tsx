@@ -1,35 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Star, Clock, Flame, Leaf, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Star, Clock, Flame, Leaf, Edit2, Trash2, Eye, EyeOff, Loader2 } from "lucide-react";
 import { AdminLayout as AppLayout } from "@/components/AdminLayout";
 import { PageHeader } from "@/components/PageHeader";
+import { api } from "@/lib/api";
 
 const categories = ["All", "Breakfast", "Lunch", "Dinner", "Drinks", "Desserts", "Snacks"];
 
-const menuItems = [
-  { id: 1, name: "Wagyu Steak", category: "Dinner", price: 85, image: "🥩", desc: "Premium A5 wagyu, grilled to perfection", time: "25 min", labels: ["chef"], available: true },
-  { id: 2, name: "Grilled Salmon", category: "Lunch", price: 45, image: "🐟", desc: "Atlantic salmon with herb butter", time: "18 min", labels: ["chef"], available: true },
-  { id: 3, name: "Margherita Pizza", category: "Lunch", price: 20, image: "🍕", desc: "Fresh mozzarella, basil, tomato sauce", time: "15 min", labels: ["vegetarian"], available: true },
-  { id: 4, name: "Truffle Pasta", category: "Dinner", price: 45, image: "🍝", desc: "Handmade pasta with truffle cream", time: "20 min", labels: ["chef"], available: true },
-  { id: 5, name: "Caesar Salad", category: "Lunch", price: 16, image: "🥗", desc: "Romaine, parmesan, croutons", time: "8 min", labels: ["vegetarian"], available: true },
-  { id: 6, name: "Burger Deluxe", category: "Lunch", price: 22, image: "🍔", desc: "Angus beef, cheddar, special sauce", time: "12 min", labels: ["spicy"], available: true },
-  { id: 7, name: "Pancake Stack", category: "Breakfast", price: 14, image: "🥞", desc: "Fluffy pancakes, maple syrup, berries", time: "10 min", labels: [], available: true },
-  { id: 8, name: "Eggs Benedict", category: "Breakfast", price: 18, image: "🍳", desc: "Poached eggs, hollandaise, ham", time: "12 min", labels: ["chef"], available: false },
-  { id: 9, name: "Tiramisu", category: "Desserts", price: 12, image: "🍰", desc: "Classic Italian coffee dessert", time: "5 min", labels: [], available: true },
-  { id: 10, name: "Mojito", category: "Drinks", price: 10, image: "🍹", desc: "Fresh mint, lime, rum", time: "3 min", labels: [], available: true },
-  { id: 11, name: "Espresso", category: "Drinks", price: 4, image: "☕", desc: "Double shot, Italian roast", time: "2 min", labels: [], available: true },
-  { id: 12, name: "Spring Rolls", category: "Snacks", price: 8, image: "🥟", desc: "Crispy veggie rolls, sweet chili", time: "7 min", labels: ["vegetarian", "spicy"], available: true },
-];
+interface MenuItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  emoji: string;
+  description: string;
+  prep_time_minutes: number;
+  labels: string[];
+  is_available: boolean;
+  is_spicy: boolean;
+  is_vegetarian: boolean;
+  is_vegan: boolean;
+  is_featured: boolean;
+}
 
 const labelIcons: Record<string, { icon: typeof Star; className: string }> = {
-  chef: { icon: Star, className: "text-warning" },
+  featured: { icon: Star, className: "text-warning" },
   spicy: { icon: Flame, className: "text-destructive" },
   vegetarian: { icon: Leaf, className: "text-success" },
+  vegan: { icon: Leaf, className: "text-success" }, // Added vegan just in case
 };
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const data = await api.get('/menu');
+        // Let's format the data slightly if needed to match UI expectations
+        const formattedData = data.map((item: any) => {
+           let labels = [];
+           if (item.is_featured) labels.push('featured');
+           if (item.is_spicy) labels.push('spicy');
+           if (item.is_vegetarian) labels.push('vegetarian');
+           if (item.is_vegan) labels.push('vegan');
+
+           return {
+             ...item,
+             labels
+           };
+        });
+        setMenuItems(formattedData);
+      } catch (err) {
+        console.error("Failed to load menu", err);
+        // Might want to add a toast here later!
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMenu();
+  }, []);
 
   const filtered = menuItems.filter((item) => {
     const matchCat = activeCategory === "All" || item.category === activeCategory;
@@ -83,65 +116,71 @@ export default function MenuPage() {
       </div>
 
       {/* Grid */}
-      <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <AnimatePresence mode="popLayout">
-          {filtered.map((item) => (
-            <motion.div
-              key={item.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className={`glass-card-elevated overflow-hidden group ${!item.available ? "opacity-60" : ""}`}
-            >
-              {/* Image area */}
-              <div className="h-36 bg-muted/50 flex items-center justify-center text-5xl relative">
-                <motion.span whileHover={{ scale: 1.2, rotate: 5 }} className="cursor-default">
-                  {item.image}
-                </motion.span>
-                {/* Labels */}
-                <div className="absolute top-2 left-2 flex gap-1">
-                  {item.labels.map((l) => {
-                    const info = labelIcons[l];
-                    if (!info) return null;
-                    const LIcon = info.icon;
-                    return <LIcon key={l} className={`w-4 h-4 ${info.className}`} />;
-                  })}
-                </div>
-                {!item.available && (
-                  <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-destructive bg-destructive/10 px-3 py-1 rounded-full">Unavailable</span>
+      {loading ? (
+        <div className="flex justify-center items-center h-64 w-full">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <AnimatePresence mode="popLayout">
+            {filtered.map((item) => (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className={`glass-card-elevated overflow-hidden group ${!item.is_available ? "opacity-60" : ""}`}
+              >
+                {/* Image area */}
+                <div className="h-36 bg-muted/50 flex items-center justify-center text-5xl relative">
+                  <motion.span whileHover={{ scale: 1.2, rotate: 5 }} className="cursor-default">
+                    {item.emoji || "🍽️"}
+                  </motion.span>
+                  {/* Labels */}
+                  <div className="absolute top-2 left-2 flex gap-1">
+                    {item.labels.map((l) => {
+                      const info = labelIcons[l];
+                      if (!info) return null;
+                      const LIcon = info.icon;
+                      return <LIcon key={l} className={`w-4 h-4 ${info.className}`} />;
+                    })}
                   </div>
-                )}
-                {/* Actions */}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="w-7 h-7 rounded-lg bg-card/90 border border-border flex items-center justify-center hover:bg-muted">
-                    <Edit2 className="w-3 h-3 text-foreground" />
-                  </button>
-                  <button className="w-7 h-7 rounded-lg bg-card/90 border border-border flex items-center justify-center hover:bg-muted">
-                    {item.available ? <EyeOff className="w-3 h-3 text-foreground" /> : <Eye className="w-3 h-3 text-foreground" />}
-                  </button>
-                  <button className="w-7 h-7 rounded-lg bg-card/90 border border-border flex items-center justify-center hover:bg-destructive/10">
-                    <Trash2 className="w-3 h-3 text-destructive" />
-                  </button>
+                  {!item.is_available && (
+                    <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-destructive bg-destructive/10 px-3 py-1 rounded-full">Unavailable</span>
+                    </div>
+                  )}
+                  {/* Actions */}
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="w-7 h-7 rounded-lg bg-card/90 border border-border flex items-center justify-center hover:bg-muted">
+                      <Edit2 className="w-3 h-3 text-foreground" />
+                    </button>
+                    <button className="w-7 h-7 rounded-lg bg-card/90 border border-border flex items-center justify-center hover:bg-muted">
+                      {item.is_available ? <EyeOff className="w-3 h-3 text-foreground" /> : <Eye className="w-3 h-3 text-foreground" />}
+                    </button>
+                    <button className="w-7 h-7 rounded-lg bg-card/90 border border-border flex items-center justify-center hover:bg-destructive/10">
+                      <Trash2 className="w-3 h-3 text-destructive" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-1">
-                  <h3 className="font-display font-semibold text-foreground">{item.name}</h3>
-                  <span className="text-primary font-bold">${item.price}</span>
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-display font-semibold text-foreground">{item.name}</h3>
+                    <span className="text-primary font-bold">${item.price}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.description}</p>
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <Clock className="w-3 h-3" /> {item.prep_time_minutes} min
+                    <span className="bg-muted px-2 py-0.5 rounded-full">{item.category}</span>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{item.desc}</p>
-                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                  <Clock className="w-3 h-3" /> {item.time}
-                  <span className="bg-muted px-2 py-0.5 rounded-full">{item.category}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
     </AppLayout>
   );
 }
