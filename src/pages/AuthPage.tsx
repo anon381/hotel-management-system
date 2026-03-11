@@ -69,6 +69,7 @@ export default function AuthPage() {
         } else {
           // If no token is returned, meaning they need to log in manually afterwards
           setIsSignUp(false);
+          setFormData({ ...formData, password: "" }); // keep email typed in for ease of login
           setError("Registration successful! Please log in.");
         }
       } else {
@@ -78,10 +79,14 @@ export default function AuthPage() {
           password: formData.password,
         });
 
-        if (response.token) {
-          localStorage.setItem("token", response.token);
+        // The Supabase backend returns session inside response.session
+        const token = response.session?.access_token || response.token;
+        if (token) {
+          localStorage.setItem("token", token);
           localStorage.setItem("user", JSON.stringify({ ...response.user, role: role || "customer" }));
           navigate(config.redirectTo);
+        } else {
+          setError("Login failed: No access token returned.");
         }
       }
     } catch (err: any) {
@@ -274,7 +279,14 @@ export default function AuthPage() {
 
             <p className="text-center text-sm text-muted-foreground mt-6">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-              <button onClick={() => setIsSignUp(!isSignUp)} className="text-primary font-semibold hover:underline">
+              <button 
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setFormData({ name: "", email: "", phone: "", password: "" });
+                  setError("");
+                }} 
+                className="text-primary font-semibold hover:underline"
+              >
                 {isSignUp ? "Sign In" : "Sign Up"}
               </button>
             </p>
