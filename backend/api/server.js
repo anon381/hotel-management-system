@@ -17,8 +17,12 @@ const PORT = process.env.PORT || 3001;
 // Allow CORS for local development and the deployed frontend
 app.use(cors({ 
   origin: function (origin, callback) {
-    // Allow any localhost port or the deployed frontend URL
-    if (!origin || (origin && origin.startsWith('http://localhost:')) || origin === process.env.FRONTEND_URL || process.env.FRONTEND_URL === '*') {
+    // Allow any localhost port, the specific Vercel deployment, or the deployed frontend URL env
+    if (!origin || 
+        (origin && origin.startsWith('http://localhost:')) || 
+        origin === 'https://tableza.vercel.app' || 
+        origin === process.env.FRONTEND_URL || 
+        process.env.FRONTEND_URL === '*') {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
