@@ -39,12 +39,55 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
 
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
   const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.admin;
   const Icon = config.icon;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(config.redirectTo);
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      if (isSignUp) {
+        // Simple fetch fallback in case of errors using api wrapper
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            full_name: formData.name,
+            phone: formData.phone,
+            role: role // 'admin', 'kitchen', 'customer'
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Signup failed");
+        
+        setErrorMsg("Signup successful! You can now log in.");
+        setIsSignUp(false);
+      } else {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email, password: formData.password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Login failed");
+
+        // Save token to localStorage for the api.ts util to find
+        localStorage.setItem('supabase.auth.token', data.session.access_token);
+        localStorage.setItem('user.role', role || 'customer');
+        navigate(config.redirectTo);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -121,6 +164,12 @@ export default function AuthPage() {
                 {isSignUp ? `Sign up for ${config.title}` : `Sign in to ${config.title}`}
               </p>
             </div>
+
+            {errorMsg && (
+              <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive text-sm text-center">
+                {errorMsg}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <AnimatePresence mode="wait">
@@ -212,11 +261,12 @@ export default function AuthPage() {
 
               <motion.button
                 type="submit"
+                disabled={loading}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`w-full h-12 rounded-xl bg-gradient-to-r ${config.color} text-primary-foreground font-semibold text-sm shadow-lg hover:shadow-xl transition-shadow`}
+                className={`w-full h-12 rounded-xl bg-gradient-to-r ${config.color} text-primary-foreground font-semibold text-sm shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50`}
               >
-                {isSignUp ? "Create Account" : "Sign In"}
+                {loading ? "Processing..." : isSignUp ? "Create Account" : "Sign In"}
               </motion.button>
             </form>
 
