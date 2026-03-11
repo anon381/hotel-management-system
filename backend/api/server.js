@@ -15,16 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Allow CORS for local development and the deployed frontend
-const allowedOrigins = [
-  'http://localhost:8080',
-  'http://localhost:8081',
-  'http://localhost:5173',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
 app.use(cors({ 
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1 || process.env.FRONTEND_URL === '*') {
+    // Allow any localhost port or the deployed frontend URL
+    if (!origin || (origin && origin.startsWith('http://localhost:')) || origin === process.env.FRONTEND_URL || process.env.FRONTEND_URL === '*') {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
