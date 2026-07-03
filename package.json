@@ -47,8 +47,10 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "cors": "^2.8.6",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "express": "^5.2.1",
     "framer-motion": "^11.0.0",
     "gsap": "^3.12.0",
     "input-otp": "^1.4.2",
@@ -91,4 +93,3 @@
     "vitest": "^3.2.4"
   }
 }
-

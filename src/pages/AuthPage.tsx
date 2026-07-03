@@ -41,6 +41,7 @@ export default function AuthPage() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.admin;
   const Icon = config.icon;
@@ -48,29 +49,27 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
 
     try {
       if (isSignUp) {
-        // Register flow
         const response = await api.post("/auth/signup", {
-          full_name: formData.name, // the backend expects 'full_name' not 'name'
+          full_name: formData.name,
           email: formData.email,
           password: formData.password,
           role: role || "customer",
           phone: formData.phone,
         });
 
-        // Registration usually returns a token directly
         if (response.token) {
           localStorage.setItem("token", response.token);
           localStorage.setItem("user", JSON.stringify(response.user));
           navigate(config.redirectTo);
         } else {
-          // If no token is returned, meaning they need to log in manually afterwards
           setIsSignUp(false);
-          setFormData({ ...formData, password: "" }); // keep email typed in for ease of login
-          setError("Registration successful! Please log in.");
+          setFormData({ ...formData, password: "" });
+          setSuccess("Registration successful! Please log in.");
         }
       } else {
         // Login flow
@@ -190,6 +189,12 @@ export default function AuthPage() {
               </p>
             </div>
 
+            {success && (
+              <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm text-center">
+                {success}
+              </div>
+            )}
+
             {error && (
               <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center">
                 {error}
@@ -303,6 +308,7 @@ export default function AuthPage() {
                   setIsSignUp(!isSignUp);
                   setFormData({ name: "", email: "", phone: "", password: "" });
                   setError("");
+                  setSuccess("");
                 }} 
                 className="text-primary font-semibold hover:underline"
               >
